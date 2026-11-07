@@ -1,7 +1,16 @@
-﻿__pycache__/
+__pycache__/
 *.py[cod]
 *$py.class
 .env
 .venv/
 venv/
 .DS_Store
+
+# Streamlit secrets (do not commit actual API keys)
+.streamlit/secrets.toml
+
+# Legacy artifact names (safe to ignore)
+synthetic_salaries.csv
+salary_rf_model.pkl
+model_columns.pkl
+ambitionbox_salaries_cleaned.csv
