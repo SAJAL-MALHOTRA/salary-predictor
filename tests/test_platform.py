@@ -302,3 +302,29 @@ def test_contract_auditor_mechanics():
     assert audit2["paper_inflation_gap_pct"] == 0.0
 
 
+def test_company_tier_classification():
+    """Verify Indian tech employer tiering and negotiation guidance rules."""
+    import company_tiers as ct
+
+    t1 = ct.classify_employer_tier("Google India")
+    assert t1["tier_num"] == 1
+    assert t1["typical_notice_days"] == 30
+    assert "RSU" in t1["equity_structure"]
+
+    t2 = ct.classify_employer_tier("Swiggy")
+    assert t2["tier_num"] == 2
+    assert "ESOP" in t2["equity_structure"]
+
+    t3 = ct.classify_employer_tier("Thoughtworks")
+    assert t3["tier_num"] == 3
+
+    t4 = ct.classify_employer_tier("Tata Consultancy Services")
+    assert t4["tier_num"] == 4
+    assert t4["typical_notice_days"] == 90
+    assert "band" in t4["negotiation_playbook"].lower()
+
+    t_unk = ct.classify_employer_tier("UnknownStartup99")
+    assert t_unk["tier_num"] == 3
+
+
+

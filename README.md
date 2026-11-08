@@ -128,10 +128,11 @@ Engineering honest machine learning requires documenting errors caught during re
 |---|---|---|
 | [`app.py`](app.py) | Single-Screen Offer Evaluator | Phone-responsive UI with 0%/50%/100% in-hand scenarios, calibrated conformal intervals, and 1-click negotiation toolkit |
 | [`contract_auditor.py`](contract_auditor.py) | Statutory Contract Trap Auditor | Audits Payment of Gratuity Act 1972 provisions (4.81% basic), Section 89(1) clawbacks, and computes True Guaranteed Cash |
+| [`company_tiers.py`](company_tiers.py) | Employer Tier & Negotiation Playbook | Categorizes firms into 4 compensation tiers (Global Tech, Unicorns, Consultancies, IT Services) with tactical playbooks |
 | [`community_notes.py`](community_notes.py) | Crowdsourced Offer Terms Layer | SQLite-backed offer notes engine with solo moderation (URL, email, phone, and anti-doxxing regex guards) |
 | [`taxonomy.py`](taxonomy.py) | NLP Job Title Normalization | Maps free-text scraped headlines into 15 Canonical Role Families and 5 Seniority Levels |
 | [`train_model.py`](train_model.py) | ML Training & Conformal Calibration | Scikit-learn Pipeline with ColumnTransformer + VotingRegressor (RF + HGB) and split conformal prediction |
-| [`tests/test_platform.py`](tests/test_platform.py) | Automated CI Verification | 10 unit tests covering ML inference, Budget 2024 tax engine, H-1B/Glassdoor data, Reddit extraction, community notes, and contract traps |
+| [`tests/test_platform.py`](tests/test_platform.py) | Automated CI Verification | 11 unit tests covering ML inference, Budget 2024 tax engine, H-1B/Glassdoor data, Reddit extraction, community notes, contract traps, and employer tiers |
 
 ---
 
@@ -145,7 +146,7 @@ cd salary-predictor
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Run automated verification suite (10 tests)
+# 3. Run automated verification suite (11 tests)
 pytest tests/ -v
 
 # 4. Launch single-screen Offer Evaluator
