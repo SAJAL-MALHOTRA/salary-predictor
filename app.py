@@ -41,7 +41,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# SEO Meta Tags & OpenGraph injection
+# SEO Meta Tags & OpenGraph injection + Dynamic Head Injection
 st.markdown(
     """
     <head>
@@ -64,6 +64,26 @@ st.markdown(
         }
         </script>
     </head>
+    <script>
+      (function() {
+        try {
+          var doc = (window.parent && window.parent.document) ? window.parent.document : document;
+          doc.title = "India Tech Offer Evaluator | Is Your Offer Good?";
+          var setMeta = function(attr, name, content) {
+            var el = doc.querySelector('meta[' + attr + '="' + name + '"]');
+            if (!el) {
+              el = doc.createElement('meta');
+              el.setAttribute(attr, name);
+              doc.head.appendChild(el);
+            }
+            el.setAttribute('content', content);
+          };
+          setMeta('name', 'description', 'Evaluate Indian tech offers in seconds. Budget 2024 New Tax Regime in-hand calculator, gratuity and clawback trap auditor, and tier-calibrated percentiles.');
+          setMeta('property', 'og:title', 'India Tech Offer Evaluator | Is Your Offer Good?');
+          setMeta('property', 'og:description', 'Calculate real monthly bank credit, detect contract traps, and get calibrated peer percentiles before signing.');
+        } catch(e) {}
+      })();
+    </script>
     """,
     unsafe_allow_html=True,
 )
@@ -107,7 +127,7 @@ html, body, [class*="css"] {
     border-color: #a7f3d0;
 }
 .app-headline {
-    font-size: 2.4rem;
+    font-size: 2.35rem;
     font-weight: 800;
     color: #0f172a;
     letter-spacing: -0.04em;
@@ -118,7 +138,7 @@ html, body, [class*="css"] {
     font-size: 1.05rem;
     color: #475569;
     line-height: 1.5;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.15rem;
 }
 
 /* Trust Bar */
@@ -131,12 +151,40 @@ html, body, [class*="css"] {
     font-size: 0.8rem;
     color: #64748b;
     border-bottom: 1px solid #f1f5f9;
+    flex-wrap: wrap;
 }
 .trust-item {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     font-weight: 600;
+}
+
+/* Styled Streamlit Native Buttons (Pill Aesthetic) */
+button[data-testid="baseButton-secondary"] {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1e293b !important;
+    border-radius: 9999px !important;
+    font-weight: 600 !important;
+    font-size: 0.82rem !important;
+    padding: 0.35rem 0.85rem !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+}
+button[data-testid="baseButton-secondary"]:hover {
+    background: #eef2ff !important;
+    border-color: #6366f1 !important;
+    color: #4338ca !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.12) !important;
+}
+button[data-testid="baseButton-primary"] {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25) !important;
 }
 
 /* Cards */
@@ -207,19 +255,18 @@ html, body, [class*="css"] {
     margin: 0.25rem 0;
 }
 
-/* Trap Meter Progress Bar */
+/* Multi-Segment Trap Meter */
 .trap-meter-shell {
-    background: #fee2e2;
-    border-radius: 9999px;
+    display: flex;
     height: 14px;
+    border-radius: 9999px;
     overflow: hidden;
-    position: relative;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
     margin: 0.6rem 0;
 }
 .trap-meter-fill {
-    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
     height: 100%;
-    border-radius: 9999px;
     transition: width 0.4s ease;
 }
 
@@ -229,7 +276,7 @@ html, body, [class*="css"] {
     border-radius: 9999px;
     height: 10px;
     position: relative;
-    margin: 1.2rem 0 0.8rem 0;
+    margin: 1.4rem 0 0.8rem 0;
 }
 .spectrum-fill {
     background: linear-gradient(90deg, #6366f1 0%, #4338ca 100%);
@@ -244,9 +291,10 @@ html, body, [class*="css"] {
     color: #ffffff;
     font-size: 0.72rem;
     font-weight: 800;
-    padding: 0.15rem 0.45rem;
+    padding: 0.15rem 0.5rem;
     border-radius: 6px;
     white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
 /* Counter Box */
@@ -269,6 +317,12 @@ html, body, [class*="css"] {
     font-weight: 800;
     color: #0f172a;
     margin: 0.2rem 0;
+}
+.counter-desc {
+    font-size: 0.78rem;
+    color: #64748b;
+    line-height: 1.4;
+    margin-top: 0.25rem;
 }
 
 /* Red Flag Notice */
@@ -310,6 +364,36 @@ html, body, [class*="css"] {
 .badge-slate { background: #f1f5f9; color: #475569; }
 .badge-amber { background: #fef3c7; color: #92400e; }
 .badge-emerald { background: #d1fae5; color: #065f46; }
+
+/* Responsive Viewports */
+@media (max-width: 640px) {
+    .scenario-grid {
+        grid-template-columns: 1fr;
+    }
+    .metric-hero {
+        font-size: 1.85rem;
+    }
+    .app-headline {
+        font-size: 1.85rem;
+    }
+    .trust-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+}
+
+/* Print Friendly 1-Page Summary */
+@media print {
+    header, footer, [data-testid="stSidebar"], .hero-badge-strip, div[data-testid="stForm"], div[data-testid="stHorizontalBlock"] {
+        display: none !important;
+    }
+    .card-shell, .card-shell-emerald {
+        box-shadow: none !important;
+        border: 1px solid #94a3b8 !important;
+        page-break-inside: avoid;
+    }
+}
 
 /* Dev Mode Tabs */
 div[data-baseweb="tab-list"] {
@@ -738,17 +822,27 @@ with st.expander("🛡️ Offer Trap Detector & Paper CTC Reality Check", expand
         expected_tenure_years=exp_tenure,
     )
 
-    # Visual Paper CTC Gap Meter
-    guaranteed_pct = max(0, min(100, int(100 - contract_audit["paper_inflation_gap_pct"])))
+    # Multi-Segment Trap Meter
+    pct_var = max(0.0, min(100.0, round(float(input_var_pct), 1)))
+    pct_grat = max(0.0, min(100.0, round((contract_audit["phantom_gratuity_loss_rupees"] / (float(input_ctc) * 100000.0)) * 100.0, 1)))
+    pct_guar = max(0.0, min(100.0, round(100.0 - pct_var - pct_grat, 1)))
+
     st.markdown(
         f"""
-        <div style="margin-top: 0.5rem; margin-bottom: 0.3rem;">
+        <div style="margin-top: 0.5rem; margin-bottom: 0.4rem;">
             <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700;">
-                <span style="color: #047857;">Guaranteed Cash: ₹ {contract_audit['guaranteed_year1_cash_lpa']} LPA ({guaranteed_pct}%)</span>
+                <span style="color: #047857;">Guaranteed Cash: ₹ {contract_audit['guaranteed_year1_cash_lpa']} LPA ({pct_guar}%)</span>
                 <span style="color: #c2410c;">Paper CTC Gap: {contract_audit['paper_inflation_gap_pct']}% at-risk</span>
             </div>
             <div class="trap-meter-shell">
-                <div class="trap-meter-fill" style="width: {guaranteed_pct}%;"></div>
+                <div class="trap-meter-fill" style="width: {pct_guar}%; background: #10b981;" title="Guaranteed Cash: {pct_guar}%"></div>
+                <div class="trap-meter-fill" style="width: {pct_var}%; background: #f59e0b;" title="Variable At-Risk: {pct_var}%"></div>
+                <div class="trap-meter-fill" style="width: {pct_grat}%; background: #ef4444;" title="Phantom Gratuity: {pct_grat}%"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 0.74rem; font-weight: 600; margin-top: 0.35rem;">
+                <span style="color: #047857;">● Guaranteed Cash: {pct_guar}% (₹{contract_audit['guaranteed_year1_cash_lpa']}L)</span>
+                <span style="color: #d97706;">● Variable At-Risk: {pct_var}% (₹{contract_audit['variable_lpa']}L)</span>
+                <span style="color: #dc2626;">● Phantom Gratuity: {pct_grat}% (₹{int(contract_audit['phantom_gratuity_loss_rupees']):,})</span>
             </div>
         </div>
         """,
@@ -807,6 +901,7 @@ else:
     percentile = int(min(98, round(75 + 20 * ((float(input_ctc) - p75) / max(10.0, p75 * 0.5)))))
 
 position_label = "above tier median" if float(input_ctc) >= p50 else "below tier median"
+marker_left = min(91, max(9, percentile))
 
 st.markdown(
     f"""
@@ -820,7 +915,7 @@ st.markdown(
         </div>
         <!-- Visual Spectrum Bar -->
         <div class="spectrum-bar-shell">
-            <div class="spectrum-marker" style="left: {percentile}%;">You ({percentile}%)</div>
+            <div class="spectrum-marker" style="left: {marker_left}%;">You ({percentile}%)</div>
             <div class="spectrum-fill" style="width: {percentile}%;"></div>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; font-weight: 700;">

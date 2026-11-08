@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://salary-predictor-india.streamlit.app/static/sitemap.xml
