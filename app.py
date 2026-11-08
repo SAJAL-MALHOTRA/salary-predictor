@@ -637,28 +637,31 @@ with st.expander("🛡️ Offer Trap Detector & Paper CTC Reality Check", expand
 # ═══════════════════════════════════════════════════════════════════════════════
 st.markdown("<div style='height: 5px;'></div>", unsafe_allow_html=True)
 
-fam_df = df[df["Role_Family"] == detected_family]
-if len(fam_df) < 5:
-    fam_df = df
+tier_spread = ct.get_tier_market_spread(tier_info["tier_num"], detected_seniority)
+p25 = tier_spread["p25"]
+p50 = tier_spread["median"]
+p75 = tier_spread["p75"]
 
-percentile = int(round((fam_df["Avg_Salary_LPA"] < float(input_ctc)).mean() * 100))
-percentile = min(99, max(1, percentile))
+if float(input_ctc) <= p25:
+    percentile = int(max(5, round(25 * (float(input_ctc) / p25))))
+elif float(input_ctc) <= p50:
+    percentile = int(round(25 + 25 * ((float(input_ctc) - p25) / (p50 - p25))))
+elif float(input_ctc) <= p75:
+    percentile = int(round(50 + 25 * ((float(input_ctc) - p50) / (p75 - p50))))
+else:
+    percentile = int(min(98, round(75 + 20 * ((float(input_ctc) - p75) / max(10.0, p75 * 0.5)))))
 
-p25 = round(float(np.percentile(fam_df["Avg_Salary_LPA"], 25)), 1)
-p50 = round(float(np.percentile(fam_df["Avg_Salary_LPA"], 50)), 1)
-p75 = round(float(np.percentile(fam_df["Avg_Salary_LPA"], 75)), 1)
-
-position_label = "above market median" if float(input_ctc) >= p50 else "below market median"
+position_label = "above tier median" if float(input_ctc) >= p50 else "below tier median"
 
 st.markdown(
     f"""
     <div class="output-card">
-        <div class="card-caption">3. Peer Percentile & Market Benchmark</div>
-        <div class="percentile-val">{percentile}th Percentile <span style="font-size: 1.05rem; font-weight: 500; color: #64748b;">for {detected_family} ({detected_seniority})</span></div>
+        <div class="card-caption">3. Peer Percentile & Tier Market Benchmark</div>
+        <div class="percentile-val">{percentile}th Percentile <span style="font-size: 1.05rem; font-weight: 500; color: #64748b;">for {detected_family} ({detected_seniority} · {tier_info['tier_badge']})</span></div>
         <div style="margin-top: 0.5rem; font-size: 0.88rem; color: #334155; line-height: 1.55;">
-            An offer of <strong>₹ {float(input_ctc):.1f} LPA</strong> sits <strong>{position_label}</strong> (market median: ₹ {p50} LPA).<br>
-            • <strong>80% Conformal Prediction Interval:</strong> <strong style="color:#4338ca;">₹ {conf_low}L – ₹ {conf_high}L</strong> (calibrated ±{conf_margin} LPA uncertainty margin with finite-sample 80.0% coverage guarantee)<br>
-            • <strong>Middle 50% Market Spread (P25–P75):</strong> <strong>₹ {p25}L – ₹ {p75}L</strong> across verified peer disclosures.
+            An offer of <strong>₹ {float(input_ctc):.1f} LPA</strong> sits <strong>{position_label}</strong> (tier median: ₹ {p50} LPA).<br>
+            • <strong>80% Conformal Prediction Interval:</strong> <strong style="color:#4338ca;">₹ {conf_low}L – ₹ {conf_high}L</strong> (calibrated ±{conf_margin} LPA uncertainty margin around evaluated offer with finite-sample 80.0% coverage guarantee)<br>
+            • <strong>Middle 50% Market Spread (P25–P75):</strong> <strong>₹ {p25}L – ₹ {p75}L</strong> for {tier_info['tier_name']}.
         </div>
     </div>
     """,
