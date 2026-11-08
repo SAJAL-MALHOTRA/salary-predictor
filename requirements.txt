@@ -12,3 +12,4 @@ langchain-community>=0.2.0
 langchain-core>=0.2.0
 google-genai>=1.0.0
 pytest>=8.0.0
+praw>=8.0.0

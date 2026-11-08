@@ -201,10 +201,17 @@ def load_assets():
     else:
         glassdoor_benchmarks = {}
 
-    return pipeline, metadata, df, company_insights, h1b_benchmarks, glassdoor_benchmarks
+    rd_file = _BASE / "reddit_benchmarks.json"
+    if rd_file.exists():
+        with open(rd_file, "r", encoding="utf-8") as f:
+            reddit_benchmarks = json.load(f)
+    else:
+        reddit_benchmarks = {}
+
+    return pipeline, metadata, df, company_insights, h1b_benchmarks, glassdoor_benchmarks, reddit_benchmarks
 
 
-pipeline, metadata, df, company_insights, h1b_benchmarks, glassdoor_benchmarks = load_assets()
+pipeline, metadata, df, company_insights, h1b_benchmarks, glassdoor_benchmarks, reddit_benchmarks = load_assets()
 
 companies = metadata["companies"]
 company_jobs = metadata["company_jobs"]
@@ -523,13 +530,14 @@ if gd_data:
     )
 
 
-# ── 7. PRIMARY 3-MODULE TABS ─────────────────────────────────────────────────
+# ── 7. PRIMARY 4-MODULE TABS ─────────────────────────────────────────────────
 st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
 
-main_tab1, main_tab2, main_tab3 = st.tabs(
+main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs(
     [
         "📊 Salary & Career Deep Dive",
         "⚖️ Compare Two Offers",
+        "🔥 Reddit Unfiltered (r/developersIndia)",
         "🤖 AmbitionBox AI Copilot",
     ]
 )
@@ -926,9 +934,176 @@ with main_tab2:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# TAB 3: AMBITIONBOX AI REVIEW COPILOT
+# TAB 3: REDDIT UNFILTERED (r/developersIndia & r/cscareerquestionsIN)
 # ═══════════════════════════════════════════════════════════════════════════════
 with main_tab3:
+    st.subheader("🔥 Reddit Unfiltered: The Real Developer Truth")
+    st.caption("Candid salary leaks, 90-day notice period traps, bench policy realities, and real appraisal stats from r/developersIndia.")
+
+    # Company selection for Reddit tab
+    rd_companies = sorted(list(reddit_benchmarks.keys())) if reddit_benchmarks else []
+    default_rd_idx = rd_companies.index(selected_company) if selected_company in rd_companies else 0
+
+    col_rd_sel, col_rd_meta = st.columns([2, 1], gap="medium")
+    with col_rd_sel:
+        rd_selected_company = st.selectbox(
+            "Select Company for Reddit Culture X-Ray",
+            rd_companies if rd_companies else [selected_company],
+            index=default_rd_idx,
+            key="reddit_company_select",
+        )
+    with col_rd_meta:
+        st.markdown(
+            """
+            <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 0.6rem 0.9rem; font-size: 0.85rem; color: #9a3412;">
+                ⚠️ <strong>Unmoderated by HR:</strong> Insights extracted from raw anonymous engineer threads on <code>r/developersIndia</code>.
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    rd_data = reddit_benchmarks.get(rd_selected_company, None)
+
+    if not rd_data:
+        st.info(f"No direct Reddit threads indexed for **{rd_selected_company}** yet. You can run `python reddit_harvester.py` to fetch additional live discussions.")
+    else:
+        # 1. Corporate PR vs Reddit Reality (Culture X-Ray)
+        st.markdown(f"### 🩻 Culture X-Ray: Corporate Scorecard vs. Reddit Reality for **{rd_selected_company}**")
+
+        cx_col1, cx_col2 = st.columns(2, gap="large")
+
+        # Left: Corporate / AmbitionBox Scorecard
+        with cx_col1:
+            amb_info = company_insights.get(rd_selected_company, {})
+            amb_rating = amb_info.get("rating", "N/A")
+            amb_rev = amb_info.get("total_reviews", "N/A")
+            st.markdown(
+                f"""
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.2rem; min-height: 280px;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase;">🏢 Corporate Scorecard (AmbitionBox)</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; color: #0f172a; margin: 0.3rem 0;">
+                        ⭐ {amb_rating} / 5.0 <span style='font-size: 0.9rem; color: #64748b; font-weight: normal;'>({amb_rev} reviews)</span>
+                    </div>
+                    <p style='font-size: 0.85rem; color: #475569; margin-top: 0.5rem;'><strong>Official HR Highlights:</strong></p>
+                """,
+                unsafe_allow_html=True,
+            )
+            if amb_info.get("top_likes"):
+                st.markdown(f'<div class="pros-quote">"{amb_info["top_likes"][0]}"</div>', unsafe_allow_html=True)
+            else:
+                st.markdown('<div class="pros-quote">"Stable corporate brand with global exposure."</div>', unsafe_allow_html=True)
+
+            if amb_info.get("top_dislikes"):
+                st.markdown(f'<div class="cons-quote">"{amb_info["top_dislikes"][0]}"</div>', unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        # Right: Unfiltered Reddit Reality
+        with cx_col2:
+            sb = rd_data["sentiment_breakdown"]
+            rf = rd_data["red_flags"]
+            crit_pct = round(sb.get("negative_pct", 0) + sb.get("toxic_pct", 0), 1)
+            st.markdown(
+                f"""
+                <div style="background: #fffbfa; border: 1px solid #fecdd3; border-radius: 12px; padding: 1.2rem; min-height: 280px;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #e11d48; text-transform: uppercase;">🔥 Reddit Reality (r/developersIndia)</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin: 0.3rem 0;">
+                        Sentiment: <span style="color: {'#16a34a' if rd_data['avg_sentiment_polarity'] > 0 else '#dc2626'};">{sb.get('positive_pct', 0)}% Positive</span> · 
+                        <span style="color: #64748b;">{sb.get('neutral_pct', 0)}% Neutral</span> · 
+                        <span style="color: #e11d48;">{crit_pct}% Critical/Toxic</span>
+                    </div>
+                    <div style="margin-top: 0.8rem; font-size: 0.88rem; color: #334155;">
+                        <div>⚠️ <strong>Notice Period:</strong> <span style="color: {'#dc2626' if rf.get('notice_period_days') == 90 else '#16a34a'}; font-weight: 700;">{rf.get('notice_period_days', 60)} Days ({rf.get('notice_risk_label', 'Standard')})</span></div>
+                        <div style="margin-top: 0.35rem;">⚠️ <strong>Bench / Layoff Risk:</strong> <span style="font-weight: 700; color: {'#dc2626' if rf.get('bench_risk_level') == 'Severe' else '#d97706'};">{rf.get('bench_risk_level', 'Low')}</span></div>
+                        <div style="margin-top: 0.35rem;">⚠️ <strong>PIP / Stack-Ranking Alert:</strong> {'🚨 Reported by developers' if rf.get('pip_quota_alert') else '✅ Low quota risk reported'}</div>
+                        <div style="margin-top: 0.35rem;">📉 <strong>Reported Real Appraisals:</strong> <em>{rf.get('reported_appraisals', 'Standard merit')}</em></div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
+
+        # 2. Leaked Community Offers
+        st.markdown(f"### 💸 Community Leaked Offers & Verified Packages for **{rd_selected_company}**")
+        leaks = rd_data.get("leaked_offers", [])
+        if leaks:
+            leak_cols = st.columns(min(len(leaks), 3))
+            for i, lk in enumerate(leaks[:3]):
+                with leak_cols[i]:
+                    base_str = f"Base: ₹ {lk['base_lpa']}L" if lk.get("base_lpa") else "Full Package"
+                    yoe_str = f"{lk['yoe']} YoE" if lk.get("yoe") is not None else "Lateral"
+                    st.markdown(
+                        f"""
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; border-top: 4px solid #4f46e5;">
+                            <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Reported Offer · {yoe_str}</div>
+                            <div style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0.2rem 0;">₹ {lk['ctc_lpa']} LPA</div>
+                            <div style="font-size: 0.85rem; color: #475569;">{base_str}</div>
+                            <div style="margin-top: 0.5rem; display: inline-block; background: #eef2ff; color: #4338ca; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 6px;">
+                                {lk['verdict']}
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+        else:
+            st.info("No specific numeric offer breakdowns extracted for this company yet.")
+
+        st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
+
+        # 3. Top Community Exposes & Threads
+        st.markdown(f"### 🧵 Top r/developersIndia Discussions ({len(rd_data.get('top_threads', []))} threads)")
+        for t in rd_data.get("top_threads", []):
+            with st.expander(f"📌 {t['title']} (👍 {t['score']} upvotes · 💬 {t['num_comments']} comments)"):
+                st.markdown(f"**Community Excerpt:**")
+                st.write(t["excerpt"])
+                sub_label = t["permalink"].split("/r/")[1].split("/")[0] if "/r/" in t["permalink"] else "developersIndia"
+                st.markdown(f"🔗 [Read Full Reddit Discussion on r/{sub_label}]({t['permalink']})")
+
+        st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
+
+        # 4. Interactive Reddit Offer Evaluator
+        st.markdown("### ⚖️ Reddit Offer Evaluator & Verdict")
+        st.caption("Input your offer details to get a blunt, candid verdict benchmarked against developer sentiment.")
+        with st.form("reddit_eval_form"):
+            ev_col1, ev_col2, ev_col3 = st.columns(3)
+            with ev_col1:
+                ev_ctc = st.number_input("Offered CTC (₹ LPA)", min_value=1.0, max_value=200.0, value=12.0, step=0.5)
+            with ev_col2:
+                ev_yoe = st.number_input("Your Experience (Years)", min_value=0.0, max_value=30.0, value=2.5, step=0.5)
+            with ev_col3:
+                st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+                eval_btn = st.form_submit_button("Get Community Verdict 🚀", use_container_width=True)
+
+        if eval_btn:
+            from reddit_nlp_extractor import evaluate_offer_verdict
+
+            v_label = evaluate_offer_verdict(ev_ctc, ev_yoe)
+            rf_info = rd_data["red_flags"]
+
+            st.markdown(
+                f"""
+                <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 12px; padding: 1.2rem; margin-top: 0.5rem;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #166534; text-transform: uppercase;">Reddit Community Verdict</div>
+                    <div style="font-size: 1.35rem; font-weight: 800; color: #14532d; margin: 0.2rem 0;">
+                        {v_label}
+                    </div>
+                    <div style="font-size: 0.9rem; color: #166534; margin-top: 0.4rem;">
+                        At <strong>{ev_yoe} years of experience</strong>, <strong>₹ {ev_ctc:.1f} LPA</strong> at <strong>{rd_selected_company}</strong> falls into the <em>{v_label}</em> bracket.
+                    </div>
+                    <div style="font-size: 0.85rem; color: #15803d; margin-top: 0.5rem;">
+                        <strong>Key Terms to Watch:</strong> This company has a <strong>{rf_info.get('notice_period_days', 60)}-day notice period</strong>. Ensure that signing bonuses do not contain predatory clawback clauses and clarify whether variable pay is tied to individual or company-wide billing.
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TAB 4: AMBITIONBOX AI REVIEW COPILOT
+# ═══════════════════════════════════════════════════════════════════════════════
+with main_tab4:
     st.subheader("🤖 AmbitionBox AI Copilot: Workplace Culture Intelligence")
     st.caption("Ask natural language questions across 33,200+ review vectors embedded from verified AmbitionBox employee feedback.")
 
@@ -1033,9 +1208,11 @@ with st.expander("ℹ️ Data Provenance, Machine Learning Methodology & Disclai
 
     st.markdown(
         f"""
-### 📊 Data Provenance & Academic / Portfolio Notice
-- **Data Source 1 (India Offshore):** Compensation records and employee sentiment scraped from [AmbitionBox](https://www.ambitionbox.com/salaries) (mid-2026 snapshot) strictly for educational, demonstration, and non-commercial portfolio research.
-- **Data Source 2 (US Onsite H-1B):** Augmented with 100% legal, public government disclosure data from the **U.S. Department of Labor (DOL) Office of Foreign Labor Certification (OFLC)**, tracking over 1,000,000+ certified H-1B petitions, median USD salaries, and Level I-IV prevailing wage minimums.
+### 📊 Multi-Source Data Provenance & Academic Portfolio Notice
+- **Data Source 1 (AmbitionBox):** Compensation records and employee sentiment scraped from [AmbitionBox](https://www.ambitionbox.com/salaries) (mid-2026 snapshot) strictly for educational, demonstration, and non-commercial portfolio research.
+- **Data Source 2 (Kaggle Glassdoor India):** Open research salary dataset (`ruchi798/software-industry-salary-dataset-2022`) with 2,836 individual records matched across 73 employers for offshore cross-validation.
+- **Data Source 3 (US Onsite DOL H-1B):** Augmented with 100% legal, public government disclosure data from the **U.S. Department of Labor (DOL) Office of Foreign Labor Certification (OFLC)**, tracking over 1,000,000+ certified H-1B petitions, median USD salaries, and Level I-IV prevailing wage minimums.
+- **Data Source 4 (Reddit r/developersIndia):** Uncensored community developer intelligence, 90-day notice period traps, bench policies, and verified offer leaks extracted across top tech employers.
 - **Coverage:** **{len(companies)} companies** and **{len(all_job_titles)} unique job titles** across India.
 - **Role Taxonomy:** Parsed into **{len(role_families)} Canonical Role Families** and **5 Seniority Levels** via regex pattern matching to resolve categorical sparsity.
 - **RAG Review Index:** **33,200+ review vectors** embedded via `all-MiniLM-L6-v2` and indexed with FAISS for semantic review retrieval.

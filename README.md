@@ -76,6 +76,16 @@ A production-grade compensation and career intelligence platform combining **Vot
   - Empirical P10, P50 (median), and P90 benchmarks
   - Real-time delta between ensemble predictions and Glassdoor medians.
 
+### 10. 🔥 Reddit Unfiltered: The Real Developer Truth Engine (r/developersIndia)
+- Directly addresses corporate review sanitization by harvesting and structuring authentic developer discussions from `r/developersIndia` and `r/cscareerquestionsIN`.
+- **Culture X-Ray (Corporate PR vs. Reddit Reality):**
+  - Side-by-side comparison of polished HR scores vs raw developer sentiment distributions (% Positive, Neutral, Negative, Toxic).
+  - Indian tech **Dark Pattern & Red-Flag Radar**: 90-Day Notice Period traps, unbilled bench ultimatums (RMG), silent PIP / stack-ranking quotas (Amazon URA), and delayed/low appraisal stats.
+- **Community Leaked CTCs & Compensation Explorer:**
+  - Real community-disclosed packages detailing Base, Variable, and ESOPs across IT services, Unicorns, and FAANG/Tier-1 GCCs.
+- **Interactive Reddit Offer Evaluator:**
+  - Enter proposed CTC, company, and YoE to get an instant, unfiltered community verdict and negotiation risk checklist.
+
 ---
 
 ## 🛠️ Quickstart & Setup
@@ -84,7 +94,7 @@ A production-grade compensation and career intelligence platform combining **Vot
 # 1. Clone repository and navigate inside
 cd salary-predictor
 
-# 2. Install pinned dependencies (including CPU PyTorch & Pytest)
+# 2. Install pinned dependencies (including CPU PyTorch, Pytest & PRAW)
 pip install -r requirements.txt
 
 # 3. Run automated verification test suite
@@ -93,9 +103,11 @@ pytest tests/ -v
 # 4. (Optional) Re-train model pipeline & generate company intelligence assets
 python train_model.py
 
-# 5. (Optional) Refresh multi-source benchmarks (DOL H-1B & Glassdoor)
+# 5. (Optional) Refresh multi-source benchmarks (DOL H-1B, Glassdoor, & Reddit)
 python ingest_h1b_dol_data.py
 python ingest_glassdoor_data.py
+python reddit_harvester.py
+python reddit_nlp_extractor.py
 
 # 6. Launch the Streamlit web application
 streamlit run app.py
@@ -107,8 +119,13 @@ streamlit run app.py
 
 | File / Directory | Description |
 |---|---|
-| `app.py` | Multi-tab Streamlit intelligence platform with interactive Plotly visuals, RAG assistant, and tax calculators |
+| `app.py` | Multi-tab Streamlit platform with 4 modules: Salary Deep Dive, Offer Compare, Reddit Unfiltered, and AI Copilot |
 | `taxonomy.py` | Single source of truth for NLP regex job categorization across 15 Role Families & 5 Seniority Levels |
+| `reddit_harvester.py` | Harvester module supporting live Reddit PRAW API crawling and high-fidelity seed corpus fallback |
+| `reddit_nlp_extractor.py` | Regex & NLP parser extracting compensation figures, YoE, red flags (90-day notice, bench, PIP), and sentiment |
+| `reddit_benchmarks.json` | Pre-computed Reddit scorecards across 22 top tech employers (sentiment, red flags, leaked CTCs, threads) |
+| `reddit_threads_cleaned.csv` | Normalized tabular dataset of parsed Reddit developer threads and offer disclosures |
+| `reddit_raw_posts.json` | Raw ingested post bodies, scores, permalinks, and top comment trees from r/developersIndia |
 | `rag_assistant.py` | RAG module: lazy FAISS loading, review parsing, semantic search, and Gemini/extractive synthesis |
 | `faiss_index/` | Local vector index (`index.faiss` + `index.pkl`) storing 33,200+ review embeddings |
 | `train_model.py` | Ingests data, applies NLP role normalization, executes 5-fold CV, trains Voting Ensemble |
@@ -120,7 +137,7 @@ streamlit run app.py
 | `glassdoor_salaries_cleaned.csv` | Normalized Glassdoor records mapped to canonical company and role taxonomy |
 | `generate_evaluation_plots.py` | Publication-grade evaluation plotting script generating calibration & residual curves |
 | `assets/` | High-resolution evaluation charts (`model_evaluation_dashboard.png`, `calibration_plot.png`, etc.) |
-| `tests/test_platform.py` | Pytest verification suite covering inference, taxonomy, tax logic, and data schemas |
+| `tests/test_platform.py` | Automated Pytest verification suite covering inference, taxonomy, tax math, and data schemas |
 | `.github/workflows/ci.yml` | GitHub Actions CI workflow executing pytest suite on push and pull requests |
 | `METHODOLOGY.md` | In-depth technical report: ablation study, 5-fold CV breakdown, segment error analysis, US DOL data integration |
 | `evaluation_report.json` | Programmatically exported cross-validation metrics, segment MAEs, and fold scores |

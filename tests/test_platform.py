@@ -46,6 +46,14 @@ def glassdoor_benchmarks():
         return json.load(f)
 
 
+@pytest.fixture(scope="session")
+def reddit_benchmarks():
+    rd_path = BASE_DIR / "reddit_benchmarks.json"
+    assert rd_path.exists(), f"reddit_benchmarks.json not found at {rd_path}"
+    with open(rd_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
 def test_metadata_structure(model_metadata):
     """Verify that metadata dictionary contains all expected keys and valid CV metrics."""
     expected_keys = [
@@ -164,3 +172,41 @@ def test_glassdoor_benchmarks_data(glassdoor_benchmarks):
     assert tcs_gd["sample_count"] >= 100, "TCS should have >= 100 Glassdoor records"
     assert tcs_gd["median_salary_lpa"] > 0
     assert len(tcs_gd["top_locations"]) > 0
+
+
+def test_reddit_benchmarks_data(reddit_benchmarks):
+    """Verify r/developersIndia Reddit benchmarks integrity and dark pattern extraction."""
+    assert len(reddit_benchmarks) >= 15, "Expected at least 15 benchmarked companies from Reddit"
+    assert "TCS" in reddit_benchmarks
+    assert "Infosys" in reddit_benchmarks
+    assert "Amazon" in reddit_benchmarks
+
+    tcs_rd = reddit_benchmarks["TCS"]
+    assert tcs_rd["thread_count"] >= 1
+    assert "sentiment_breakdown" in tcs_rd
+    assert "red_flags" in tcs_rd
+    assert tcs_rd["red_flags"]["notice_period_days"] == 90, "TCS should reflect 90-day notice period"
+
+    amzn_rd = reddit_benchmarks["Amazon"]
+    assert amzn_rd["red_flags"]["pip_quota_alert"] is True, "Amazon should detect PIP / URA quota alert"
+
+
+def test_reddit_nlp_extraction():
+    """Verify compensation regex and red flag parsers in reddit_nlp_extractor."""
+    from reddit_nlp_extractor import extract_ctc_figures, extract_yoe, detect_red_flags
+
+    # CTC parsing
+    ctc1, base1, var1 = extract_ctc_figures("Offered 28L Base and 5L Bonus with total 34 LPA CTC")
+    assert ctc1 == 34.0
+    assert base1 == 28.0
+    assert var1 == 5.0
+
+    # YoE parsing
+    assert extract_yoe("I have 4.5 YOE in backend") == 4.5
+    assert extract_yoe("As a 2024 batch fresher looking for jobs") == 0.0
+
+    # Red Flag detection
+    flags = detect_red_flags("Management refused early release due to 90 days notice period and put team on bench")
+    assert flags["notice_period_days"] == 90
+    assert flags["bench_risk"] in ["Moderate", "Severe"]
+    assert flags["red_flag_score"] >= 35

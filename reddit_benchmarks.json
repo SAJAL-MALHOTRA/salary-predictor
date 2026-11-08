@@ -1,0 +1,990 @@
+{
+  "ITC": {
+    "thread_count": 5,
+    "avg_sentiment_polarity": 0.17,
+    "sentiment_breakdown": {
+      "positive_pct": 60.0,
+      "neutral_pct": 20.0,
+      "negative_pct": 20.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 30,
+      "notice_risk_label": "Standard",
+      "bench_risk_level": "Moderate",
+      "pip_quota_alert": false,
+      "service_bond_detected": true,
+      "reported_appraisals": "4 appraisal"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 77.0,
+        "base_lpa": 42.0,
+        "yoe": 4.0,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Uber Bangalore SWE-2 offer: 42L Base + 75L Stock for 4 YoE",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/uber_bangalore_swe2_compensation"
+      },
+      {
+        "ctc_lpa": 60.0,
+        "base_lpa": 30.0,
+        "yoe": 3.0,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Oracle OCI (Cloud Infrastructure) vs Oracle Applications: Huge salary ",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/oracle_oci_vs_apps_salary_reality"
+      },
+      {
+        "ctc_lpa": 13.0,
+        "base_lpa": 9.5,
+        "yoe": null,
+        "verdict": "Mid-Market Lateral",
+        "source_title": "Infosys Specialist Programmer (SP) 9.5 LPA vs Power Programmer 13 LPA:",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/infosys_sp_reality_check_ctc"
+      },
+      {
+        "ctc_lpa": 11.0,
+        "base_lpa": null,
+        "yoe": 0.0,
+        "verdict": "Tier-1 Fresher Package (SP/Fintech)",
+        "source_title": "Infosys delayed onboarding for 2023-2024 batch freshers — what to do w",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/infosys_onboarding_delay_fresher_advice"
+      },
+      {
+        "ctc_lpa": 9.2,
+        "base_lpa": null,
+        "yoe": null,
+        "verdict": "Mid-Market Lateral",
+        "source_title": "TCS Prime vs TCS Digital vs Ninja: The complete salary and appraisal b",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/tcs_prime_vs_digital_reality"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Uber Bangalore SWE-2 offer: 42L Base + 75L Stock for 4 YoE",
+        "score": 2150,
+        "num_comments": 390,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/uber_bangalore_swe2_compensation",
+        "sentiment": "Positive",
+        "excerpt": "Offer breakdown: Base: 42 LPA, Target Bonus: 15% (~6.3 LPA), RSUs: $90,000 (~77 Lakhs INR) vested equally over 4 years. Sign-on: 5 LPA. Year 1 CTC: ~72 LPA. Notice period 30 days! High engineering bar with strict distributed systems and concurrency q..."
+      },
+      {
+        "title": "Oracle OCI (Cloud Infrastructure) vs Oracle Applications: Huge salary and WLB difference",
+        "score": 1670,
+        "num_comments": 240,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/oracle_oci_vs_apps_salary_reality",
+        "sentiment": "Positive",
+        "excerpt": "Do not confuse Oracle OCI with Oracle Apps! OCI IC-2 (1-3 YoE): 24-30L Base + $35k RSUs. OCI IC-3 (3-6 YoE): 35-45L Base + $70k RSUs. Total IC-3 comp ~ 50-60 LPA. Oracle Apps IC-3 is 18-24 LPA. Notice period is 30 days! WLB in OCI is intense, but sta..."
+      },
+      {
+        "title": "Infosys delayed onboarding for 2023-2024 batch freshers — what to do while waiting?",
+        "score": 1240,
+        "num_comments": 350,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/infosys_onboarding_delay_fresher_advice",
+        "sentiment": "Negative",
+        "excerpt": "Received offer letter for System Engineer role (3.6 LPA) in August 2023. It has been 14 months and onboarding keeps getting pushed quarter after quarter. Many candidates are stuck because other companies reject us asking why there is a gap. Do not wa..."
+      }
+    ]
+  },
+  "TCS": {
+    "thread_count": 2,
+    "avg_sentiment_polarity": -0.28,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 50.0,
+      "negative_pct": 50.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 90,
+      "notice_risk_label": "High Risk (Restricted Mobility)",
+      "bench_risk_level": "Severe",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "4 appraisal"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 9.2,
+        "base_lpa": null,
+        "yoe": null,
+        "verdict": "Mid-Market Lateral",
+        "source_title": "TCS Prime vs TCS Digital vs Ninja: The complete salary and appraisal b",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/tcs_prime_vs_digital_reality"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "TCS Prime vs TCS Digital vs Ninja: The complete salary and appraisal breakdown for 2024-2025",
+        "score": 842,
+        "num_comments": 198,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/tcs_prime_vs_digital_reality",
+        "sentiment": "Neutral",
+        "excerpt": "After 4 years at TCS (joined as Digital at 7 LPA, now at 9.2 LPA after 4 appraisal cycles), here is the brutal truth for freshers and lateral hires. Ninja starts at 3.36 LPA, Digital at 7.0 LPA, and Prime at 9.0 LPA. Notice period is strictly 90 days..."
+      },
+      {
+        "title": "Got put on bench at TCS after project ramp down — what is the real layoff risk?",
+        "score": 512,
+        "num_comments": 142,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/tcs_bench_layoff_risk_rmg",
+        "sentiment": "Negative",
+        "excerpt": "Our BFSI project ended last week and the whole team of 18 developers was moved to bench. RMG (Resource Management Group) sent an email stating we have 35 days to clear internal interviews or face separation/allocation to support projects. Has anyone ..."
+      }
+    ]
+  },
+  "Infosys": {
+    "thread_count": 2,
+    "avg_sentiment_polarity": 0.02,
+    "sentiment_breakdown": {
+      "positive_pct": 50.0,
+      "neutral_pct": 0.0,
+      "negative_pct": 50.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 60,
+      "notice_risk_label": "Standard",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": true,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 13.0,
+        "base_lpa": 9.5,
+        "yoe": null,
+        "verdict": "Mid-Market Lateral",
+        "source_title": "Infosys Specialist Programmer (SP) 9.5 LPA vs Power Programmer 13 LPA:",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/infosys_sp_reality_check_ctc"
+      },
+      {
+        "ctc_lpa": 11.0,
+        "base_lpa": null,
+        "yoe": 0.0,
+        "verdict": "Tier-1 Fresher Package (SP/Fintech)",
+        "source_title": "Infosys delayed onboarding for 2023-2024 batch freshers — what to do w",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/infosys_onboarding_delay_fresher_advice"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Infosys delayed onboarding for 2023-2024 batch freshers — what to do while waiting?",
+        "score": 1240,
+        "num_comments": 350,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/infosys_onboarding_delay_fresher_advice",
+        "sentiment": "Negative",
+        "excerpt": "Received offer letter for System Engineer role (3.6 LPA) in August 2023. It has been 14 months and onboarding keeps getting pushed quarter after quarter. Many candidates are stuck because other companies reject us asking why there is a gap. Do not wa..."
+      },
+      {
+        "title": "Infosys Specialist Programmer (SP) 9.5 LPA vs Power Programmer 13 LPA: Reality of hikes and work pressure",
+        "score": 930,
+        "num_comments": 284,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/infosys_sp_reality_check_ctc",
+        "sentiment": "Positive",
+        "excerpt": "Joined Infosys as Specialist Programmer (SP) with 9.5 LPA fixed. Work is decent on Spring Boot and Kafka, but the 90-day notice period is agonizing. If you try to switch, HR will not negotiate buyout unless the receiving company has a special vendor ..."
+      }
+    ]
+  },
+  "UST": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": -0.2,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 0.0,
+      "negative_pct": 100.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 60,
+      "notice_risk_label": "Standard",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 11.0,
+        "base_lpa": null,
+        "yoe": 0.0,
+        "verdict": "Tier-1 Fresher Package (SP/Fintech)",
+        "source_title": "Infosys delayed onboarding for 2023-2024 batch freshers — what to do w",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/infosys_onboarding_delay_fresher_advice"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Infosys delayed onboarding for 2023-2024 batch freshers — what to do while waiting?",
+        "score": 1240,
+        "num_comments": 350,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/infosys_onboarding_delay_fresher_advice",
+        "sentiment": "Negative",
+        "excerpt": "Received offer letter for System Engineer role (3.6 LPA) in August 2023. It has been 14 months and onboarding keeps getting pushed quarter after quarter. Many candidates are stuck because other companies reject us asking why there is a gap. Do not wa..."
+      }
+    ]
+  },
+  "Wipro": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": -0.2,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 0.0,
+      "negative_pct": 100.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 90,
+      "notice_risk_label": "High Risk (Restricted Mobility)",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": true,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 6.5,
+        "base_lpa": null,
+        "yoe": null,
+        "verdict": "Service Firm Baseline (Lowball)",
+        "source_title": "Wipro cut salary offer from 6.5 LPA (Turbo) to 3.5 LPA (Elite) — legal",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/wipro_turbo_salary_cut_reality"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Wipro cut salary offer from 6.5 LPA (Turbo) to 3.5 LPA (Elite) — legal options?",
+        "score": 1420,
+        "num_comments": 410,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/wipro_turbo_salary_cut_reality",
+        "sentiment": "Negative",
+        "excerpt": "Passed Velocity training with 85%+ score, was promised Turbo package of 6.5 LPA. HR sent email stating business demand requires taking Elite role at 3.5 LPA or losing the offer. Notice period at Wipro is 90 days, and the bond penalty clause was 75k f..."
+      }
+    ]
+  },
+  "Cognizant": {
+    "thread_count": 2,
+    "avg_sentiment_polarity": -0.28,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 50.0,
+      "negative_pct": 50.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 90,
+      "notice_risk_label": "High Risk (Restricted Mobility)",
+      "bench_risk_level": "Moderate",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 8.5,
+        "base_lpa": null,
+        "yoe": 5.0,
+        "verdict": "Below Market Median",
+        "source_title": "HCLTech 90-day notice period and appraisal reality for 3-5 YoE",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/hcltech_notice_period_appraisal"
+      },
+      {
+        "ctc_lpa": 6.75,
+        "base_lpa": null,
+        "yoe": null,
+        "verdict": "Service Firm Baseline (Lowball)",
+        "source_title": "Cognizant GenC Elevate (4.25 LPA) vs GenC Next (6.75 LPA) appraisal an",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/cognizant_genc_appraisal_bench_policy"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Cognizant GenC Elevate (4.25 LPA) vs GenC Next (6.75 LPA) appraisal and bench updates",
+        "score": 680,
+        "num_comments": 160,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/cognizant_genc_appraisal_bench_policy",
+        "sentiment": "Negative",
+        "excerpt": "GenC Next salary is 6.75 LPA. Appraisal was delayed by 4 months and the final hike was 1.8% to 3.5%. Bench policy: After 30 days unallocated, you are put on 'Action Tracker' with mandatory daily attendance in office even if no project work exists. 90..."
+      },
+      {
+        "title": "HCLTech 90-day notice period and appraisal reality for 3-5 YoE",
+        "score": 420,
+        "num_comments": 95,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/hcltech_notice_period_appraisal",
+        "sentiment": "Neutral",
+        "excerpt": "Working at HCLTech Noida campus as Senior Software Engineer (4 YoE, 8.5 LPA). Appraisal this year was 3.8%. Work culture is heavily dependent on US client timezone. Management insists on 3 days WFO with biometric tracking. Notice period 3 months...."
+      }
+    ]
+  },
+  "Accenture": {
+    "thread_count": 2,
+    "avg_sentiment_polarity": 0.05,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 100.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 90,
+      "notice_risk_label": "High Risk (Restricted Mobility)",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 32.0,
+        "base_lpa": null,
+        "yoe": null,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Accenture India (ATCI): Level 11 (ASE 4.5 LPA) to Level 9 (Team Lead 1",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/accenture_salary_levels_transparency"
+      },
+      {
+        "ctc_lpa": 8.5,
+        "base_lpa": null,
+        "yoe": 5.0,
+        "verdict": "Below Market Median",
+        "source_title": "HCLTech 90-day notice period and appraisal reality for 3-5 YoE",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/hcltech_notice_period_appraisal"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Accenture India (ATCI): Level 11 (ASE 4.5 LPA) to Level 9 (Team Lead 15-20 LPA) salary transparency",
+        "score": 1180,
+        "num_comments": 290,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/accenture_salary_levels_transparency",
+        "sentiment": "Neutral",
+        "excerpt": "Here is the verified band hierarchy for Accenture Technology India: Level 12 Associate (3.5 LPA), Level 11 Analyst (4.5 to 6.5 LPA), Level 10 Senior Analyst (8 to 12 LPA), Level 9 Specialist / TL (14 to 21 LPA), Level 8 Associate Manager (22 to 32 LP..."
+      },
+      {
+        "title": "HCLTech 90-day notice period and appraisal reality for 3-5 YoE",
+        "score": 420,
+        "num_comments": 95,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/hcltech_notice_period_appraisal",
+        "sentiment": "Neutral",
+        "excerpt": "Working at HCLTech Noida campus as Senior Software Engineer (4 YoE, 8.5 LPA). Appraisal this year was 3.8%. Work culture is heavily dependent on US client timezone. Management insists on 3 days WFO with biometric tracking. Notice period 3 months...."
+      }
+    ]
+  },
+  "HCLTech": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": 0.05,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 100.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 90,
+      "notice_risk_label": "High Risk (Restricted Mobility)",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 8.5,
+        "base_lpa": null,
+        "yoe": 5.0,
+        "verdict": "Below Market Median",
+        "source_title": "HCLTech 90-day notice period and appraisal reality for 3-5 YoE",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/hcltech_notice_period_appraisal"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "HCLTech 90-day notice period and appraisal reality for 3-5 YoE",
+        "score": 420,
+        "num_comments": 95,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/hcltech_notice_period_appraisal",
+        "sentiment": "Neutral",
+        "excerpt": "Working at HCLTech Noida campus as Senior Software Engineer (4 YoE, 8.5 LPA). Appraisal this year was 3.8%. Work culture is heavily dependent on US client timezone. Management insists on 3 days WFO with biometric tracking. Notice period 3 months...."
+      }
+    ]
+  },
+  "Amazon": {
+    "thread_count": 3,
+    "avg_sentiment_polarity": 0.43,
+    "sentiment_breakdown": {
+      "positive_pct": 66.7,
+      "neutral_pct": 33.3,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 90,
+      "notice_risk_label": "High Risk (Restricted Mobility)",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": true,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 94.0,
+        "base_lpa": 36.0,
+        "yoe": 3.5,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Google India L4 SWE offer breakdown (Bangalore / Hyderabad) — 3.5 YoE",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/google_india_l4_offer_breakdown"
+      },
+      {
+        "ctc_lpa": 80.0,
+        "base_lpa": 22.0,
+        "yoe": null,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Amazon India SDE-1 to SDE-2 compensation breakdown and PIP / URA cultu",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/amazon_india_sde_comp_and_pip_culture"
+      },
+      {
+        "ctc_lpa": 60.0,
+        "base_lpa": 30.0,
+        "yoe": null,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Microsoft India L61 / L62 (SDE-2) compensation, perks, and current hir",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/microsoft_idc_comp_and_culture_review"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Google India L4 SWE offer breakdown (Bangalore / Hyderabad) — 3.5 YoE",
+        "score": 3120,
+        "num_comments": 480,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/google_india_l4_offer_breakdown",
+        "sentiment": "Positive",
+        "excerpt": "Got an offer for Google L4 Software Engineer: Base: 36 LPA. Performance Bonus: 15% target (~5.4 LPA). GSU Equity: $110,000 (~94 Lakhs INR) vested over 4 years (33/33/22/12 front-loaded). First year total comp is around 68-72 LPA. Notice period at Goo..."
+      },
+      {
+        "title": "Amazon India SDE-1 to SDE-2 compensation breakdown and PIP / URA culture truth",
+        "score": 2450,
+        "num_comments": 520,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/amazon_india_sde_comp_and_pip_culture",
+        "sentiment": "Neutral",
+        "excerpt": "Ex-Amazon SDE-2 here (Bangalore). Compensation breakdown: SDE-1 starts at 18-22L Base + 5-8L Signing Bonus (Yr 1) + 5L Bonus (Yr 2) + 30-40L RSUs (5/15/40/40 vesting). Total first year CTC ~ 32-35 LPA. SDE-2 is 32-42L Base + 60-80L RSUs (total comp 5..."
+      },
+      {
+        "title": "Microsoft India L61 / L62 (SDE-2) compensation, perks, and current hiring bar",
+        "score": 1820,
+        "num_comments": 310,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/microsoft_idc_comp_and_culture_review",
+        "sentiment": "Positive",
+        "excerpt": "Microsoft IDC (Hyderabad/Bangalore): L61 is 26-30L Base + 20% bonus + $40k stock. L62 is 32-38L Base + 20% bonus + $70k stock. Total comp for L62 sits around 52-60 LPA. Notice period is 60 days. Culture is much calmer than Amazon, excellent health in..."
+      }
+    ]
+  },
+  "Google": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": 0.5,
+    "sentiment_breakdown": {
+      "positive_pct": 100.0,
+      "neutral_pct": 0.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 90,
+      "notice_risk_label": "High Risk (Restricted Mobility)",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 94.0,
+        "base_lpa": 36.0,
+        "yoe": 3.5,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Google India L4 SWE offer breakdown (Bangalore / Hyderabad) — 3.5 YoE",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/google_india_l4_offer_breakdown"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Google India L4 SWE offer breakdown (Bangalore / Hyderabad) — 3.5 YoE",
+        "score": 3120,
+        "num_comments": 480,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/google_india_l4_offer_breakdown",
+        "sentiment": "Positive",
+        "excerpt": "Got an offer for Google L4 Software Engineer: Base: 36 LPA. Performance Bonus: 15% target (~5.4 LPA). GSU Equity: $110,000 (~94 Lakhs INR) vested over 4 years (33/33/22/12 front-loaded). First year total comp is around 68-72 LPA. Notice period at Goo..."
+      }
+    ]
+  },
+  "Microsoft": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": 0.75,
+    "sentiment_breakdown": {
+      "positive_pct": 100.0,
+      "neutral_pct": 0.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 60,
+      "notice_risk_label": "Standard",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 60.0,
+        "base_lpa": 30.0,
+        "yoe": null,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Microsoft India L61 / L62 (SDE-2) compensation, perks, and current hir",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/microsoft_idc_comp_and_culture_review"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Microsoft India L61 / L62 (SDE-2) compensation, perks, and current hiring bar",
+        "score": 1820,
+        "num_comments": 310,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/microsoft_idc_comp_and_culture_review",
+        "sentiment": "Positive",
+        "excerpt": "Microsoft IDC (Hyderabad/Bangalore): L61 is 26-30L Base + 20% bonus + $40k stock. L62 is 32-38L Base + 20% bonus + $70k stock. Total comp for L62 sits around 52-60 LPA. Notice period is 60 days. Culture is much calmer than Amazon, excellent health in..."
+      }
+    ]
+  },
+  "Uber": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": 0.25,
+    "sentiment_breakdown": {
+      "positive_pct": 100.0,
+      "neutral_pct": 0.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 30,
+      "notice_risk_label": "Standard",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 77.0,
+        "base_lpa": 42.0,
+        "yoe": 4.0,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Uber Bangalore SWE-2 offer: 42L Base + 75L Stock for 4 YoE",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/uber_bangalore_swe2_compensation"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Uber Bangalore SWE-2 offer: 42L Base + 75L Stock for 4 YoE",
+        "score": 2150,
+        "num_comments": 390,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/uber_bangalore_swe2_compensation",
+        "sentiment": "Positive",
+        "excerpt": "Offer breakdown: Base: 42 LPA, Target Bonus: 15% (~6.3 LPA), RSUs: $90,000 (~77 Lakhs INR) vested equally over 4 years. Sign-on: 5 LPA. Year 1 CTC: ~72 LPA. Notice period 30 days! High engineering bar with strict distributed systems and concurrency q..."
+      }
+    ]
+  },
+  "Flipkart": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": 0.25,
+    "sentiment_breakdown": {
+      "positive_pct": 100.0,
+      "neutral_pct": 0.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 60,
+      "notice_risk_label": "Standard",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 42.0,
+        "base_lpa": 28.0,
+        "yoe": null,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Flipkart SDE-2 compensation breakdown, appraisal cycles, and Big Billi",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/flipkart_sde2_comp_and_bbd_reality"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Flipkart SDE-2 compensation breakdown, appraisal cycles, and Big Billion Days pressure",
+        "score": 1640,
+        "num_comments": 275,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/flipkart_sde2_comp_and_bbd_reality",
+        "sentiment": "Positive",
+        "excerpt": "Flipkart SDE-2 (Bellandur, Bangalore): Fixed base: 28 to 34 LPA. Variable: 10-15%. ESOPs: 18-25 Lakhs vested over 4 years (25% each year). Total Year 1 comp ~ 36-42 LPA. Notice period is 60 days. During BBD (Big Billion Days), work is easily 12-14 ho..."
+      }
+    ]
+  },
+  "Zomato": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": 0.05,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 100.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 60,
+      "notice_risk_label": "Standard",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 38.0,
+        "base_lpa": 34.0,
+        "yoe": null,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Swiggy remote policy vs Zomato aggressive culture: SDE-2 offer compari",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/swiggy_remote_vs_zomato_office_culture"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Swiggy remote policy vs Zomato aggressive culture: SDE-2 offer comparison",
+        "score": 1980,
+        "num_comments": 420,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/swiggy_remote_vs_zomato_office_culture",
+        "sentiment": "Neutral",
+        "excerpt": "Got offers from both: Swiggy offered 34L Fixed + 15L ESOPs with Remote-first policy (mandatory office 1 week per quarter). Zomato offered 38L Fixed + no ESOPs with 5 days strict in-office Gurgaon. Decided to pick Swiggy for peace of mind. Swiggy noti..."
+      }
+    ]
+  },
+  "Swiggy": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": 0.05,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 100.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 60,
+      "notice_risk_label": "Standard",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 38.0,
+        "base_lpa": 34.0,
+        "yoe": null,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Swiggy remote policy vs Zomato aggressive culture: SDE-2 offer compari",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/swiggy_remote_vs_zomato_office_culture"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Swiggy remote policy vs Zomato aggressive culture: SDE-2 offer comparison",
+        "score": 1980,
+        "num_comments": 420,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/swiggy_remote_vs_zomato_office_culture",
+        "sentiment": "Neutral",
+        "excerpt": "Got offers from both: Swiggy offered 34L Fixed + 15L ESOPs with Remote-first policy (mandatory office 1 week per quarter). Zomato offered 38L Fixed + no ESOPs with 5 days strict in-office Gurgaon. Decided to pick Swiggy for peace of mind. Swiggy noti..."
+      }
+    ]
+  },
+  "Razorpay": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": 0.05,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 100.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 60,
+      "notice_risk_label": "Standard",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 32.0,
+        "base_lpa": 18.0,
+        "yoe": 0.0,
+        "verdict": "Top 1% Fresher (FAANG/Unicorn)",
+        "source_title": "Razorpay SDE-1 and SDE-2 compensation structure and ESOP buyback histo",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/razorpay_esop_and_salary_breakdown"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Razorpay SDE-1 and SDE-2 compensation structure and ESOP buyback history",
+        "score": 1520,
+        "num_comments": 210,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/razorpay_esop_and_salary_breakdown",
+        "sentiment": "Neutral",
+        "excerpt": "Razorpay compensation: SDE-1 (fresher/1 YoE): 16-18L Fixed + 4L ESOPs. SDE-2 (2.5-4 YoE): 26-32L Fixed + 10-15L ESOPs. Razorpay has conducted consecutive annual ESOP buybacks which makes their equity as good as liquid cash. Notice period is 60 days. ..."
+      }
+    ]
+  },
+  "Paytm": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": -0.4,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 0.0,
+      "negative_pct": 100.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 60,
+      "notice_risk_label": "Standard",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 28.0,
+        "base_lpa": 28.0,
+        "yoe": null,
+        "verdict": "Strong Product / FinTech Tier",
+        "source_title": "Paytm Noida aftermath: Layoffs, restructuring, and salary trends for e",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/paytm_layoff_and_restructure_reality"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Paytm Noida aftermath: Layoffs, restructuring, and salary trends for engineers",
+        "score": 1280,
+        "num_comments": 340,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/paytm_layoff_and_restructure_reality",
+        "sentiment": "Negative",
+        "excerpt": "Following RBI regulatory actions, Paytm had stealth layoffs in lending and payments verticals. Compensation: SDE-2 is 22-28L Fixed, but appraisal was frozen for many business units. Notice period is 60 days. Many developers are jumping ship to PhoneP..."
+      }
+    ]
+  },
+  "Goldman Sachs": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": 0.05,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 100.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 90,
+      "notice_risk_label": "High Risk (Restricted Mobility)",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 45.0,
+        "base_lpa": 24.0,
+        "yoe": 6.0,
+        "verdict": "Executive / Elite Comp",
+        "source_title": "Goldman Sachs Bangalore: Analyst (18-24 LPA) and Associate (32-45 LPA)",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/goldman_sachs_bangalore_salary_wlb"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Goldman Sachs Bangalore: Analyst (18-24 LPA) and Associate (32-45 LPA) compensation & hours",
+        "score": 1740,
+        "num_comments": 280,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/goldman_sachs_bangalore_salary_wlb",
+        "sentiment": "Neutral",
+        "excerpt": "Goldman Sachs Bangalore (Helios Business Park): Analyst starts at 18-24 LPA base + year-end discretionary bonus (typically 20-35% of base). Associate (3-6 YoE) is 32-45 LPA base + 25-40% bonus. Notice period is 90 days for Analysts and 90 days for As..."
+      }
+    ]
+  },
+  "Oracle": {
+    "thread_count": 2,
+    "avg_sentiment_polarity": 0.15,
+    "sentiment_breakdown": {
+      "positive_pct": 50.0,
+      "neutral_pct": 0.0,
+      "negative_pct": 50.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 90,
+      "notice_risk_label": "High Risk (Restricted Mobility)",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 60.0,
+        "base_lpa": 30.0,
+        "yoe": 3.0,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Oracle OCI (Cloud Infrastructure) vs Oracle Applications: Huge salary ",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/oracle_oci_vs_apps_salary_reality"
+      },
+      {
+        "ctc_lpa": 32.0,
+        "base_lpa": 18.0,
+        "yoe": 6.0,
+        "verdict": "Solid Lead/Architect Tier",
+        "source_title": "J.P. Morgan Chase (JPMC) India: Software Engineer 601 vs 602 compensat",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/jpmorgan_india_comp_and_wfo_policy"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Oracle OCI (Cloud Infrastructure) vs Oracle Applications: Huge salary and WLB difference",
+        "score": 1670,
+        "num_comments": 240,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/oracle_oci_vs_apps_salary_reality",
+        "sentiment": "Positive",
+        "excerpt": "Do not confuse Oracle OCI with Oracle Apps! OCI IC-2 (1-3 YoE): 24-30L Base + $35k RSUs. OCI IC-3 (3-6 YoE): 35-45L Base + $70k RSUs. Total IC-3 comp ~ 50-60 LPA. Oracle Apps IC-3 is 18-24 LPA. Notice period is 30 days! WLB in OCI is intense, but sta..."
+      },
+      {
+        "title": "J.P. Morgan Chase (JPMC) India: Software Engineer 601 vs 602 compensation and 5-day WFO mandate",
+        "score": 1490,
+        "num_comments": 310,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/jpmorgan_india_comp_and_wfo_policy",
+        "sentiment": "Negative",
+        "excerpt": "JPMC Mumbai/Bangalore/Hyderabad: 601 (Analyst) 14-18 LPA base. 602 (Associate, 3-6 YoE) 24-32 LPA base + 10-18% bonus. Notice period is 90 days. Key issue: Leadership enforced 5 days strict office attendance with badge tracking. Good stability and ze..."
+      }
+    ]
+  },
+  "JPMorgan Chase": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": -0.2,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 0.0,
+      "negative_pct": 100.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 90,
+      "notice_risk_label": "High Risk (Restricted Mobility)",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 32.0,
+        "base_lpa": 18.0,
+        "yoe": 6.0,
+        "verdict": "Solid Lead/Architect Tier",
+        "source_title": "J.P. Morgan Chase (JPMC) India: Software Engineer 601 vs 602 compensat",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/jpmorgan_india_comp_and_wfo_policy"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "J.P. Morgan Chase (JPMC) India: Software Engineer 601 vs 602 compensation and 5-day WFO mandate",
+        "score": 1490,
+        "num_comments": 310,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/jpmorgan_india_comp_and_wfo_policy",
+        "sentiment": "Negative",
+        "excerpt": "JPMC Mumbai/Bangalore/Hyderabad: 601 (Analyst) 14-18 LPA base. 602 (Associate, 3-6 YoE) 24-32 LPA base + 10-18% bonus. Notice period is 90 days. Key issue: Leadership enforced 5 days strict office attendance with badge tracking. Good stability and ze..."
+      }
+    ]
+  },
+  "Deloitte": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": 0.05,
+    "sentiment_breakdown": {
+      "positive_pct": 0.0,
+      "neutral_pct": 100.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 90,
+      "notice_risk_label": "High Risk (Restricted Mobility)",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 38.0,
+        "base_lpa": null,
+        "yoe": 4.0,
+        "verdict": "Tier-1 Top Decile (FAANG/Uber)",
+        "source_title": "Deloitte USI vs Deloitte India: Salary slabs from Consultant to Manage",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/deloitte_usi_salary_and_culture_breakdown"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Deloitte USI vs Deloitte India: Salary slabs from Consultant to Manager",
+        "score": 890,
+        "num_comments": 190,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/deloitte_usi_salary_and_culture_breakdown",
+        "sentiment": "Neutral",
+        "excerpt": "Deloitte USI (Hyderabad/Bangalore): Consultant (2-4 YoE) 10-15 LPA. Senior Consultant (4-7 YoE) 16-24 LPA. Manager (8+ YoE) 28-38 LPA. Notice period is 90 days. High client dependency, long hours during deliverables. Variable pay is 10-15% linked to ..."
+      }
+    ]
+  },
+  "Atlassian": {
+    "thread_count": 1,
+    "avg_sentiment_polarity": 0.25,
+    "sentiment_breakdown": {
+      "positive_pct": 100.0,
+      "neutral_pct": 0.0,
+      "negative_pct": 0.0,
+      "toxic_pct": 0.0
+    },
+    "red_flags": {
+      "notice_period_days": 60,
+      "notice_risk_label": "Standard",
+      "bench_risk_level": "Low",
+      "pip_quota_alert": false,
+      "service_bond_detected": false,
+      "reported_appraisals": "Not reported"
+    },
+    "leaked_offers": [
+      {
+        "ctc_lpa": 72.0,
+        "base_lpa": 45.0,
+        "yoe": 5.0,
+        "verdict": "Executive / Elite Comp",
+        "source_title": "Atlassian India: P3 (Senior Engineer) 45L Base + $100k RSUs + 100% Rem",
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/atlassian_india_remote_and_compensation"
+      }
+    ],
+    "top_threads": [
+      {
+        "title": "Atlassian India: P3 (Senior Engineer) 45L Base + $100k RSUs + 100% Remote policy",
+        "score": 2890,
+        "num_comments": 410,
+        "permalink": "https://www.reddit.com/r/developersIndia/comments/atlassian_india_remote_and_compensation",
+        "sentiment": "Positive",
+        "excerpt": "Atlassian's 'Team Anywhere' policy is legitimate — you can work from anywhere in India without salary reduction. P3 (Senior SWE, ~5 YoE) comp: 42-48L Base + 15% Bonus + $90k-$110k RSUs (25% equal vest per year). Total comp ~ 65-72 LPA. Notice period ..."
+      }
+    ]
+  }
+}
