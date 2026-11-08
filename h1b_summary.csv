@@ -1,0 +1,51 @@
+Company,US_Employer_Entity,Total_H1B_Filings,Median_Wage_USD,Approval_Rate_Pct,Primary_State,Top_Occupation
+Infosys,INFOSYS LIMITED,200329,76800,99.55,TX,"Computer Occupations, All Other"
+TCS,TATA CONSULTANCY SERVICES LIMITED,126291,67400,99.23,MD,Computer Programmers
+Cognizant,COGNIZANT TECHNOLOGY SOLUTIONS US CORP,125757,89600,96.07,TX,"Computer Occupations, All Other"
+Deloitte,Deloitte Consulting LLP,79212,88700,98.22,PA,Computer Systems Analyst
+Wipro,WIPRO LIMITED,71022,70300,91.54,NJ,Software Developers
+Capgemini,CAPGEMINI AMERICA INC,59909,85200,94.17,IL,Software Developers
+Accenture,Accenture LLP,57231,81300,98.15,IL,Computer Systems Analyst
+IBM,IBM India Private Limited,48627,74300,80.9,NC,Software Developers
+Tech Mahindra,Tech Mahindra (Americas) Inc.,43470,75600,96.21,NJ,Computer Programmers
+HCLTech,HCL AMERICA INC,42931,77900,98.07,CA,Computer Programmers
+Amazon,AMAZON.COM SERVICES LLC,36147,154400,99.71,VA,Software Developers
+LTIMindtree,LARSEN & TOUBRO INFOTECH LIMITED,29907,69100,94.49,NJ,Software Developers
+UST,UST GLOBAL INC,19536,65000,93.68,CA,Software Developers
+Oracle,"Oracle America, Inc.",14346,105000,89.74,TX,Software Developers
+Mphasis,Mphasis Corporation,13245,76900,95.18,NY,Computer Programmers
+Hexaware Technologies,"Hexaware Technologies, Inc.",11303,73800,88.91,NJ,Computer Programmers
+PwC,PRICEWATERHOUSECOOPERS LLP,9574,74500,97.86,FL,Accountants
+NTT DATA,"NTT DATA Americas, Inc.",9389,87500,93.78,TX,Software Developers
+Randstad,"RANDSTAD TECHNOLOGIES, LLC",6933,105400,91.88,MA,Software Developers
+Persistent Systems,"PERSISTENT SYSTEMS, INC.",5889,74400,83.22,CA,Computer Programmers
+Ericsson,Ericsson Inc.,5553,85600,66.61,TX,"Computer Occupations, All Other"
+FIS,"FIS Management Services, LLC",2879,113300,83.85,NY,Software Developers
+ITC Infotech,"ITC INFOTECH (USA), INC.",2765,65000,91.03,NJ,Software Developers
+ITC,"ITC INFOTECH (USA), INC.",2765,65000,91.03,NJ,Software Developers
+Wells Fargo,"WELLS FARGO BANK, N.A.",2740,130000,97.04,AZ,Software Developers
+Genpact,Genpact LLC,2726,87000,98.02,NJ,Software Developers
+Cyient,"Cyient, Inc. ",2520,67800,96.03,CT,Software Developers
+Amdocs,"Amdocs, Inc.",2386,94400,93.08,MO,Software Developers
+Nagarro,"NAGARRO, INC",2040,79000,99.41,CA,Software Developers
+Samsung,"Samsung Electronics America, Inc.",1865,120300,83.49,NJ,Software Developers
+Atos,ATOS SYNTEL INC,1772,93000,90.07,MI,Software Developers
+Schneider Electric,"SCHNEIDER ELECTRIC USA, INC.",1227,82200,85.09,MA,Software Developers
+IQVIA,IQVIA Inc.,1140,120000,85.7,NC,Software Developers
+TP,SOFTPATH SYSTEM LLC,1099,60000,61.33,GA,Computer Systems Analyst
+CBRE,"CBRE, INC.",898,100000,88.08,TX,Software Developers
+Coforge,Coforge Limited,851,103600,97.77,NJ,Computer Systems Analyst
+DXC Technology,DXC Technology Services LLC,626,91300,67.89,VA,Software Developers
+Standard Chartered,Standard Chartered Bank,331,121000,90.33,NY,Financial Managers
+WNS,"Turner & Townsend, Inc.",315,125000,90.79,NY,Cost Estimators
+Sun Pharmaceutical Industries,"Sun Pharmaceutical Industries, Inc.",260,81800,90.0,NJ,Chemists
+Infosys BPM,INFOSYS BPM LIMITED,215,87300,98.6,TX,"Computer Occupations, All Other"
+JSW Steel,"JSW Steel USA, Inc.",117,78000,94.87,TX,Automotive Engineers
+Aurobindo Pharma,"Aurobindo Pharma USA, Inc.",100,80000,98.0,NJ,"Computer Occupations, All Other"
+eClerx,eClerx LLC,75,105000,90.67,NY,Operation Research Analysts
+Startek,STARTEKK LLC,73,72000,93.15,TX,Computer Systems Analyst
+Lupin,"Lupin Pharmaceuticals, Inc.",59,110000,88.14,NJ,Database Administrators
+Sutherland Global Services,"Sutherland Global Services, Inc.",38,120000,86.84,NY,Software Developers
+Cipla,"SciPlay Games, LLC",38,125000,84.21,IA,Business Intelligence Analysts
+vivo,Invivo Corporation,37,79300,94.59,FL,Software Developers
+BNY,BNY Mellon Government Securities Services Corporation,26,148300,92.31,PA,Software Developers

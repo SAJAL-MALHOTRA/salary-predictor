@@ -1,0 +1,802 @@
+{
+  "Accenture": {
+    "matched_employer_name": "Accenture LLP",
+    "us_work_state": "IL",
+    "total_h1b_filings": 57231,
+    "median_wage_usd": 81300,
+    "certified_pct": 98.15,
+    "top_us_job_title": "Computer Systems Analyst",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 68900.0,
+      "Level II (Mid-Level)": 84200.0,
+      "Level III (Senior / Lead)": 105200.0,
+      "Level IV (Principal / Manager)": 129100.0
+    },
+    "ppp_equivalent_inr_lpa": 19.1,
+    "market_fx_inr_lpa": 69.9
+  },
+  "Amazon": {
+    "matched_employer_name": "AMAZON.COM SERVICES LLC",
+    "us_work_state": "VA",
+    "total_h1b_filings": 36147,
+    "median_wage_usd": 154400,
+    "certified_pct": 99.71,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 130800.0,
+      "Level II (Mid-Level)": 159800.0,
+      "Level III (Senior / Lead)": 199800.0,
+      "Level IV (Principal / Manager)": 245200.0
+    },
+    "ppp_equivalent_inr_lpa": 36.3,
+    "market_fx_inr_lpa": 132.8
+  },
+  "Amdocs": {
+    "matched_employer_name": "Amdocs, Inc.",
+    "us_work_state": "MO",
+    "total_h1b_filings": 2386,
+    "median_wage_usd": 94400,
+    "certified_pct": 93.08,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 80000.0,
+      "Level II (Mid-Level)": 97700.0,
+      "Level III (Senior / Lead)": 122200.0,
+      "Level IV (Principal / Manager)": 149900.0
+    },
+    "ppp_equivalent_inr_lpa": 22.2,
+    "market_fx_inr_lpa": 81.2
+  },
+  "Atos": {
+    "matched_employer_name": "ATOS SYNTEL INC",
+    "us_work_state": "MI",
+    "total_h1b_filings": 1772,
+    "median_wage_usd": 93000,
+    "certified_pct": 90.07,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 78800.0,
+      "Level II (Mid-Level)": 96300.0,
+      "Level III (Senior / Lead)": 120400.0,
+      "Level IV (Principal / Manager)": 147700.0
+    },
+    "ppp_equivalent_inr_lpa": 21.9,
+    "market_fx_inr_lpa": 80.0
+  },
+  "Aurobindo Pharma": {
+    "matched_employer_name": "Aurobindo Pharma USA, Inc.",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 100,
+    "median_wage_usd": 80000,
+    "certified_pct": 98.0,
+    "top_us_job_title": "Computer Occupations, All Other",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 67800.0,
+      "Level II (Mid-Level)": 82800.0,
+      "Level III (Senior / Lead)": 103500.0,
+      "Level IV (Principal / Manager)": 127100.0
+    },
+    "ppp_equivalent_inr_lpa": 18.8,
+    "market_fx_inr_lpa": 68.8
+  },
+  "BNY": {
+    "matched_employer_name": "BNY Mellon Government Securities Services Corporation",
+    "us_work_state": "PA",
+    "total_h1b_filings": 26,
+    "median_wage_usd": 148300,
+    "certified_pct": 92.31,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 125600.0,
+      "Level II (Mid-Level)": 153500.0,
+      "Level III (Senior / Lead)": 191900.0,
+      "Level IV (Principal / Manager)": 235500.0
+    },
+    "ppp_equivalent_inr_lpa": 34.9,
+    "market_fx_inr_lpa": 127.5
+  },
+  "CBRE": {
+    "matched_employer_name": "CBRE, INC.",
+    "us_work_state": "TX",
+    "total_h1b_filings": 898,
+    "median_wage_usd": 100000,
+    "certified_pct": 88.08,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 84700.0,
+      "Level II (Mid-Level)": 103500.0,
+      "Level III (Senior / Lead)": 129400.0,
+      "Level IV (Principal / Manager)": 158800.0
+    },
+    "ppp_equivalent_inr_lpa": 23.5,
+    "market_fx_inr_lpa": 86.0
+  },
+  "Capgemini": {
+    "matched_employer_name": "CAPGEMINI AMERICA INC",
+    "us_work_state": "IL",
+    "total_h1b_filings": 59909,
+    "median_wage_usd": 85200,
+    "certified_pct": 94.17,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 72200.0,
+      "Level II (Mid-Level)": 88200.0,
+      "Level III (Senior / Lead)": 110300.0,
+      "Level IV (Principal / Manager)": 135300.0
+    },
+    "ppp_equivalent_inr_lpa": 20.0,
+    "market_fx_inr_lpa": 73.3
+  },
+  "Cipla": {
+    "matched_employer_name": "SciPlay Games, LLC",
+    "us_work_state": "IA",
+    "total_h1b_filings": 38,
+    "median_wage_usd": 125000,
+    "certified_pct": 84.21,
+    "top_us_job_title": "Business Intelligence Analysts",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 105900.0,
+      "Level II (Mid-Level)": 129400.0,
+      "Level III (Senior / Lead)": 161800.0,
+      "Level IV (Principal / Manager)": 198500.0
+    },
+    "ppp_equivalent_inr_lpa": 29.4,
+    "market_fx_inr_lpa": 107.5
+  },
+  "Coforge": {
+    "matched_employer_name": "Coforge Limited",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 851,
+    "median_wage_usd": 103600,
+    "certified_pct": 97.77,
+    "top_us_job_title": "Computer Systems Analyst",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 87800.0,
+      "Level II (Mid-Level)": 107300.0,
+      "Level III (Senior / Lead)": 134100.0,
+      "Level IV (Principal / Manager)": 164500.0
+    },
+    "ppp_equivalent_inr_lpa": 24.3,
+    "market_fx_inr_lpa": 89.1
+  },
+  "Cognizant": {
+    "matched_employer_name": "COGNIZANT TECHNOLOGY SOLUTIONS US CORP",
+    "us_work_state": "TX",
+    "total_h1b_filings": 125757,
+    "median_wage_usd": 89600,
+    "certified_pct": 96.07,
+    "top_us_job_title": "Computer Occupations, All Other",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 75900.0,
+      "Level II (Mid-Level)": 92800.0,
+      "Level III (Senior / Lead)": 116000.0,
+      "Level IV (Principal / Manager)": 142300.0
+    },
+    "ppp_equivalent_inr_lpa": 21.1,
+    "market_fx_inr_lpa": 77.1
+  },
+  "Cyient": {
+    "matched_employer_name": "Cyient, Inc. ",
+    "us_work_state": "CT",
+    "total_h1b_filings": 2520,
+    "median_wage_usd": 67800,
+    "certified_pct": 96.03,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 57400.0,
+      "Level II (Mid-Level)": 70200.0,
+      "Level III (Senior / Lead)": 87700.0,
+      "Level IV (Principal / Manager)": 107700.0
+    },
+    "ppp_equivalent_inr_lpa": 15.9,
+    "market_fx_inr_lpa": 58.3
+  },
+  "DXC Technology": {
+    "matched_employer_name": "DXC Technology Services LLC",
+    "us_work_state": "VA",
+    "total_h1b_filings": 626,
+    "median_wage_usd": 91300,
+    "certified_pct": 67.89,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 77300.0,
+      "Level II (Mid-Level)": 94500.0,
+      "Level III (Senior / Lead)": 118200.0,
+      "Level IV (Principal / Manager)": 145000.0
+    },
+    "ppp_equivalent_inr_lpa": 21.5,
+    "market_fx_inr_lpa": 78.5
+  },
+  "Deloitte": {
+    "matched_employer_name": "Deloitte Consulting LLP",
+    "us_work_state": "PA",
+    "total_h1b_filings": 79212,
+    "median_wage_usd": 88700,
+    "certified_pct": 98.22,
+    "top_us_job_title": "Computer Systems Analyst",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 75100.0,
+      "Level II (Mid-Level)": 91800.0,
+      "Level III (Senior / Lead)": 114800.0,
+      "Level IV (Principal / Manager)": 140900.0
+    },
+    "ppp_equivalent_inr_lpa": 20.8,
+    "market_fx_inr_lpa": 76.3
+  },
+  "Ericsson": {
+    "matched_employer_name": "Ericsson Inc.",
+    "us_work_state": "TX",
+    "total_h1b_filings": 5553,
+    "median_wage_usd": 85600,
+    "certified_pct": 66.61,
+    "top_us_job_title": "Computer Occupations, All Other",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 72500.0,
+      "Level II (Mid-Level)": 88600.0,
+      "Level III (Senior / Lead)": 110800.0,
+      "Level IV (Principal / Manager)": 136000.0
+    },
+    "ppp_equivalent_inr_lpa": 20.1,
+    "market_fx_inr_lpa": 73.6
+  },
+  "FIS": {
+    "matched_employer_name": "FIS Management Services, LLC",
+    "us_work_state": "NY",
+    "total_h1b_filings": 2879,
+    "median_wage_usd": 113300,
+    "certified_pct": 83.85,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 96000.0,
+      "Level II (Mid-Level)": 117300.0,
+      "Level III (Senior / Lead)": 146600.0,
+      "Level IV (Principal / Manager)": 179900.0
+    },
+    "ppp_equivalent_inr_lpa": 26.6,
+    "market_fx_inr_lpa": 97.4
+  },
+  "Genpact": {
+    "matched_employer_name": "Genpact LLC",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 2726,
+    "median_wage_usd": 87000,
+    "certified_pct": 98.02,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 73700.0,
+      "Level II (Mid-Level)": 90100.0,
+      "Level III (Senior / Lead)": 112600.0,
+      "Level IV (Principal / Manager)": 138200.0
+    },
+    "ppp_equivalent_inr_lpa": 20.4,
+    "market_fx_inr_lpa": 74.8
+  },
+  "HCLTech": {
+    "matched_employer_name": "HCL AMERICA INC",
+    "us_work_state": "CA",
+    "total_h1b_filings": 42931,
+    "median_wage_usd": 77900,
+    "certified_pct": 98.07,
+    "top_us_job_title": "Computer Programmers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 66000.0,
+      "Level II (Mid-Level)": 80600.0,
+      "Level III (Senior / Lead)": 100800.0,
+      "Level IV (Principal / Manager)": 123700.0
+    },
+    "ppp_equivalent_inr_lpa": 18.3,
+    "market_fx_inr_lpa": 67.0
+  },
+  "Hexaware Technologies": {
+    "matched_employer_name": "Hexaware Technologies, Inc.",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 11303,
+    "median_wage_usd": 73800,
+    "certified_pct": 88.91,
+    "top_us_job_title": "Computer Programmers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 62500.0,
+      "Level II (Mid-Level)": 76400.0,
+      "Level III (Senior / Lead)": 95500.0,
+      "Level IV (Principal / Manager)": 117200.0
+    },
+    "ppp_equivalent_inr_lpa": 17.3,
+    "market_fx_inr_lpa": 63.5
+  },
+  "IBM": {
+    "matched_employer_name": "IBM India Private Limited",
+    "us_work_state": "NC",
+    "total_h1b_filings": 48627,
+    "median_wage_usd": 74300,
+    "certified_pct": 80.9,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 62900.0,
+      "Level II (Mid-Level)": 76900.0,
+      "Level III (Senior / Lead)": 96200.0,
+      "Level IV (Principal / Manager)": 118000.0
+    },
+    "ppp_equivalent_inr_lpa": 17.5,
+    "market_fx_inr_lpa": 63.9
+  },
+  "IQVIA": {
+    "matched_employer_name": "IQVIA Inc.",
+    "us_work_state": "NC",
+    "total_h1b_filings": 1140,
+    "median_wage_usd": 120000,
+    "certified_pct": 85.7,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 101600.0,
+      "Level II (Mid-Level)": 124200.0,
+      "Level III (Senior / Lead)": 155300.0,
+      "Level IV (Principal / Manager)": 190600.0
+    },
+    "ppp_equivalent_inr_lpa": 28.2,
+    "market_fx_inr_lpa": 103.2
+  },
+  "ITC": {
+    "matched_employer_name": "ITC INFOTECH (USA), INC.",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 2765,
+    "median_wage_usd": 65000,
+    "certified_pct": 91.03,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 55100.0,
+      "Level II (Mid-Level)": 68000,
+      "Level III (Senior / Lead)": 85000,
+      "Level IV (Principal / Manager)": 105000
+    },
+    "ppp_equivalent_inr_lpa": 15.3,
+    "market_fx_inr_lpa": 55.9
+  },
+  "ITC Infotech": {
+    "matched_employer_name": "ITC INFOTECH (USA), INC.",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 2765,
+    "median_wage_usd": 65000,
+    "certified_pct": 91.03,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 55100.0,
+      "Level II (Mid-Level)": 68000,
+      "Level III (Senior / Lead)": 85000,
+      "Level IV (Principal / Manager)": 105000
+    },
+    "ppp_equivalent_inr_lpa": 15.3,
+    "market_fx_inr_lpa": 55.9
+  },
+  "Infosys": {
+    "matched_employer_name": "INFOSYS LIMITED",
+    "us_work_state": "TX",
+    "total_h1b_filings": 200329,
+    "median_wage_usd": 76800,
+    "certified_pct": 99.55,
+    "top_us_job_title": "Computer Occupations, All Other",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 65100.0,
+      "Level II (Mid-Level)": 79500.0,
+      "Level III (Senior / Lead)": 99400.0,
+      "Level IV (Principal / Manager)": 122000.0
+    },
+    "ppp_equivalent_inr_lpa": 18.0,
+    "market_fx_inr_lpa": 66.0
+  },
+  "Infosys BPM": {
+    "matched_employer_name": "INFOSYS BPM LIMITED",
+    "us_work_state": "TX",
+    "total_h1b_filings": 215,
+    "median_wage_usd": 87300,
+    "certified_pct": 98.6,
+    "top_us_job_title": "Computer Occupations, All Other",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 73900.0,
+      "Level II (Mid-Level)": 90400.0,
+      "Level III (Senior / Lead)": 113000.0,
+      "Level IV (Principal / Manager)": 138700.0
+    },
+    "ppp_equivalent_inr_lpa": 20.5,
+    "market_fx_inr_lpa": 75.1
+  },
+  "JSW Steel": {
+    "matched_employer_name": "JSW Steel USA, Inc.",
+    "us_work_state": "TX",
+    "total_h1b_filings": 117,
+    "median_wage_usd": 78000,
+    "certified_pct": 94.87,
+    "top_us_job_title": "Automotive Engineers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 66100.0,
+      "Level II (Mid-Level)": 80800.0,
+      "Level III (Senior / Lead)": 100900.0,
+      "Level IV (Principal / Manager)": 123900.0
+    },
+    "ppp_equivalent_inr_lpa": 18.3,
+    "market_fx_inr_lpa": 67.1
+  },
+  "LTIMindtree": {
+    "matched_employer_name": "LARSEN & TOUBRO INFOTECH LIMITED",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 29907,
+    "median_wage_usd": 69100,
+    "certified_pct": 94.49,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 58500.0,
+      "Level II (Mid-Level)": 71500.0,
+      "Level III (Senior / Lead)": 89400.0,
+      "Level IV (Principal / Manager)": 109700.0
+    },
+    "ppp_equivalent_inr_lpa": 16.2,
+    "market_fx_inr_lpa": 59.4
+  },
+  "Lupin": {
+    "matched_employer_name": "Lupin Pharmaceuticals, Inc.",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 59,
+    "median_wage_usd": 110000,
+    "certified_pct": 88.14,
+    "top_us_job_title": "Database Administrators",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 93200.0,
+      "Level II (Mid-Level)": 113900.0,
+      "Level III (Senior / Lead)": 142400.0,
+      "Level IV (Principal / Manager)": 174700.0
+    },
+    "ppp_equivalent_inr_lpa": 25.9,
+    "market_fx_inr_lpa": 94.6
+  },
+  "Mphasis": {
+    "matched_employer_name": "Mphasis Corporation",
+    "us_work_state": "NY",
+    "total_h1b_filings": 13245,
+    "median_wage_usd": 76900,
+    "certified_pct": 95.18,
+    "top_us_job_title": "Computer Programmers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 65100.0,
+      "Level II (Mid-Level)": 79600.0,
+      "Level III (Senior / Lead)": 99500.0,
+      "Level IV (Principal / Manager)": 122100.0
+    },
+    "ppp_equivalent_inr_lpa": 18.1,
+    "market_fx_inr_lpa": 66.1
+  },
+  "NTT DATA": {
+    "matched_employer_name": "NTT DATA Americas, Inc.",
+    "us_work_state": "TX",
+    "total_h1b_filings": 9389,
+    "median_wage_usd": 87500,
+    "certified_pct": 93.78,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 74100.0,
+      "Level II (Mid-Level)": 90600.0,
+      "Level III (Senior / Lead)": 113200.0,
+      "Level IV (Principal / Manager)": 139000.0
+    },
+    "ppp_equivalent_inr_lpa": 20.6,
+    "market_fx_inr_lpa": 75.2
+  },
+  "Nagarro": {
+    "matched_employer_name": "NAGARRO, INC",
+    "us_work_state": "CA",
+    "total_h1b_filings": 2040,
+    "median_wage_usd": 79000,
+    "certified_pct": 99.41,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 66900.0,
+      "Level II (Mid-Level)": 81800.0,
+      "Level III (Senior / Lead)": 102200.0,
+      "Level IV (Principal / Manager)": 125500.0
+    },
+    "ppp_equivalent_inr_lpa": 18.6,
+    "market_fx_inr_lpa": 67.9
+  },
+  "Oracle": {
+    "matched_employer_name": "Oracle America, Inc.",
+    "us_work_state": "TX",
+    "total_h1b_filings": 14346,
+    "median_wage_usd": 105000,
+    "certified_pct": 89.74,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 88900.0,
+      "Level II (Mid-Level)": 108700.0,
+      "Level III (Senior / Lead)": 135900.0,
+      "Level IV (Principal / Manager)": 166800.0
+    },
+    "ppp_equivalent_inr_lpa": 24.7,
+    "market_fx_inr_lpa": 90.3
+  },
+  "Persistent Systems": {
+    "matched_employer_name": "PERSISTENT SYSTEMS, INC.",
+    "us_work_state": "CA",
+    "total_h1b_filings": 5889,
+    "median_wage_usd": 74400,
+    "certified_pct": 83.22,
+    "top_us_job_title": "Computer Programmers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 63000.0,
+      "Level II (Mid-Level)": 77000.0,
+      "Level III (Senior / Lead)": 96300.0,
+      "Level IV (Principal / Manager)": 118200.0
+    },
+    "ppp_equivalent_inr_lpa": 17.5,
+    "market_fx_inr_lpa": 64.0
+  },
+  "PwC": {
+    "matched_employer_name": "PRICEWATERHOUSECOOPERS LLP",
+    "us_work_state": "FL",
+    "total_h1b_filings": 9574,
+    "median_wage_usd": 74500,
+    "certified_pct": 97.86,
+    "top_us_job_title": "Accountants",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 63100.0,
+      "Level II (Mid-Level)": 77100.0,
+      "Level III (Senior / Lead)": 96400.0,
+      "Level IV (Principal / Manager)": 118300.0
+    },
+    "ppp_equivalent_inr_lpa": 17.5,
+    "market_fx_inr_lpa": 64.1
+  },
+  "Randstad": {
+    "matched_employer_name": "RANDSTAD TECHNOLOGIES, LLC",
+    "us_work_state": "MA",
+    "total_h1b_filings": 6933,
+    "median_wage_usd": 105400,
+    "certified_pct": 91.88,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 89300.0,
+      "Level II (Mid-Level)": 109100.0,
+      "Level III (Senior / Lead)": 136400.0,
+      "Level IV (Principal / Manager)": 167400.0
+    },
+    "ppp_equivalent_inr_lpa": 24.8,
+    "market_fx_inr_lpa": 90.6
+  },
+  "Samsung": {
+    "matched_employer_name": "Samsung Electronics America, Inc.",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 1865,
+    "median_wage_usd": 120300,
+    "certified_pct": 83.49,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 101900.0,
+      "Level II (Mid-Level)": 124500.0,
+      "Level III (Senior / Lead)": 155700.0,
+      "Level IV (Principal / Manager)": 191100.0
+    },
+    "ppp_equivalent_inr_lpa": 28.3,
+    "market_fx_inr_lpa": 103.5
+  },
+  "Schneider Electric": {
+    "matched_employer_name": "SCHNEIDER ELECTRIC USA, INC.",
+    "us_work_state": "MA",
+    "total_h1b_filings": 1227,
+    "median_wage_usd": 82200,
+    "certified_pct": 85.09,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 69600.0,
+      "Level II (Mid-Level)": 85100.0,
+      "Level III (Senior / Lead)": 106400.0,
+      "Level IV (Principal / Manager)": 130600.0
+    },
+    "ppp_equivalent_inr_lpa": 19.3,
+    "market_fx_inr_lpa": 70.7
+  },
+  "Standard Chartered": {
+    "matched_employer_name": "Standard Chartered Bank",
+    "us_work_state": "NY",
+    "total_h1b_filings": 331,
+    "median_wage_usd": 121000,
+    "certified_pct": 90.33,
+    "top_us_job_title": "Financial Managers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 102500.0,
+      "Level II (Mid-Level)": 125300.0,
+      "Level III (Senior / Lead)": 156600.0,
+      "Level IV (Principal / Manager)": 192200.0
+    },
+    "ppp_equivalent_inr_lpa": 28.4,
+    "market_fx_inr_lpa": 104.1
+  },
+  "Startek": {
+    "matched_employer_name": "STARTEKK LLC",
+    "us_work_state": "TX",
+    "total_h1b_filings": 73,
+    "median_wage_usd": 72000,
+    "certified_pct": 93.15,
+    "top_us_job_title": "Computer Systems Analyst",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 61000.0,
+      "Level II (Mid-Level)": 74500.0,
+      "Level III (Senior / Lead)": 93200.0,
+      "Level IV (Principal / Manager)": 114400.0
+    },
+    "ppp_equivalent_inr_lpa": 16.9,
+    "market_fx_inr_lpa": 61.9
+  },
+  "Sun Pharmaceutical Industries": {
+    "matched_employer_name": "Sun Pharmaceutical Industries, Inc.",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 260,
+    "median_wage_usd": 81800,
+    "certified_pct": 90.0,
+    "top_us_job_title": "Chemists",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 69300.0,
+      "Level II (Mid-Level)": 84700.0,
+      "Level III (Senior / Lead)": 105900.0,
+      "Level IV (Principal / Manager)": 129900.0
+    },
+    "ppp_equivalent_inr_lpa": 19.2,
+    "market_fx_inr_lpa": 70.3
+  },
+  "Sutherland Global Services": {
+    "matched_employer_name": "Sutherland Global Services, Inc.",
+    "us_work_state": "NY",
+    "total_h1b_filings": 38,
+    "median_wage_usd": 120000,
+    "certified_pct": 86.84,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 101600.0,
+      "Level II (Mid-Level)": 124200.0,
+      "Level III (Senior / Lead)": 155300.0,
+      "Level IV (Principal / Manager)": 190600.0
+    },
+    "ppp_equivalent_inr_lpa": 28.2,
+    "market_fx_inr_lpa": 103.2
+  },
+  "TCS": {
+    "matched_employer_name": "TATA CONSULTANCY SERVICES LIMITED",
+    "us_work_state": "MD",
+    "total_h1b_filings": 126291,
+    "median_wage_usd": 67400,
+    "certified_pct": 99.23,
+    "top_us_job_title": "Computer Programmers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 57100.0,
+      "Level II (Mid-Level)": 69800.0,
+      "Level III (Senior / Lead)": 87200.0,
+      "Level IV (Principal / Manager)": 107000.0
+    },
+    "ppp_equivalent_inr_lpa": 15.8,
+    "market_fx_inr_lpa": 58.0
+  },
+  "TP": {
+    "matched_employer_name": "SOFTPATH SYSTEM LLC",
+    "us_work_state": "GA",
+    "total_h1b_filings": 1099,
+    "median_wage_usd": 60000,
+    "certified_pct": 61.33,
+    "top_us_job_title": "Computer Systems Analyst",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 55000,
+      "Level II (Mid-Level)": 68000,
+      "Level III (Senior / Lead)": 85000,
+      "Level IV (Principal / Manager)": 105000
+    },
+    "ppp_equivalent_inr_lpa": 14.1,
+    "market_fx_inr_lpa": 51.6
+  },
+  "Tech Mahindra": {
+    "matched_employer_name": "Tech Mahindra (Americas) Inc.",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 43470,
+    "median_wage_usd": 75600,
+    "certified_pct": 96.21,
+    "top_us_job_title": "Computer Programmers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 64000.0,
+      "Level II (Mid-Level)": 78300.0,
+      "Level III (Senior / Lead)": 97800.0,
+      "Level IV (Principal / Manager)": 120100.0
+    },
+    "ppp_equivalent_inr_lpa": 17.8,
+    "market_fx_inr_lpa": 65.0
+  },
+  "UST": {
+    "matched_employer_name": "UST GLOBAL INC",
+    "us_work_state": "CA",
+    "total_h1b_filings": 19536,
+    "median_wage_usd": 65000,
+    "certified_pct": 93.68,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 55100.0,
+      "Level II (Mid-Level)": 68000,
+      "Level III (Senior / Lead)": 85000,
+      "Level IV (Principal / Manager)": 105000
+    },
+    "ppp_equivalent_inr_lpa": 15.3,
+    "market_fx_inr_lpa": 55.9
+  },
+  "WNS": {
+    "matched_employer_name": "Turner & Townsend, Inc.",
+    "us_work_state": "NY",
+    "total_h1b_filings": 315,
+    "median_wage_usd": 125000,
+    "certified_pct": 90.79,
+    "top_us_job_title": "Cost Estimators",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 105900.0,
+      "Level II (Mid-Level)": 129400.0,
+      "Level III (Senior / Lead)": 161800.0,
+      "Level IV (Principal / Manager)": 198500.0
+    },
+    "ppp_equivalent_inr_lpa": 29.4,
+    "market_fx_inr_lpa": 107.5
+  },
+  "Wells Fargo": {
+    "matched_employer_name": "WELLS FARGO BANK, N.A.",
+    "us_work_state": "AZ",
+    "total_h1b_filings": 2740,
+    "median_wage_usd": 130000,
+    "certified_pct": 97.04,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 110100.0,
+      "Level II (Mid-Level)": 134600.0,
+      "Level III (Senior / Lead)": 168200.0,
+      "Level IV (Principal / Manager)": 206500.0
+    },
+    "ppp_equivalent_inr_lpa": 30.6,
+    "market_fx_inr_lpa": 111.8
+  },
+  "Wipro": {
+    "matched_employer_name": "WIPRO LIMITED",
+    "us_work_state": "NJ",
+    "total_h1b_filings": 71022,
+    "median_wage_usd": 70300,
+    "certified_pct": 91.54,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 59500.0,
+      "Level II (Mid-Level)": 72800.0,
+      "Level III (Senior / Lead)": 91000.0,
+      "Level IV (Principal / Manager)": 111700.0
+    },
+    "ppp_equivalent_inr_lpa": 16.5,
+    "market_fx_inr_lpa": 60.5
+  },
+  "eClerx": {
+    "matched_employer_name": "eClerx LLC",
+    "us_work_state": "NY",
+    "total_h1b_filings": 75,
+    "median_wage_usd": 105000,
+    "certified_pct": 90.67,
+    "top_us_job_title": "Operation Research Analysts",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 88900.0,
+      "Level II (Mid-Level)": 108700.0,
+      "Level III (Senior / Lead)": 135900.0,
+      "Level IV (Principal / Manager)": 166800.0
+    },
+    "ppp_equivalent_inr_lpa": 24.7,
+    "market_fx_inr_lpa": 90.3
+  },
+  "vivo": {
+    "matched_employer_name": "Invivo Corporation",
+    "us_work_state": "FL",
+    "total_h1b_filings": 37,
+    "median_wage_usd": 79300,
+    "certified_pct": 94.59,
+    "top_us_job_title": "Software Developers",
+    "wage_levels_usd": {
+      "Level I (Entry / Junior)": 67200.0,
+      "Level II (Mid-Level)": 82100.0,
+      "Level III (Senior / Lead)": 102600.0,
+      "Level IV (Principal / Manager)": 125900.0
+    },
+    "ppp_equivalent_inr_lpa": 18.6,
+    "market_fx_inr_lpa": 68.2
+  }
+}

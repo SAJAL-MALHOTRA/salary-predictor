@@ -187,10 +187,17 @@ def load_assets():
     else:
         company_insights = {}
 
-    return pipeline, metadata, df, company_insights
+    h1b_file = _BASE / "h1b_lca_benchmarks.json"
+    if h1b_file.exists():
+        with open(h1b_file, "r", encoding="utf-8") as f:
+            h1b_benchmarks = json.load(f)
+    else:
+        h1b_benchmarks = {}
+
+    return pipeline, metadata, df, company_insights, h1b_benchmarks
 
 
-pipeline, metadata, df, company_insights = load_assets()
+pipeline, metadata, df, company_insights, h1b_benchmarks = load_assets()
 
 companies = metadata["companies"]
 company_jobs = metadata["company_jobs"]
@@ -694,7 +701,69 @@ with main_tab1:
 
     st.markdown("---")
 
-    # ── Section 4: Employee Culture Voice (Likes & Dislikes) ──
+    # ── Section 4: US Onsite H-1B Prevailing Wage Opportunity ──
+    h1b_data = h1b_benchmarks.get(selected_company)
+    st.subheader(f"🇺🇸 US Onsite H-1B Opportunity ({selected_company})")
+    st.caption("Official disclosure benchmarks from the U.S. Department of Labor (DOL) Office of Foreign Labor Certification.")
+
+    if h1b_data:
+        h1b_c1, h1b_c2, h1b_c3 = st.columns([1.3, 1.3, 1.4], gap="medium")
+        with h1b_c1:
+            st.markdown(
+                f"""
+                <div class="metric-box">
+                    <div class="metric-caption">Median US Onsite Wage</div>
+                    <div style="font-size: 2rem; font-weight:800; color:#1e1b4b;">${h1b_data['median_wage_usd']:,} <span style="font-size: 1rem; color:#64748b;">/ yr</span></div>
+                    <div class="metric-sub">Direct FX: <strong>₹ {h1b_data['market_fx_inr_lpa']} LPA</strong> · PPP Eq: <strong>₹ {h1b_data['ppp_equivalent_inr_lpa']} LPA</strong></div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with h1b_c2:
+            st.markdown(
+                f"""
+                <div class="metric-box-highlight">
+                    <div class="metric-caption">Official Sponsorship Track</div>
+                    <div style="font-size: 2rem; font-weight:800; color:#047857;">{h1b_data['total_h1b_filings']:,} <span style="font-size: 1rem; color:#065f46;">filings</span></div>
+                    <div class="metric-sub">DOL Approval Rate: <strong>{h1b_data['certified_pct']}% Certified</strong></div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with h1b_c3:
+            st.markdown(
+                f"""
+                <div class="metric-box">
+                    <div class="metric-caption">US Entity & Location</div>
+                    <div style="font-size: 1.15rem; font-weight:700; color:#0f172a; margin-bottom: 0.2rem;">{h1b_data['matched_employer_name'][:30]}</div>
+                    <div class="metric-sub">Primary State: <strong>{h1b_data['us_work_state']}</strong> · Top Role: <strong>{h1b_data['top_us_job_title']}</strong></div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        # Prevailing wage levels table
+        levels_dict = h1b_data.get("wage_levels_usd", {})
+        if levels_dict:
+            with st.expander("🏛️ View Prevailing Wage by Experience Level (US DOL Regulations)"):
+                lvl_df = pd.DataFrame([
+                    {"Seniority Level": k, "Annual USD Wage": f"${v:,}", "Direct FX (INR)": f"₹ {round(v * 86.0 / 100000, 1)} LPA", "World Bank PPP (INR)": f"₹ {round(v * 23.5 / 100000, 1)} LPA"}
+                    for k, v in levels_dict.items()
+                ])
+                st.dataframe(lvl_df, use_container_width=True, hide_index=True)
+    else:
+        st.markdown(
+            f"""
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.85rem 1.1rem; font-size: 0.9rem; color: #64748b;">
+                🏢 <strong>Domestic Operations:</strong> No active H-1B visa sponsorships on record with the U.S. Department of Labor for <strong>{selected_company}</strong>. Compensation reflects purely domestic Indian offshore salary structures.
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("---")
+
+    # ── Section 5: Employee Culture Voice (Likes & Dislikes) ──
     top_likes = comp_info.get("top_likes", [])
     top_dislikes = comp_info.get("top_dislikes", [])
     if top_likes or top_dislikes:
@@ -945,7 +1014,8 @@ with st.expander("ℹ️ Data Provenance, Machine Learning Methodology & Disclai
     st.markdown(
         f"""
 ### 📊 Data Provenance & Academic / Portfolio Notice
-- **Data Source:** Compensation records and employee sentiment scraped from [AmbitionBox](https://www.ambitionbox.com/salaries) (mid-2026 snapshot) strictly for educational, demonstration, and non-commercial portfolio research.
+- **Data Source 1 (India Offshore):** Compensation records and employee sentiment scraped from [AmbitionBox](https://www.ambitionbox.com/salaries) (mid-2026 snapshot) strictly for educational, demonstration, and non-commercial portfolio research.
+- **Data Source 2 (US Onsite H-1B):** Augmented with 100% legal, public government disclosure data from the **U.S. Department of Labor (DOL) Office of Foreign Labor Certification (OFLC)**, tracking over 1,000,000+ certified H-1B petitions, median USD salaries, and Level I-IV prevailing wage minimums.
 - **Coverage:** **{len(companies)} companies** and **{len(all_job_titles)} unique job titles** across India.
 - **Role Taxonomy:** Parsed into **{len(role_families)} Canonical Role Families** and **5 Seniority Levels** via regex pattern matching to resolve categorical sparsity.
 - **RAG Review Index:** **33,200+ review vectors** embedded via `all-MiniLM-L6-v2` and indexed with FAISS for semantic review retrieval.

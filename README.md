@@ -55,6 +55,12 @@ A comprehensive Streamlit web platform for salary estimation, RAG-powered workpl
 - Simulates how compensation evolves across 0 to 18 years of experience for any role at any company.
 - Plots milestone stages: Fresh Graduate, Mid-Level, Senior, and Lead/Principal.
 
+### 8. 🇺🇸 US Onsite H-1B Prevailing Wage Intelligence (US DOL OFLC Data)
+- Integrates **100% legal, public government disclosure records** from the **U.S. Department of Labor (DOL)** Office of Foreign Labor Certification (OFLC).
+- Tracks over **1,000,000+ certified H-1B visa petitions** across 50 tier-1 Indian IT and multinational technology firms (Infosys: 200k, TCS: 126k, Cognizant: 125k, Google: 42k, etc.).
+- Compares **Offshore India CTC** against **US Onsite H-1B Median Wages** with both Direct FX (USD to INR @ 86) and World Bank Purchasing Power Parity (PPP @ 23.5).
+- Displays federal prevailing wage tiers (Level I Entry to Level IV Leadership) pursuant to 20 CFR § 656.40.
+
 ---
 
 ## 🛠️ Quickstart & Setup
@@ -69,7 +75,10 @@ pip install -r requirements.txt
 # 3. Train model pipeline & generate company intelligence assets
 python train_model.py
 
-# 4. Launch the Streamlit web application
+# 4. (Optional) Ingest and update official US DOL H-1B LCA benchmarks
+python ingest_h1b_dol_data.py
+
+# 5. Launch the Streamlit web application
 streamlit run app.py
 ```
 
@@ -79,11 +88,14 @@ streamlit run app.py
 
 | File | Description |
 |---|---|
-| `app.py` | Full multi-tab Streamlit dashboard with Plotly charts, RAG interface, and tax calculators |
+| `app.py` | Full multi-tab Streamlit dashboard with Plotly charts, RAG interface, tax calculators, and US H-1B benchmark module |
 | `rag_assistant.py` | RAG module: lazy FAISS loading, review parsing, semantic search, and Gemini/extractive synthesis |
 | `faiss_index/` | Local vector index (`index.faiss` + `index.pkl`) storing 33,200+ review embeddings |
 | `train_model.py` | Ingests data, applies NLP role normalization, executes 5-fold CV, trains Voting Ensemble |
-| `METHODOLOGY.md` | In-depth technical report: ablation study, 5-fold CV breakdown, segment error analysis |
+| `ingest_h1b_dol_data.py` | Ingestion script pulling official US Department of Labor OFLC H-1B LCA public disclosure data |
+| `h1b_lca_benchmarks.json` | Pre-computed US DOL H-1B benchmarks for 50 employers (filings, median wage, wage levels) |
+| `h1b_summary.csv` | Summary table of top employers by certified H-1B filings and approval rates |
+| `METHODOLOGY.md` | In-depth technical report: ablation study, 5-fold CV breakdown, segment error analysis, US DOL data integration |
 | `evaluation_report.json` | Programmatically exported cross-validation metrics, segment MAEs, and fold scores |
 | `salary_data.csv` | Cleaned, deduplicated salary dataset with company ratings, industry, role family, and seniority |
 | `company_insights.json` | Pre-aggregated company ratings, review counts, HQ locations, top likes/dislikes |

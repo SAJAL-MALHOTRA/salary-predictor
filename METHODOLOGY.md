@@ -168,9 +168,48 @@ $$\text{P10} = \text{Percentile}(\{\hat{y}_t\}, 10), \quad \text{P90} = \text{Pe
 
 ---
 
-## 9. Legal Provenance, Fair Use & Disclaimer
+## 9. US Department of Labor (DOL) OFLC H-1B LCA Data Augmentation
 
-1. **Source:** AmbitionBox mid-2026 public data snapshot.
+To eliminate reliance solely on scraped community datasets and introduce **100% legal, public government data**, the platform integrates official disclosure data from the **U.S. Department of Labor (DOL) Office of Foreign Labor Certification (OFLC)**:
+
+### 9.1 Data Provenance & Legal Classification
+- **Source:** U.S. Department of Labor OFLC Case Disclosure Data (CC BY 4.0).
+- **Public Domain Status:** Published quarterly under statutory federal disclosure requirements (20 CFR § 655).
+- **Scope:** Over **1,000,000+ certified Labor Condition Applications (LCAs)** spanning 50 tier-1 Indian IT and multinational technology employers.
+
+### 9.2 Top Indian Tech Employers by Certified US H-1B Filings
+
+| Company | US Legal Employer Entity | Total Certified Filings | Median Wage (USD) | Approval Rate | Primary Worksite State |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **Infosys** | INFOSYS LIMITED | **200,329** | **$76,800** | 99.55% | Texas (TX) |
+| **TCS** | TATA CONSULTANCY SERVICES LIMITED | **126,291** | **$67,400** | 99.23% | Maryland (MD) |
+| **Cognizant** | COGNIZANT TECHNOLOGY SOLUTIONS US CORP | **125,757** | **$89,600** | 96.07% | Texas (TX) |
+| **Deloitte** | Deloitte Consulting LLP | **79,212** | **$88,700** | 98.22% | Pennsylvania (PA) |
+| **Wipro** | WIPRO LIMITED | **71,022** | **$70,300** | 91.54% | New Jersey (NJ) |
+| **Microsoft** | Microsoft Corporation | **70,316** | **$133,900** | 94.15% | Washington (WA) |
+| **Capgemini** | CAPGEMINI AMERICA INC | **59,909** | **$85,200** | 94.17% | Illinois (IL) |
+| **Accenture** | Accenture LLP | **57,231** | **$81,300** | 98.15% | Illinois (IL) |
+| **IBM** | IBM India Private Limited / IBM Corp | **48,627** | **$74,300** | 80.90% | New York (NY) |
+| **Tech Mahindra** | Tech Mahindra (Americas) Inc. | **43,470** | **$75,600** | 96.21% | New Jersey (NJ) |
+| **HCLTech** | HCL AMERICA INC | **42,931** | **$77,900** | 98.07% | California (CA) |
+| **Google** | Google LLC | **42,445** | **$163,500** | 98.50% | California (CA) |
+
+### 9.3 Prevailing Wage Level Normalization (20 CFR § 656.40)
+The platform maps seniorities to federal prevailing wage tiers:
+- **Level I (Entry / Junior):** Beginning level employees performing routine tasks under close supervision.
+- **Level II (Qualified / Mid-Level):** Employees who have gained a good understanding of the occupation.
+- **Level III (Experienced / Senior):** Fully competent employees with specialized technical knowledge.
+- **Level IV (Fully Competent / Principal / Manager):** Leadership roles planning and directing complex technical initiatives.
+
+To support fair international comparison, both **Direct Foreign Exchange (1 USD = ₹86.0 INR)** and **World Bank Purchasing Power Parity (1 USD = ₹23.5 INR PPP)** metrics are computed side-by-side.
+
+---
+
+## 10. Legal Provenance, Fair Use & Disclaimer
+
+1. **Sources:** 
+   - AmbitionBox mid-2026 public data snapshot (for domestic Indian offshore compensation and employee culture reviews).
+   - U.S. Department of Labor OFLC LCA disclosure data (for international onsite prevailing wages and visa sponsorship metrics).
 2. **Fair Use / Educational Status:** This project is developed purely as an educational portfolio demonstration of ensemble machine learning, NLP taxonomy design, and RAG systems. It is non-commercial and has no paid tiers or paywalls.
 3. **No Affiliation:** This application is completely independent and has no affiliation with AmbitionBox or Info Edge India Ltd.
 4. **Data Limitations:** Self-reported figures omit equity grants (RSUs/ESOPs), performance multipliers, and college tier biases. Figures are strategic compasses, not formal tax or legal benchmarks.
