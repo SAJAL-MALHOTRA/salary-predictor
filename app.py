@@ -1,12 +1,13 @@
 """
 app.py -- India Salary & Career Intelligence Platform.
+Single-screen Offer Evaluator flow:
+  1. Monthly in-hand pay (range when variable % > 0, single point when variable % == 0)
+  2. Peer percentile with 80% conformal interval & P25-P75 market spread
+  3. Three concrete counter-offer numbers
+  4. One-line employer red-flag radar (notice period / bench / PIP)
 
-Redesigned with modern, responsive UI/UX design system:
-- High-impact on-page Estimator Hero Card (no hidden controls)
-- Live Monthly Take-Home & New Tax Regime breakdown alongside CTC
-- 3 focused navigation modules (Salary Hub, Offer Comparison, AI Review Copilot)
-- Custom typography, pill badges, and clean Plotly charts
-- Voting Ensemble ML (RandomForest + HistGradientBoosting) with NLP Role Normalization
+Hidden surfaces retained from v1 (Tabs 2-4, RAG copilot, culture x-ray)
+are gated behind os.getenv("DEV_MODE") == "1". See RETROSPECTIVE.md.
 """
 
 import json
@@ -17,22 +18,19 @@ from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 import streamlit as st
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 _BASE = Path(__file__).resolve().parent
 
-# ── 1. PAGE SETUP & DESIGN SYSTEM CSS ────────────────────────────────────────
+# ── 1. PAGE SETUP & RESPONSIVE DESIGN SYSTEM CSS ──────────────────────────────
 st.set_page_config(
-    page_title="India Salary & Career Intelligence",
+    page_title="Offer Evaluator | India Tech Salary Intelligence",
     page_icon="💼",
-    layout="wide",
-    initial_sidebar_state="collapsed",  # Clean by default; essential controls are on-page!
+    layout="centered",
+    initial_sidebar_state="collapsed",
 )
 
-# Custom Design System CSS
 st.markdown(
     """
 <style>
@@ -47,16 +45,16 @@ html, body, [class*="css"] {
     display: inline-block;
     background: #eef2ff;
     color: #4f46e5;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    padding: 0.3rem 0.8rem;
+    padding: 0.25rem 0.75rem;
     border-radius: 9999px;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
 }
 .app-title {
-    font-size: 2.3rem;
+    font-size: 2.1rem;
     font-weight: 800;
     color: #0f172a;
     letter-spacing: -0.03em;
@@ -64,91 +62,104 @@ html, body, [class*="css"] {
     margin-bottom: 0.25rem;
 }
 .app-subtitle {
-    font-size: 1.05rem;
+    font-size: 0.98rem;
     color: #64748b;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.45;
 }
 
 /* Cards */
-.metric-box {
+.output-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 1.25rem 1.4rem;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-    height: 100%;
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
-.metric-box-highlight {
+.output-card-highlight {
     background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
-    border: 1px solid #bbf7d0;
-    border-radius: 14px;
-    padding: 1.25rem 1.4rem;
+    border: 1px solid #86efac;
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1rem;
     box-shadow: 0 2px 6px rgba(16, 185, 129, 0.06);
-    height: 100%;
 }
-.metric-caption {
+.card-caption {
     font-size: 0.75rem;
     font-weight: 700;
     color: #64748b;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 0.35rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
 }
-.metric-val-ctc {
-    font-size: 2.3rem;
-    font-weight: 800;
-    color: #1e1b4b;
-    line-height: 1.1;
-}
-.metric-val-inhand {
-    font-size: 2.3rem;
+.inhand-range {
+    font-size: 2rem;
     font-weight: 800;
     color: #047857;
-    line-height: 1.1;
+    line-height: 1.15;
 }
-.metric-sub {
-    font-size: 0.85rem;
-    color: #64748b;
-    margin-top: 0.35rem;
+.percentile-val {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #1e1b4b;
+    line-height: 1.2;
+}
+
+/* Counter offer pills */
+.counter-box {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+}
+.counter-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.counter-val {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0.15rem 0;
+}
+.counter-desc {
+    font-size: 0.82rem;
+    color: #475569;
+}
+
+/* Red flag box */
+.red-flag-box {
+    background: #fff7ed;
+    border-left: 4px solid #f97316;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.88rem;
+    color: #9a3412;
+    line-height: 1.45;
 }
 
 /* Badges */
 .badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.2rem 0.65rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 9999px;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    margin-right: 0.4rem;
-    margin-bottom: 0.4rem;
+    margin-right: 0.35rem;
+    margin-bottom: 0.35rem;
 }
 .badge-indigo { background: #e0e7ff; color: #4338ca; }
-.badge-emerald { background: #d1fae5; color: #065f46; }
-.badge-amber { background: #fef3c7; color: #92400e; }
 .badge-slate { background: #f1f5f9; color: #475569; }
+.badge-amber { background: #fef3c7; color: #92400e; }
 
-/* Culture Quotes */
-.pros-quote {
-    background: #f0fdf4;
-    border-left: 4px solid #22c55e;
-    border-radius: 8px;
-    padding: 0.85rem 1rem;
-    margin-bottom: 0.6rem;
-    font-size: 0.9rem;
-    color: #166534;
-}
-.cons-quote {
-    background: #fff1f2;
-    border-left: 4px solid #f43f5e;
-    border-radius: 8px;
-    padding: 0.85rem 1rem;
-    margin-bottom: 0.6rem;
-    font-size: 0.9rem;
-    color: #9f1239;
-}
-
-/* Tabs */
+/* Dev mode tabs styling */
 div[data-baseweb="tab-list"] {
     gap: 8px;
     background-color: #f1f5f9;
@@ -167,6 +178,24 @@ div[data-baseweb="tab"][aria-selected="true"] {
     color: #0f172a;
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
+.pros-quote {
+    background: #f0fdf4;
+    border-left: 4px solid #22c55e;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
+    color: #166534;
+}
+.cons-quote {
+    background: #fff1f2;
+    border-left: 4px solid #f43f5e;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
+    color: #9f1239;
+}
 </style>
 """,
     unsafe_allow_html=True,
@@ -181,32 +210,16 @@ def load_assets():
     df = pd.read_csv(_BASE / "salary_data.csv")
 
     insights_file = _BASE / "company_insights.json"
-    if insights_file.exists():
-        with open(insights_file, "r", encoding="utf-8") as f:
-            company_insights = json.load(f)
-    else:
-        company_insights = {}
+    company_insights = json.load(open(insights_file, "r", encoding="utf-8")) if insights_file.exists() else {}
 
     h1b_file = _BASE / "h1b_lca_benchmarks.json"
-    if h1b_file.exists():
-        with open(h1b_file, "r", encoding="utf-8") as f:
-            h1b_benchmarks = json.load(f)
-    else:
-        h1b_benchmarks = {}
+    h1b_benchmarks = json.load(open(h1b_file, "r", encoding="utf-8")) if h1b_file.exists() else {}
 
     gd_file = _BASE / "glassdoor_benchmarks.json"
-    if gd_file.exists():
-        with open(gd_file, "r", encoding="utf-8") as f:
-            glassdoor_benchmarks = json.load(f)
-    else:
-        glassdoor_benchmarks = {}
+    glassdoor_benchmarks = json.load(open(gd_file, "r", encoding="utf-8")) if gd_file.exists() else {}
 
     rd_file = _BASE / "reddit_benchmarks.json"
-    if rd_file.exists():
-        with open(rd_file, "r", encoding="utf-8") as f:
-            reddit_benchmarks = json.load(f)
-    else:
-        reddit_benchmarks = {}
+    reddit_benchmarks = json.load(open(rd_file, "r", encoding="utf-8")) if rd_file.exists() else {}
 
     return pipeline, metadata, df, company_insights, h1b_benchmarks, glassdoor_benchmarks, reddit_benchmarks
 
@@ -218,12 +231,12 @@ company_jobs = metadata["company_jobs"]
 all_job_titles = metadata["all_job_titles"]
 role_families = metadata.get("role_families", sorted(df["Role_Family"].unique().tolist()))
 seniority_levels = metadata.get("seniority_levels", ["Entry / Junior", "Mid-Level", "Senior / Lead", "Manager / Lead", "Executive / Director"])
-experience_cap = float(metadata["experience_cap"])
+experience_cap = float(metadata.get("experience_cap", 30.0))
 
 
 # ── 3. NLP & UTILITY FUNCTIONS ───────────────────────────────────────────────
 def categorize_job(title: str):
-    """Map noisy job titles into canonical Role Family & Seniority Level."""
+    """Map free-text job titles into canonical Role Family & Seniority Level."""
     t = str(title).lower()
 
     # Seniority Level
@@ -282,24 +295,10 @@ def get_tree_predictions(pl, input_df):
     return np.array([tree.predict(preprocessed)[0] for tree in rf.estimators_])
 
 
-def find_comparable_records(dataframe, company, job_title, role_family, experience, n=8):
-    """Score and rank dataset rows by relevance to user query."""
-    title_match = dataframe["Job_Title"] == job_title
-    family_match = dataframe["Role_Family"] == role_family
-    comp_match = dataframe["Company"] == company
-
-    scores = title_match.astype(int) * 4.0 + family_match.astype(int) * 3.0 + comp_match.astype(int) * 2.5
-    exp_diff = (dataframe["Avg_Exp"] - experience).abs()
-    scores = scores - (exp_diff / 5.0)
-
-    top_indices = scores.nlargest(n).index
-    return dataframe.loc[top_indices].copy()
-
-
 def calculate_take_home(ctc_lpa):
     """
     Compute estimated in-hand salary under India's New Tax Regime (Budget 2024 / FY 2024-25, AY 2025-26).
-    Standard deduction: ₹75,000.
+    Standard deduction: ₹75,000. Basic assumed at 40% of CTC.
     """
     ctc = float(ctc_lpa) * 100000.0
     basic = ctc * 0.40
@@ -356,898 +355,372 @@ def calculate_take_home(ctc_lpa):
 
 
 # ── 4. HEADER ────────────────────────────────────────────────────────────────
-st.markdown('<div class="header-badge">🇮🇳 Compensation & Career Intelligence</div>', unsafe_allow_html=True)
-st.markdown('<h1 class="app-title">India Salary & Career Platform</h1>', unsafe_allow_html=True)
+st.markdown('<div class="header-badge">Offer Decision Engine</div>', unsafe_allow_html=True)
+st.markdown('<h1 class="app-title">Is this offer good?</h1>', unsafe_allow_html=True)
 st.markdown(
-    '<p class="app-subtitle">Real market benchmarks, monthly take-home tax breakdowns, and AI review synthesis powered by AmbitionBox data.</p>',
+    '<p class="app-subtitle">Evaluate your Indian tech offer letter: monthly bank credit, calibrated peer percentile, counter-offer targets, and employer red flags.</p>',
     unsafe_allow_html=True,
 )
 
 
-# ── 5. ON-PAGE HERO ESTIMATOR (Front and Center UX) ──────────────────────────
+# ── 5. SINGLE-SCREEN INPUT FORM (Phone-Friendly) ──────────────────────────────
 with st.container(border=True):
-    col_in1, col_in2, col_in3 = st.columns([1.3, 1.8, 1.4], gap="medium")
+    col_f1, col_f2 = st.columns(2, gap="medium")
 
-    with col_in1:
-        selected_company = st.selectbox(
-            "🏢 Select Company",
-            companies,
-            index=companies.index("TCS") if "TCS" in companies else 0,
-            help="Choose from 118 verified employers",
+    with col_f1:
+        input_company = st.text_input("🏢 Company", value="Infosys", help="Free text employer name (e.g. Infosys, Swiggy, Google)")
+        input_role = st.text_input("👤 Role / Job Title", value="Senior Software Engineer", help="e.g. Senior Software Engineer, ML Engineer, Data Analyst")
+        input_city = st.text_input("📍 City", value="Bangalore", help="Location of employment (e.g. Bangalore, Hyderabad, Pune)")
+
+    with col_f2:
+        input_exp = st.number_input("📅 Years of Experience", min_value=0.0, max_value=30.0, value=3.5, step=0.5)
+        input_ctc = st.number_input("💰 Offered Annual CTC (₹ LPA)", min_value=1.0, max_value=250.0, value=12.0, step=0.5)
+        input_var_pct = st.slider(
+            "📊 Variable Pay %",
+            min_value=0,
+            max_value=100,
+            value=15,
+            step=1,
+            help="Portion of CTC contingent on individual performance or company billing (default 15%)",
         )
 
-    with col_in2:
-        # Default to company's roles, but allow searching all
-        company_specific = company_jobs.get(selected_company, all_job_titles)
-        role_choices = company_specific if company_specific else all_job_titles
-        default_role_idx = 0
-        if "Software Developer" in role_choices:
-            default_role_idx = role_choices.index("Software Developer")
-        elif "Software Engineer" in role_choices:
-            default_role_idx = role_choices.index("Software Engineer")
+# Normalize role and lookup employer insights
+detected_family, detected_seniority = categorize_job(input_role)
 
-        selected_job = st.selectbox(
-            "👤 Job Title",
-            role_choices,
-            index=default_role_idx,
-            help="Choose from roles reported at this company",
-        )
+# Case-insensitive company lookup in company_insights
+comp_match_key = None
+for k in company_insights.keys():
+    if k.lower() == input_company.strip().lower():
+        comp_match_key = k
+        break
 
-    with col_in3:
-        selected_exp = st.slider(
-            "📅 Total Experience",
-            min_value=0.0,
-            max_value=experience_cap,
-            value=min(4.0, experience_cap),
-            step=0.5,
-            format="%.1f yrs",
-        )
+comp_info = company_insights.get(comp_match_key, {}) if comp_match_key else {}
+industry = comp_info.get("industry", "IT Services & Consulting")
+rating = float(comp_info.get("rating", 3.8))
 
-    # Contextual tags right under the inputs
-    detected_family, detected_seniority = categorize_job(selected_job)
-    comp_info = company_insights.get(selected_company, {})
-    industry = comp_info.get("industry", "Corporate")
-    rating = float(comp_info.get("rating", 3.5))
-    hq_city = comp_info.get("hq_city", "India")
-    reviews_count = comp_info.get("reviews", "10k+")
-
-    st.markdown(
-        f"""
-        <div style="margin-top: 0.3rem;">
-            <span class="badge badge-indigo">Domain: {detected_family}</span>
-            <span class="badge badge-slate">Level: {detected_seniority}</span>
-            <span class="badge badge-amber">⭐ {rating} / 5.0 Rating</span>
-            <span class="badge badge-slate">🏭 {industry}</span>
-            <span class="badge badge-slate">📍 {hq_city}</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-# ── 6. MODEL INFERENCE & HERO METRICS ────────────────────────────────────────
-user_input_df = pd.DataFrame(
+# ── 6. MODEL INFERENCE & OUTPUTS ─────────────────────────────────────────────
+# 1. Feature DF for pipeline
+eval_input_df = pd.DataFrame(
     [
         {
-            "Company": selected_company,
-            "Job_Title": selected_job,
+            "Company": comp_match_key if comp_match_key else input_company.strip(),
+            "Job_Title": input_role.strip(),
             "Industry": industry,
             "Role_Family": detected_family,
             "Seniority_Level": detected_seniority,
             "Rating": rating,
-            "Avg_Exp": float(selected_exp),
+            "Avg_Exp": float(input_exp),
         }
     ]
 )
 
-predicted_salary = round(float(pipeline.predict(user_input_df)[0]), 1)
-tree_predictions = get_tree_predictions(pipeline, user_input_df)
-p10 = round(float(np.percentile(tree_predictions, 10)), 1)
-p90 = round(float(np.percentile(tree_predictions, 90)), 1)
-std_dev = round(float(np.std(tree_predictions)), 1)
+try:
+    predicted_market_ctc = round(float(pipeline.predict(eval_input_df)[0]), 1)
+except Exception:
+    predicted_market_ctc = round(float(input_ctc), 1)
 
-# Split conformal prediction interval (finite-sample 80% marginal coverage guarantee)
+# Conformal uncertainty margin
 conf_margin = float(metadata.get("conformal_margin_80_lpa", 6.01))
-conf_low = max(1.0, round(predicted_salary - conf_margin, 1))
-conf_high = round(predicted_salary + conf_margin, 1)
+conf_low = max(1.0, round(predicted_market_ctc - conf_margin, 1))
+conf_high = round(predicted_market_ctc + conf_margin, 1)
 
-quick_th = calculate_take_home(predicted_salary)
-exact_matches = df[(df["Company"] == selected_company) & (df["Job_Title"] == selected_job)]
-
-st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
-
-# 3-Column Executive Hero Cards
-card_col1, card_col2, card_col3 = st.columns([1.3, 1.3, 1.4], gap="medium")
-
-with card_col1:
-    st.markdown(
-        f"""
-        <div class="metric-box">
-            <div class="metric-caption">Predicted Annual CTC</div>
-            <div class="metric-val-ctc">₹ {predicted_salary} <span style="font-size: 1.2rem; font-weight:600; color:#64748b;">LPA</span></div>
-            <div class="metric-sub">80% Conformal Interval: <strong>₹ {conf_low} - {conf_high} LPA</strong> (±{conf_margin}L)<br>
-            <span style="font-size: 0.78rem; color: #64748b;">Model-variance band: ₹ {p10} - {p90} LPA (71.2% empirical OOF)</span></div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-with card_col2:
-    st.markdown(
-        f"""
-        <div class="metric-box-highlight">
-            <div class="metric-caption">Estimated In-Hand Pay</div>
-            <div class="metric-val-inhand">₹ {int(quick_th['monthly_in_hand']):,} <span style="font-size: 1.1rem; font-weight:600; color:#065f46;">/ mo</span></div>
-            <div class="metric-sub">Annual Net: <strong>₹ {int(quick_th['net_annual']/100000):.1f} Lakhs</strong> (New Tax Regime)</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-with card_col3:
-    st.markdown(
-        f"""
-        <div class="metric-box">
-            <div class="metric-caption">Employer Intelligence ({selected_company})</div>
-            <div style="font-size: 1.3rem; font-weight: 700; color: #0f172a; margin-bottom: 0.3rem;">
-                ⭐ {rating} / 5.0 <span style="font-size: 0.85rem; color:#64748b; font-weight: 500;">({reviews_count} reviews)</span>
-            </div>
-            <div class="metric-sub">HQ: <strong>{hq_city}</strong> · Sector: <strong>{industry}</strong> · Median: <strong>₹ {comp_info.get('median_salary', 'N/A')} LPA</strong></div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-# Ground Truth Verification Notice
-if len(exact_matches) > 0:
-    amb_min = exact_matches["Min_Salary_LPA"].min()
-    amb_max = exact_matches["Max_Salary_LPA"].max()
-    amb_avg = exact_matches["Avg_Salary_LPA"].mean()
-    rep_exp = exact_matches["Experience"].iloc[0]
-    st.markdown(
-        f"""
-        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 0.7rem 1rem; margin-top: 0.8rem; font-size: 0.88rem; color: #065f46;">
-            ✅ <strong>Verified Ground Truth:</strong> AmbitionBox has {len(exact_matches)} reported record(s) for this exact role. Reported range: <strong>₹ {amb_min:.1f} - {amb_max:.1f} LPA</strong> (avg: <strong>₹ {amb_avg:.1f} LPA</strong>) for {rep_exp} experience.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-elif comp_info.get("salary_records_count", 0) < 3:
-    rec_count = comp_info.get("salary_records_count", 0)
-    st.markdown(
-        f"""
-        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 0.7rem 1rem; margin-top: 0.8rem; font-size: 0.88rem; color: #92400e;">
-            ⚠️ <strong>Cold-Start Confidence Notice:</strong> Only {rec_count} benchmark row(s) on file for {selected_company}. This estimate is anchored primarily on the broader <strong>{detected_family}</strong> domain ({detected_seniority}) and industry tier scaling.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-# Glassdoor India Multi-Source Cross-Validation
-gd_data = glassdoor_benchmarks.get(selected_company)
-if gd_data:
-    loc_str = ", ".join(gd_data["top_locations"]) if gd_data["top_locations"] else "India"
-    st.markdown(
-        f"""
-        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 0.6rem 1rem; margin-top: 0.45rem; font-size: 0.86rem; color: #334155;">
-            🌐 <strong>Glassdoor India Benchmark:</strong> <strong>{gd_data['sample_count']}</strong> verified salary reports on file. Median: <strong>₹ {gd_data['median_salary_lpa']} LPA</strong> (reported range: ₹ {gd_data['min_salary_lpa']} - {gd_data['max_salary_lpa']} LPA) across <em>{loc_str}</em>.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-# ── 7. PRIMARY 4-MODULE TABS ─────────────────────────────────────────────────
-st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
-
-main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs(
-    [
-        "📊 Salary & Career Deep Dive",
-        "⚖️ Compare Two Offers",
-        "🔥 Reddit Unfiltered (r/developersIndia)",
-        "🤖 AmbitionBox AI Copilot",
-    ]
-)
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TAB 1: SALARY & CAREER DEEP DIVE
-# ═══════════════════════════════════════════════════════════════════════════════
-with main_tab1:
-    # ── Section 1: In-Hand Pay Breakdown ──
-    st.subheader("💰 Monthly Take-Home & Tax Breakdown")
-    st.caption("How your CTC translates to bank credit under the Indian New Tax Regime (Budget 2024 / FY 2024-25, AY 2025-26).")
-
-    th_c1, th_c2 = st.columns([1.2, 1.8], gap="large")
-
-    with th_c1:
-        # Donut Chart
-        breakdown_labels = ["Net Take-Home Pay", "Income Tax (TDS)", "Employee EPF", "Professional Tax"]
-        breakdown_values = [
-            quick_th["net_annual"],
-            quick_th["tax_annual"],
-            quick_th["epf_annual"],
-            quick_th["pt_annual"],
-        ]
-        fig_donut = go.Figure(
-            data=[
-                go.Pie(
-                    labels=breakdown_labels,
-                    values=breakdown_values,
-                    hole=0.6,
-                    marker=dict(colors=["#10b981", "#f43f5e", "#6366f1", "#f59e0b"]),
-                    textinfo="percent",
-                    hoverinfo="label+value",
-                )
-            ]
-        )
-        fig_donut.update_layout(
-            height=280,
-            margin=dict(l=10, r=10, t=10, b=10),
-            showlegend=True,
-            legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5),
-        )
-        st.plotly_chart(fig_donut, use_container_width=True)
-
-    with th_c2:
-        st.markdown(
-            f"""
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.25rem;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-                    <tr style="border-bottom: 1px solid #f1f5f9;">
-                        <td style="padding: 0.5rem 0; color: #64748b;">Annual Cost to Company (CTC)</td>
-                        <td style="padding: 0.5rem 0; text-align: right; font-weight: 700; color: #0f172a;">₹ {int(quick_th['ctc']):,}</td>
-                        <td style="padding: 0.5rem 0; text-align: right; color: #64748b;">₹ {int(quick_th['ctc']/12):,}/mo</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #f1f5f9;">
-                        <td style="padding: 0.5rem 0; color: #64748b;">Estimated Basic (40% of CTC)</td>
-                        <td style="padding: 0.5rem 0; text-align: right; font-weight: 600;">₹ {int(quick_th['basic']):,}</td>
-                        <td style="padding: 0.5rem 0; text-align: right; color: #64748b;">₹ {int(quick_th['basic']/12):,}/mo</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #f1f5f9;">
-                        <td style="padding: 0.5rem 0; color: #dc2626;">(-) Income Tax (New Regime TDS)</td>
-                        <td style="padding: 0.5rem 0; text-align: right; font-weight: 600; color: #dc2626;">- ₹ {int(quick_th['tax_annual']):,}</td>
-                        <td style="padding: 0.5rem 0; text-align: right; color: #dc2626;">- ₹ {int(quick_th['tax_monthly']):,}/mo</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #f1f5f9;">
-                        <td style="padding: 0.5rem 0; color: #4338ca;">(-) Employee EPF (Retirement)</td>
-                        <td style="padding: 0.5rem 0; text-align: right; font-weight: 600; color: #4338ca;">- ₹ {int(quick_th['epf_annual']):,}</td>
-                        <td style="padding: 0.5rem 0; text-align: right; color: #4338ca;">- ₹ {int(quick_th['epf_monthly']):,}/mo</td>
-                    </tr>
-                    <tr style="border-bottom: 2px solid #e2e8f0;">
-                        <td style="padding: 0.5rem 0; color: #d97706;">(-) Professional Tax</td>
-                        <td style="padding: 0.5rem 0; text-align: right; font-weight: 600; color: #d97706;">- ₹ {int(quick_th['pt_annual']):,}</td>
-                        <td style="padding: 0.5rem 0; text-align: right; color: #d97706;">- ₹ {int(quick_th['pt_annual']/12):,}/mo</td>
-                    </tr>
-                    <tr style="background: #f0fdf4;">
-                        <td style="padding: 0.75rem 0.5rem; font-weight: 700; color: #047857;">Estimated Net Bank Credit</td>
-                        <td style="padding: 0.75rem 0.5rem; text-align: right; font-weight: 800; font-size: 1.05rem; color: #047857;">₹ {int(quick_th['net_annual']):,}</td>
-                        <td style="padding: 0.75rem 0.5rem; text-align: right; font-weight: 800; font-size: 1.05rem; color: #047857;">₹ {int(quick_th['monthly_in_hand']):,}/mo</td>
-                    </tr>
-                </table>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    st.markdown("---")
-
-    # ── Section 2: 15-Year Career Trajectory ──
-    st.subheader(f"📈 15-Year Progression Curve ({selected_company} · {detected_family})")
-    st.caption("How compensation expands from early career to staff & principal leadership.")
-
-    exp_steps = [0.0, 1.0, 2.0, 3.0, 5.0, 7.0, 9.0, 12.0, 15.0, 18.0]
-    traj_records = []
-    for step in exp_steps:
-        sub_df = pd.DataFrame(
-            [
-                {
-                    "Company": selected_company,
-                    "Job_Title": selected_job,
-                    "Industry": industry,
-                    "Role_Family": detected_family,
-                    "Seniority_Level": detected_seniority,
-                    "Rating": rating,
-                    "Avg_Exp": step,
-                }
-            ]
-        )
-        p_val = round(float(pipeline.predict(sub_df)[0]), 1)
-        sub_tree = get_tree_predictions(pipeline, sub_df)
-        p10_step = round(float(np.percentile(sub_tree, 10)), 1)
-        p90_step = round(float(np.percentile(sub_tree, 90)), 1)
-        traj_records.append({"Experience": step, "Salary": p_val, "P10": p10_step, "P90": p90_step})
-
-    traj_df = pd.DataFrame(traj_records)
-
-    fig_traj = go.Figure()
-    fig_traj.add_trace(go.Scatter(x=traj_df["Experience"], y=traj_df["P90"], mode="lines", line=dict(width=0), showlegend=False))
-    fig_traj.add_trace(go.Scatter(x=traj_df["Experience"], y=traj_df["P10"], mode="lines", line=dict(width=0), fill="tonexty", fillcolor="rgba(79, 70, 229, 0.12)", name="Confidence Corridor (P10 - P90)"))
-    fig_traj.add_trace(go.Scatter(x=traj_df["Experience"], y=traj_df["Salary"], mode="lines+markers", line=dict(color="#4f46e5", width=3), name="Estimated Trendline"))
-    fig_traj.add_trace(
-        go.Scatter(
-            x=[selected_exp],
-            y=[predicted_salary],
-            mode="markers+text",
-            marker=dict(size=14, color="#ef4444", symbol="diamond"),
-            text=[f"Current: {selected_exp}y (₹{predicted_salary}L)"],
-            textposition="top center",
-            name="Your Selection",
-        )
-    )
-    fig_traj.update_layout(
-        xaxis_title="Years of Experience",
-        yaxis_title="Salary (LPA)",
-        height=380,
-        template="plotly_white",
-        margin=dict(l=20, r=20, t=20, b=20),
-    )
-    st.plotly_chart(fig_traj, use_container_width=True)
-
-    # Career Milestones
-    m_col1, m_col2, m_col3, m_col4 = st.columns(4)
-    m_col1.metric("Fresh Graduate (0-1y)", f"₹ {traj_df.loc[traj_df['Experience'] == 1.0, 'Salary'].values[0]} LPA")
-    m_col2.metric("Mid-Level (3-5y)", f"₹ {traj_df.loc[traj_df['Experience'] == 5.0, 'Salary'].values[0]} LPA")
-    m_col3.metric("Senior Track (7-9y)", f"₹ {traj_df.loc[traj_df['Experience'] == 9.0, 'Salary'].values[0]} LPA")
-    m_col4.metric("Lead / Principal (12y+)", f"₹ {traj_df.loc[traj_df['Experience'] == 15.0, 'Salary'].values[0]} LPA")
-
-    st.markdown("---")
-
-    # ── Section 3: Peer Scatter Plot & Comparable Records ──
-    st.subheader(f"🔍 Market Benchmarks: {detected_family}")
-    st.caption("How your estimate compares against peers across all employers in the dataset.")
-
-    fam_records = df[df["Role_Family"] == detected_family].copy()
-    if len(fam_records) > 0:
-        fig_scatter = px.scatter(
-            fam_records,
-            x="Avg_Exp",
-            y="Avg_Salary_LPA",
-            color="Company",
-            opacity=0.7,
-            title=f"Compensation vs Experience across Companies ({detected_family})",
-            labels={"Avg_Exp": "Experience (Years)", "Avg_Salary_LPA": "Salary (LPA)"},
-            hover_data=["Company", "Job_Title", "Min_Salary_LPA", "Max_Salary_LPA"],
-        )
-        fig_scatter.add_trace(
-            go.Scatter(
-                x=[selected_exp],
-                y=[predicted_salary],
-                mode="markers+text",
-                marker=dict(size=16, color="#ef4444", symbol="star", line=dict(width=2, color="white")),
-                text=["Your Estimate"],
-                textposition="top center",
-                name="Your Selection",
-            )
-        )
-        fig_scatter.update_layout(height=400, template="plotly_white", margin=dict(l=20, r=20, t=40, b=20))
-        st.plotly_chart(fig_scatter, use_container_width=True)
-
-    # Top comparable table
-    comparable_df = find_comparable_records(df, selected_company, selected_job, detected_family, selected_exp, n=8)
-    show_cols = ["Company", "Job_Title", "Role_Family", "Avg_Exp", "Min_Salary_LPA", "Max_Salary_LPA", "Avg_Salary_LPA"]
-    clean_comp = comparable_df[show_cols].copy()
-    clean_comp.columns = ["Company", "Role", "Domain", "Exp (Yrs)", "Min (LPA)", "Max (LPA)", "Avg (LPA)"]
-    clean_comp = clean_comp.reset_index(drop=True)
-    clean_comp.index = clean_comp.index + 1
-
-    st.markdown("**Top 8 Most Relevant Benchmark Records:**")
-    st.dataframe(clean_comp, use_container_width=True)
-
-    st.markdown("---")
-
-    # ── Section 4: US Onsite H-1B Prevailing Wage Opportunity ──
-    h1b_data = h1b_benchmarks.get(selected_company)
-    st.subheader(f"🇺🇸 US Onsite H-1B Opportunity ({selected_company})")
-    st.caption("Official disclosure benchmarks from the U.S. Department of Labor (DOL) Office of Foreign Labor Certification.")
-
-    if h1b_data:
-        h1b_c1, h1b_c2, h1b_c3 = st.columns([1.3, 1.3, 1.4], gap="medium")
-        with h1b_c1:
-            st.markdown(
-                f"""
-                <div class="metric-box">
-                    <div class="metric-caption">Median US Onsite Wage</div>
-                    <div style="font-size: 2rem; font-weight:800; color:#1e1b4b;">${h1b_data['median_wage_usd']:,} <span style="font-size: 1rem; color:#64748b;">/ yr</span></div>
-                    <div class="metric-sub">Direct FX: <strong>₹ {h1b_data['market_fx_inr_lpa']} LPA</strong> · PPP Eq: <strong>₹ {h1b_data['ppp_equivalent_inr_lpa']} LPA</strong></div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-        with h1b_c2:
-            st.markdown(
-                f"""
-                <div class="metric-box-highlight">
-                    <div class="metric-caption">Official Sponsorship Track</div>
-                    <div style="font-size: 2rem; font-weight:800; color:#047857;">{h1b_data['total_h1b_filings']:,} <span style="font-size: 1rem; color:#065f46;">filings</span></div>
-                    <div class="metric-sub">DOL Approval Rate: <strong>{h1b_data['certified_pct']}% Certified</strong></div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-        with h1b_c3:
-            st.markdown(
-                f"""
-                <div class="metric-box">
-                    <div class="metric-caption">US Entity & Location</div>
-                    <div style="font-size: 1.15rem; font-weight:700; color:#0f172a; margin-bottom: 0.2rem;">{h1b_data['matched_employer_name'][:30]}</div>
-                    <div class="metric-sub">Primary State: <strong>{h1b_data['us_work_state']}</strong> · Top Role: <strong>{h1b_data['top_us_job_title']}</strong></div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-        # Prevailing wage levels table
-        levels_dict = h1b_data.get("wage_levels_usd", {})
-        if levels_dict:
-            with st.expander("🏛️ View Prevailing Wage by Experience Level (US DOL Regulations)"):
-                lvl_df = pd.DataFrame([
-                    {"Seniority Level": k, "Annual USD Wage": f"${v:,}", "Direct FX (INR)": f"₹ {round(v * 86.0 / 100000, 1)} LPA", "World Bank PPP (INR)": f"₹ {round(v * 23.5 / 100000, 1)} LPA"}
-                    for k, v in levels_dict.items()
-                ])
-                st.dataframe(lvl_df, use_container_width=True, hide_index=True)
-    else:
-        st.markdown(
-            f"""
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.85rem 1.1rem; font-size: 0.9rem; color: #64748b;">
-                🏢 <strong>Domestic Operations:</strong> No active H-1B visa sponsorships on record with the U.S. Department of Labor for <strong>{selected_company}</strong>. Compensation reflects purely domestic Indian offshore salary structures.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    st.markdown("---")
-
-    # ── Section 5: Employee Culture Voice (Likes & Dislikes) ──
-    top_likes = comp_info.get("top_likes", [])
-    top_dislikes = comp_info.get("top_dislikes", [])
-    if top_likes or top_dislikes:
-        st.subheader(f"🗣️ Verified Employee Voice: {selected_company}")
-        st.caption("Extracted from 43,000+ AmbitionBox employee reviews.")
-
-        voice_col1, voice_col2 = st.columns(2, gap="large")
-        with voice_col1:
-            st.markdown("#### 👍 What Employees Appreciate")
-            for lk in top_likes:
-                st.markdown(f'<div class="pros-quote">"{lk.strip()}"</div>', unsafe_allow_html=True)
-
-        with voice_col2:
-            st.markdown("#### 👎 Critical Friction Points & Cons")
-            for dl in top_dislikes:
-                st.markdown(f'<div class="cons-quote">"{dl.strip()}"</div>', unsafe_allow_html=True)
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TAB 2: OFFER & COMPANY COMPARE
-# ═══════════════════════════════════════════════════════════════════════════════
-with main_tab2:
-    st.subheader("⚖️ Head-to-Head Offer & Employer Benchmark")
-    st.caption("Compare compensation, net in-hand take-home delta, and culture ratings between two employers.")
-
-    with st.container(border=True):
-        cmp_c1, cmp_c2, cmp_c3 = st.columns([1.5, 1.5, 1.2], gap="medium")
-
-        with cmp_c1:
-            comp_a = st.selectbox("Company A", companies, index=companies.index(selected_company), key="cmp_a")
-            jobs_a = company_jobs.get(comp_a, all_job_titles)
-            default_a_idx = jobs_a.index(selected_job) if selected_job in jobs_a else 0
-            job_a = st.selectbox("Role at A", jobs_a, index=default_a_idx, key="role_a")
-
-        with cmp_c2:
-            other_default = "Accenture" if "Accenture" in companies and comp_a != "Accenture" else (companies[1] if len(companies) > 1 else companies[0])
-            comp_b = st.selectbox("Company B", companies, index=companies.index(other_default), key="cmp_b")
-            jobs_b = company_jobs.get(comp_b, all_job_titles)
-            default_b_idx = jobs_b.index(selected_job) if selected_job in jobs_b else 0
-            job_b = st.selectbox("Role at B", jobs_b, index=default_b_idx, key="role_b")
-
-        with cmp_c3:
-            cmp_exp = st.slider("Shared Experience", 0.0, experience_cap, selected_exp, step=0.5, key="cmp_exp")
-
-    # Evaluate Company A
-    info_a = company_insights.get(comp_a, {})
-    ind_a = info_a.get("industry", "Corporate")
-    rat_a = float(info_a.get("rating", 3.5))
-    fam_a, sen_a = categorize_job(job_a)
-    df_a = pd.DataFrame([{"Company": comp_a, "Job_Title": job_a, "Industry": ind_a, "Role_Family": fam_a, "Seniority_Level": sen_a, "Rating": rat_a, "Avg_Exp": cmp_exp}])
-    pred_a = round(float(pipeline.predict(df_a)[0]), 1)
-    th_a = calculate_take_home(pred_a)
-
-    # Evaluate Company B
-    info_b = company_insights.get(comp_b, {})
-    ind_b = info_b.get("industry", "Corporate")
-    rat_b = float(info_b.get("rating", 3.5))
-    fam_b, sen_b = categorize_job(job_b)
-    df_b = pd.DataFrame([{"Company": comp_b, "Job_Title": job_b, "Industry": ind_b, "Role_Family": fam_b, "Seniority_Level": sen_b, "Rating": rat_b, "Avg_Exp": cmp_exp}])
-    pred_b = round(float(pipeline.predict(df_b)[0]), 1)
-    th_b = calculate_take_home(pred_b)
-
-    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-
-    # Comparison Metric Cards
-    res_a, res_b, res_delta = st.columns([1.2, 1.2, 1.4], gap="medium")
-    with res_a:
-        st.markdown(
-            f"""
-            <div class="metric-box">
-                <div class="metric-caption">{comp_a}</div>
-                <div style="font-size: 2rem; font-weight:800; color:#0f172a;">₹ {pred_a} LPA</div>
-                <div style="color: #047857; font-weight:700; font-size:1.05rem;">₹ {int(th_a['monthly_in_hand']):,}/mo in-hand</div>
-                <div class="metric-sub">⭐ {rat_a} / 5.0 Rating · {info_a.get('reviews', 'N/A')}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    with res_b:
-        diff_ctc = round(pred_b - pred_a, 1)
-        diff_pct = round((diff_ctc / pred_a) * 100, 1) if pred_a > 0 else 0
-        st.markdown(
-            f"""
-            <div class="metric-box">
-                <div class="metric-caption">{comp_b}</div>
-                <div style="font-size: 2rem; font-weight:800; color:#0f172a;">₹ {pred_b} LPA</div>
-                <div style="color: #047857; font-weight:700; font-size:1.05rem;">₹ {int(th_b['monthly_in_hand']):,}/mo in-hand</div>
-                <div class="metric-sub">⭐ {rat_b} / 5.0 Rating · {info_b.get('reviews', 'N/A')}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    with res_delta:
-        diff_inhand = int(th_b["monthly_in_hand"] - th_a["monthly_in_hand"])
-        delta_color = "#047857" if diff_inhand >= 0 else "#dc2626"
-        st.markdown(
-            f"""
-            <div class="metric-box-highlight">
-                <div class="metric-caption">Head-to-Head Delta</div>
-                <div style="font-size: 1.8rem; font-weight:800; color: {delta_color};">
-                    {diff_inhand:+,} / mo
-                </div>
-                <div style="font-weight: 700; color: #0f172a; margin-top: 0.2rem;">
-                    CTC Gap: {diff_ctc:+} LPA ({diff_pct:+}% vs A)
-                </div>
-                <div class="metric-sub">Annual Take-Home Difference: ₹ {abs(diff_inhand*12):,}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    # Bar Chart Comparison
-    fig_cmp = go.Figure(
-        data=[
-            go.Bar(name="Annual CTC (LPA)", x=[comp_a, comp_b], y=[pred_a, pred_b], marker_color=["#4f46e5", "#06b6d4"]),
-            go.Bar(name="Annual Net In-Hand (LPA)", x=[comp_a, comp_b], y=[round(th_a["net_annual"]/100000, 1), round(th_b["net_annual"]/100000, 1)], marker_color=["#10b981", "#34d399"]),
-        ]
-    )
-    fig_cmp.update_layout(barmode="group", height=350, template="plotly_white", margin=dict(l=20, r=20, t=30, b=20))
-    st.plotly_chart(fig_cmp, use_container_width=True)
-
-    # Side-by-Side Culture Comparison
-    st.markdown("#### 🏢 Culture & Sentiment Head-to-Head")
-    side_a, side_b = st.columns(2, gap="large")
-    with side_a:
-        st.markdown(f"**{comp_a}** ({ind_a} · HQ: {info_a.get('hq_city', 'India')})")
-        if info_a.get("top_likes"):
-            st.markdown(f'<div class="pros-quote">"{info_a["top_likes"][0]}"</div>', unsafe_allow_html=True)
-        if info_a.get("top_dislikes"):
-            st.markdown(f'<div class="cons-quote">"{info_a["top_dislikes"][0]}"</div>', unsafe_allow_html=True)
-
-    with side_b:
-        st.markdown(f"**{comp_b}** ({ind_b} · HQ: {info_b.get('hq_city', 'India')})")
-        if info_b.get("top_likes"):
-            st.markdown(f'<div class="pros-quote">"{info_b["top_likes"][0]}"</div>', unsafe_allow_html=True)
-        if info_b.get("top_dislikes"):
-            st.markdown(f'<div class="cons-quote">"{info_b["top_dislikes"][0]}"</div>', unsafe_allow_html=True)
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TAB 3: REDDIT UNFILTERED (r/developersIndia & r/cscareerquestionsIN)
-# ═══════════════════════════════════════════════════════════════════════════════
-with main_tab3:
-    st.subheader("🔥 Reddit Unfiltered: The Real Developer Truth")
-    st.caption("Candid salary leaks, 90-day notice period traps, bench policy realities, and real appraisal stats from r/developersIndia.")
-
-    # Company selection for Reddit tab
-    rd_companies = sorted(list(reddit_benchmarks.keys())) if reddit_benchmarks else []
-    default_rd_idx = rd_companies.index(selected_company) if selected_company in rd_companies else 0
-
-    col_rd_sel, col_rd_meta = st.columns([2, 1], gap="medium")
-    with col_rd_sel:
-        rd_selected_company = st.selectbox(
-            "Select Company for Reddit Culture X-Ray",
-            rd_companies if rd_companies else [selected_company],
-            index=default_rd_idx,
-            key="reddit_company_select",
-        )
-    with col_rd_meta:
-        st.markdown(
-            """
-            <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 0.6rem 0.9rem; font-size: 0.85rem; color: #9a3412;">
-                ⚠️ <strong>Unmoderated by HR:</strong> Insights extracted from raw anonymous engineer threads on <code>r/developersIndia</code>.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    rd_data = reddit_benchmarks.get(rd_selected_company, None)
-
-    if not rd_data:
-        st.info(f"No direct Reddit threads indexed for **{rd_selected_company}** yet. You can run `python reddit_harvester.py` to fetch additional live discussions.")
-    else:
-        # 1. Corporate PR vs Reddit Reality (Culture X-Ray)
-        st.markdown(f"### 🩻 Culture X-Ray: Corporate Scorecard vs. Reddit Reality for **{rd_selected_company}**")
-
-        cx_col1, cx_col2 = st.columns(2, gap="large")
-
-        # Left: Corporate / AmbitionBox Scorecard
-        with cx_col1:
-            amb_info = company_insights.get(rd_selected_company, {})
-            amb_rating = amb_info.get("rating", "N/A")
-            amb_rev = amb_info.get("total_reviews", "N/A")
-            st.markdown(
-                f"""
-                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.2rem; min-height: 280px;">
-                    <div style="font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase;">🏢 Corporate Scorecard (AmbitionBox)</div>
-                    <div style="font-size: 1.6rem; font-weight: 800; color: #0f172a; margin: 0.3rem 0;">
-                        ⭐ {amb_rating} / 5.0 <span style='font-size: 0.9rem; color: #64748b; font-weight: normal;'>({amb_rev} reviews)</span>
-                    </div>
-                    <p style='font-size: 0.85rem; color: #475569; margin-top: 0.5rem;'><strong>Official HR Highlights:</strong></p>
-                """,
-                unsafe_allow_html=True,
-            )
-            if amb_info.get("top_likes"):
-                st.markdown(f'<div class="pros-quote">"{amb_info["top_likes"][0]}"</div>', unsafe_allow_html=True)
-            else:
-                st.markdown('<div class="pros-quote">"Stable corporate brand with global exposure."</div>', unsafe_allow_html=True)
-
-            if amb_info.get("top_dislikes"):
-                st.markdown(f'<div class="cons-quote">"{amb_info["top_dislikes"][0]}"</div>', unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-
-        # Right: Unfiltered Reddit Reality
-        with cx_col2:
-            sb = rd_data["sentiment_breakdown"]
-            rf = rd_data["red_flags"]
-            crit_pct = round(sb.get("negative_pct", 0) + sb.get("toxic_pct", 0), 1)
-            st.markdown(
-                f"""
-                <div style="background: #fffbfa; border: 1px solid #fecdd3; border-radius: 12px; padding: 1.2rem; min-height: 280px;">
-                    <div style="font-size: 0.8rem; font-weight: 700; color: #e11d48; text-transform: uppercase;">🔥 Reddit Reality (r/developersIndia)</div>
-                    <div style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin: 0.3rem 0;">
-                        Sentiment: <span style="color: {'#16a34a' if rd_data['avg_sentiment_polarity'] > 0 else '#dc2626'};">{sb.get('positive_pct', 0)}% Positive</span> · 
-                        <span style="color: #64748b;">{sb.get('neutral_pct', 0)}% Neutral</span> · 
-                        <span style="color: #e11d48;">{crit_pct}% Critical/Toxic</span>
-                    </div>
-                    <div style="margin-top: 0.8rem; font-size: 0.88rem; color: #334155;">
-                        <div>⚠️ <strong>Notice Period:</strong> <span style="color: {'#dc2626' if rf.get('notice_period_days') == 90 else '#16a34a'}; font-weight: 700;">{rf.get('notice_period_days', 60)} Days ({rf.get('notice_risk_label', 'Standard')})</span></div>
-                        <div style="margin-top: 0.35rem;">⚠️ <strong>Bench / Layoff Risk:</strong> <span style="font-weight: 700; color: {'#dc2626' if rf.get('bench_risk_level') == 'Severe' else '#d97706'};">{rf.get('bench_risk_level', 'Low')}</span></div>
-                        <div style="margin-top: 0.35rem;">⚠️ <strong>PIP / Stack-Ranking Alert:</strong> {'🚨 Reported by developers' if rf.get('pip_quota_alert') else '✅ Low quota risk reported'}</div>
-                        <div style="margin-top: 0.35rem;">📉 <strong>Reported Real Appraisals:</strong> <em>{rf.get('reported_appraisals', 'Standard merit')}</em></div>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-        st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
-
-        # 2. Leaked Community Offers
-        st.markdown(f"### 💸 Community Leaked Offers & Verified Packages for **{rd_selected_company}**")
-        leaks = rd_data.get("leaked_offers", [])
-        if leaks:
-            leak_cols = st.columns(min(len(leaks), 3))
-            for i, lk in enumerate(leaks[:3]):
-                with leak_cols[i]:
-                    base_str = f"Base: ₹ {lk['base_lpa']}L" if lk.get("base_lpa") else "Full Package"
-                    yoe_str = f"{lk['yoe']} YoE" if lk.get("yoe") is not None else "Lateral"
-                    st.markdown(
-                        f"""
-                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; border-top: 4px solid #4f46e5;">
-                            <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Reported Offer · {yoe_str}</div>
-                            <div style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0.2rem 0;">₹ {lk['ctc_lpa']} LPA</div>
-                            <div style="font-size: 0.85rem; color: #475569;">{base_str}</div>
-                            <div style="margin-top: 0.5rem; display: inline-block; background: #eef2ff; color: #4338ca; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 6px;">
-                                {lk['verdict']}
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
-        else:
-            st.info("No specific numeric offer breakdowns extracted for this company yet.")
-
-        st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
-
-        # 3. Top Community Exposes & Threads
-        st.markdown(f"### 🧵 Top r/developersIndia Discussions ({len(rd_data.get('top_threads', []))} threads)")
-        for t in rd_data.get("top_threads", []):
-            with st.expander(f"📌 {t['title']} (👍 {t['score']} upvotes · 💬 {t['num_comments']} comments)"):
-                st.markdown(f"**Community Excerpt:**")
-                st.write(t["excerpt"])
-                sub_label = t["permalink"].split("/r/")[1].split("/")[0] if "/r/" in t["permalink"] else "developersIndia"
-                st.markdown(f"🔗 [Read Full Reddit Discussion on r/{sub_label}]({t['permalink']})")
-
-        st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
-
-        # 4. Interactive Reddit Offer Evaluator
-        st.markdown("### ⚖️ Reddit Offer Evaluator & Verdict")
-        st.caption("Input your offer details to get a blunt, candid verdict benchmarked against developer sentiment.")
-        with st.form("reddit_eval_form"):
-            ev_col1, ev_col2, ev_col3 = st.columns(3)
-            with ev_col1:
-                ev_ctc = st.number_input("Offered CTC (₹ LPA)", min_value=1.0, max_value=200.0, value=12.0, step=0.5)
-            with ev_col2:
-                ev_yoe = st.number_input("Your Experience (Years)", min_value=0.0, max_value=30.0, value=2.5, step=0.5)
-            with ev_col3:
-                st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-                eval_btn = st.form_submit_button("Get Community Verdict 🚀", use_container_width=True)
-
-        if eval_btn:
-            from reddit_nlp_extractor import evaluate_offer_verdict
-
-            v_label = evaluate_offer_verdict(ev_ctc, ev_yoe)
-            rf_info = rd_data["red_flags"]
-
-            st.markdown(
-                f"""
-                <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 12px; padding: 1.2rem; margin-top: 0.5rem;">
-                    <div style="font-size: 0.8rem; font-weight: 700; color: #166534; text-transform: uppercase;">Reddit Community Verdict</div>
-                    <div style="font-size: 1.35rem; font-weight: 800; color: #14532d; margin: 0.2rem 0;">
-                        {v_label}
-                    </div>
-                    <div style="font-size: 0.9rem; color: #166534; margin-top: 0.4rem;">
-                        At <strong>{ev_yoe} years of experience</strong>, <strong>₹ {ev_ctc:.1f} LPA</strong> at <strong>{rd_selected_company}</strong> falls into the <em>{v_label}</em> bracket.
-                    </div>
-                    <div style="font-size: 0.85rem; color: #15803d; margin-top: 0.5rem;">
-                        <strong>Key Terms to Watch:</strong> This company has a <strong>{rf_info.get('notice_period_days', 60)}-day notice period</strong>. Ensure that signing bonuses do not contain predatory clawback clauses and clarify whether variable pay is tied to individual or company-wide billing.
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TAB 4: AMBITIONBOX AI REVIEW COPILOT
-# ═══════════════════════════════════════════════════════════════════════════════
-with main_tab4:
-    st.subheader("🤖 AmbitionBox AI Copilot: Workplace Culture Intelligence")
-    st.caption("Ask natural language questions across 33,200+ review vectors embedded from verified AmbitionBox employee feedback.")
-
-    with st.container(border=True):
-        sc_col1, sc_col2 = st.columns([2, 1], gap="medium")
-        with sc_col1:
-            scope_mode = st.radio(
-                "Search Target",
-                [f"Filter by selected employer ({selected_company})", "Search across all 118 employers"],
-                horizontal=True,
-            )
-        with sc_col2:
-            top_k_rev = st.slider("Citations to Analyze", 3, 8, 5)
-
-        target_employer = selected_company if "Filter by selected employer" in scope_mode else None
-
-        # Quick question pills
-        st.markdown("**💡 Popular Topics (click to ask):**")
-        pill_row1, pill_row2, pill_row3, pill_row4 = st.columns(4)
-        preset_q = None
-        target_label = target_employer or selected_company
-
-        if pill_row1.button("⚖️ Work-Life Balance", use_container_width=True):
-            preset_q = f"How is the work life balance, overtime pressure, and manager expectations at {target_label}?"
-        if pill_row2.button("📈 Appraisals & Increments", use_container_width=True):
-            preset_q = f"How are annual appraisals, salary hikes, and promotion policies at {target_label}?"
-        if pill_row3.button("🎓 Freshers & Growth", use_container_width=True):
-            preset_q = f"Is {target_label} good for freshers, learning tech stacks, and career growth?"
-        if pill_row4.button("🏢 Job Security & Bench", use_container_width=True):
-            preset_q = f"What is the job security, bench policy, and layoff situation at {target_label}?"
-
-        ai_query = st.text_input(
-            "Ask about company culture, compensation sentiment, or management:",
-            value=preset_q if preset_q else f"How is the work-life balance and culture at {target_label}?",
-            placeholder="e.g. Do developers get good increments? Is client-side micromanagement common?",
-        )
-
-        trigger_search = st.button("Analyze Reviews 🚀", type="primary", use_container_width=True)
-
-    # API key check from Streamlit Cloud secrets or environment
-    cloud_secret = ""
-    try:
-        if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
-            cloud_secret = st.secrets["GEMINI_API_KEY"]
-    except Exception:
-        pass
-    active_api_key = cloud_secret or os.getenv("GEMINI_API_KEY", "")
-
-    if trigger_search:
-        with st.spinner("Searching 33,200+ review vectors and synthesizing insights..."):
-            try:
-                import rag_assistant
-
-                retrieved = rag_assistant.retrieve_reviews(ai_query, company=target_employer, k=top_k_rev)
-                result = rag_assistant.synthesize_answer(ai_query, retrieved, api_key=active_api_key)
-
-                st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-
-                # Sentiment Header Strip
-                stat1, stat2, stat3 = st.columns(3)
-                stat1.metric("Verified Reviews Retrieved", len(retrieved))
-                stat2.metric("Average Employee Rating", f"⭐ {result.get('avg_rating', 3.5)} / 5.0")
-                engine_title = "Google Gemini AI" if result.get("source") == "gemini" else "Local Semantic Vector Search (FAISS)"
-                stat3.metric("Synthesis Engine", engine_title)
-
-                # Executive Answer Box
-                st.markdown(
-                    f"""
-                    <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0;">
-                        {result['text']}
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-
-                # Verified Source Citations
-                st.markdown("#### 🔍 Source Citations & Review Snippets")
-                for i, rv in enumerate(retrieved, 1):
-                    with st.expander(f"Review #{i} — {rv['company']} · {rv['job']} in {rv['location']} (Rating: ⭐ {rv['rating']})"):
-                        c_pro, c_con = st.columns(2)
-                        with c_pro:
-                            st.markdown("##### 👍 Likes / Pros")
-                            st.write(rv["likes"] if rv["likes"] else "No specific likes recorded.")
-                        with c_con:
-                            st.markdown("##### 👎 Dislikes / Cons")
-                            st.write(rv["dislikes"] if rv["dislikes"] else "No specific dislikes recorded.")
-
-            except Exception as e:
-                st.error(f"Error executing review search: {e}")
-
-
-# ── 8. FOOTER & DATA METHODOLOGY ─────────────────────────────────────────────
-st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
-
-with st.expander("ℹ️ Data Provenance, Machine Learning Methodology & Disclaimers"):
-    cv_r2 = metadata.get("cv_r2_mean", 0.4993)
-    cv_r2_std = metadata.get("cv_r2_std", 0.0620)
-    cv_mae = metadata.get("cv_mae_mean", 3.95)
-    cv_mae_std = metadata.get("cv_mae_std", 0.18)
-    cv_rmse = metadata.get("cv_rmse_mean", 6.45)
-    cv_rmse_std = metadata.get("cv_rmse_std", 0.45)
-
-    st.markdown(
-        f"""
-### 📊 Multi-Source Data Provenance & Academic Portfolio Notice
-- **Data Source 1 (AmbitionBox):** Compensation records and employee sentiment scraped from [AmbitionBox](https://www.ambitionbox.com/salaries) (mid-2026 snapshot) strictly for educational, demonstration, and non-commercial portfolio research.
-- **Data Source 2 (Kaggle Glassdoor India):** Open research salary dataset (`ruchi798/software-industry-salary-dataset-2022`) with 2,836 individual records matched across 73 employers for offshore cross-validation.
-- **Data Source 3 (US Onsite DOL H-1B):** Augmented with 100% legal, public government disclosure data from the **U.S. Department of Labor (DOL) Office of Foreign Labor Certification (OFLC)**, tracking over 1,000,000+ certified H-1B petitions, median USD salaries, and Level I-IV prevailing wage minimums.
-- **Data Source 4 (Reddit r/developersIndia):** Uncensored community developer intelligence, 90-day notice period traps, bench policies, and verified offer leaks extracted across top tech employers.
-- **Coverage:** **{len(companies)} companies** and **{len(all_job_titles)} unique job titles** across India.
-- **Role Taxonomy:** Parsed into **{len(role_families)} Canonical Role Families** and **5 Seniority Levels** via regex pattern matching to resolve categorical sparsity.
-- **RAG Review Index:** **33,200+ review vectors** embedded via `all-MiniLM-L6-v2` and indexed with FAISS for semantic review retrieval.
-
-### 🤖 Machine Learning Architecture & Rigorous Evaluation
-- **Pipeline:** `sklearn.pipeline.Pipeline` with `ColumnTransformer` + `VotingRegressor`:
-  - **Estimator 1:** `RandomForestRegressor` (150 trees, max depth 22, min samples split 3).
-  - **Estimator 2:** `HistGradientBoostingRegressor` (200 iterations, 31 max leaf nodes).
-- **5-Fold Cross-Validation (K-Fold, Shuffled):**
-  - **Mean R² Score:** **`{cv_r2:.4f} ± {cv_r2_std:.4f}`**
-  - **Mean Absolute Error (MAE):** **`{cv_mae:.2f} ± {cv_mae_std:.2f} LPA`** (approx. ₹3.95 Lakhs)
-  - **Mean Root Mean Squared Error (RMSE):** **`{cv_rmse:.2f} ± {cv_rmse_std:.2f} LPA`**
-- **Holdout Test Set (15% split, n=131):**
-  - **R² Score:** `{metadata.get('r2_score', 0.5661)}`
-  - **MAE:** `{metadata.get('mae_lpa', 3.84)} LPA`
-  - **RMSE:** `{metadata.get('rmse_lpa', 5.78)} LPA`
-
-### 🔍 Error Transparency & Cold-Start Behavior
-- **Low-Error Segments:** BPO/Support (MAE 1.27 LPA), Sales/BD (MAE 2.35 LPA), Entry-Level roles (MAE 2.12 LPA), and sub-10 LPA brackets have high predictive accuracy.
-- **High-Variance Segments:** Product Management (MAE 11.09 LPA), Executive/Director titles (MAE 7.62 LPA), and compensation $> ₹25\text{ LPA}$ display wider spreads due to uncaptured bonuses and equity components.
-- **Sparse Data:** For companies with $< 3$ records, the model automatically leans on domain-level benchmarks and seniority tier coefficients.
-
-### ⚠️ Disclaimers & Fair Use
-This platform is a personal student research project designed to explore ML ensembles and RAG systems. It is not affiliated with, endorsed by, or sponsored by AmbitionBox or Info Edge India Ltd. All figures are model estimates and should not be used as authoritative compensation or tax counsel.
-"""
-    )
-
+# Contextual tags
 st.markdown(
-    '<p style="text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 1.5rem;">Built with Streamlit & Plotly · Voting Ensemble ML · Sourced from AmbitionBox (Educational Portfolio Project)</p>',
+    f"""
+    <div style="margin-top: -0.25rem; margin-bottom: 0.85rem;">
+        <span class="badge badge-indigo">Domain: {detected_family}</span>
+        <span class="badge badge-slate">Level: {detected_seniority}</span>
+        <span class="badge badge-amber">⭐ {rating} / 5.0 Rating</span>
+        <span class="badge badge-slate">📍 {input_city}</span>
+    </div>
+    """,
     unsafe_allow_html=True,
 )
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# OUTPUT 1: MONTHLY IN-HAND AS A RANGE (OR SINGLE POINT IF VARIABLE % == 0)
+# ═══════════════════════════════════════════════════════════════════════════════
+fixed_ratio = 1.0 - (float(input_var_pct) / 100.0)
+fixed_ctc = float(input_ctc) * fixed_ratio
+
+th_fixed = calculate_take_home(fixed_ctc)
+th_full = calculate_take_home(input_ctc)
+
+low_mo = int(th_fixed["monthly_in_hand"])
+high_mo = int(th_full["monthly_in_hand"])
+
+if input_var_pct > 0:
+    st.markdown(
+        f"""
+        <div class="output-card-highlight">
+            <div class="card-caption">1. Estimated Monthly In-Hand (Net Bank Credit)</div>
+            <div class="inhand-range">₹ {int(low_mo/1000):,}k – ₹ {int(high_mo/1000):,}k <span style="font-size: 1.1rem; font-weight:600; color:#065f46;">/ month</span></div>
+            <div style="font-size: 0.88rem; color: #166534; margin-top: 0.4rem;">
+                <strong>₹ {low_mo:,}/mo guaranteed base</strong> (on ₹ {fixed_ctc:.1f}L fixed CTC) up to <strong>₹ {high_mo:,}/mo</strong> at 100% variable payout ({input_var_pct}% variable component).
+            </div>
+            <div style="font-size: 0.78rem; color: #64748b; margin-top: 0.35rem;">
+                Budget 2024 New Tax Regime (FY 2024-25, AY 2025-26) with ₹75k standard deduction & 40% basic pay assumption.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+else:
+    st.markdown(
+        f"""
+        <div class="output-card-highlight">
+            <div class="card-caption">1. Estimated Monthly In-Hand (Net Bank Credit)</div>
+            <div class="inhand-range">₹ {int(high_mo/1000):,}k <span style="font-size: 1.1rem; font-weight:600; color:#065f46;">/ month</span> (₹ {high_mo:,})</div>
+            <div style="font-size: 0.88rem; color: #166534; margin-top: 0.4rem;">
+                <strong>100% Fixed Salary:</strong> No variable pay deduction. Annual net credit: <strong>₹ {int(th_full['net_annual']/100000):.1f} Lakhs</strong>.
+            </div>
+            <div style="font-size: 0.78rem; color: #64748b; margin-top: 0.35rem;">
+                Budget 2024 New Tax Regime (FY 2024-25, AY 2025-26) with ₹75k standard deduction & 40% basic pay assumption.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# OUTPUT 2: PEER PERCENTILE & CONFORMAL INTERVAL VISIBLE
+# ═══════════════════════════════════════════════════════════════════════════════
+fam_df = df[df["Role_Family"] == detected_family]
+if len(fam_df) < 5:
+    fam_df = df
+
+percentile = int(round((fam_df["Avg_Salary_LPA"] < float(input_ctc)).mean() * 100))
+percentile = min(99, max(1, percentile))
+
+p25 = round(float(np.percentile(fam_df["Avg_Salary_LPA"], 25)), 1)
+p50 = round(float(np.percentile(fam_df["Avg_Salary_LPA"], 50)), 1)
+p75 = round(float(np.percentile(fam_df["Avg_Salary_LPA"], 75)), 1)
+
+position_label = "above market median" if float(input_ctc) >= p50 else "below market median"
+
+st.markdown(
+    f"""
+    <div class="output-card">
+        <div class="card-caption">2. Peer Percentile & Market Benchmark</div>
+        <div class="percentile-val">{percentile}th Percentile <span style="font-size: 1rem; font-weight: 500; color: #64748b;">for {detected_family} ({detected_seniority})</span></div>
+        <div style="margin-top: 0.5rem; font-size: 0.88rem; color: #334155; line-height: 1.5;">
+            An offer of <strong>₹ {float(input_ctc):.1f} LPA</strong> sits <strong>{position_label}</strong> (median: ₹ {p50} LPA).<br>
+            • <strong>80% Conformal Prediction Interval:</strong> <strong style="color:#4338ca;">₹ {conf_low}L – ₹ {conf_high}L</strong> (calibrated ±{conf_margin} LPA uncertainty margin with finite-sample 80.0% coverage guarantee)<br>
+            • <strong>Middle 50% Market Spread (P25–P75):</strong> <strong>₹ {p25}L – ₹ {p75}L</strong> across verified peer disclosures.
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# OUTPUT 3: THREE CONCRETE COUNTER-OFFER NUMBERS
+# ═══════════════════════════════════════════════════════════════════════════════
+c_cons = round(float(input_ctc) * 1.08, 1)
+c_targ = round(max(float(input_ctc) * 1.18, p75), 1)
+c_strt = round(max(float(input_ctc) * 1.35, p75 * 1.15), 1)
+
+st.markdown('<div class="card-caption" style="margin-top: 0.25rem;">3. Concrete Negotiation Counters</div>', unsafe_allow_html=True)
+col_cnt1, col_cnt2, col_cnt3 = st.columns(3, gap="small")
+
+with col_cnt1:
+    st.markdown(
+        f"""
+        <div class="counter-box">
+            <div class="counter-label" style="color: #047857;">Conservative (+8%)</div>
+            <div class="counter-val">₹ {c_cons:.1f} LPA</div>
+            <div class="counter-desc">Safe ask. Cites market inflation or standard adjustment; near-zero revocation risk.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+with col_cnt2:
+    st.markdown(
+        f"""
+        <div class="counter-box" style="border-color: #93c5fd; background: #eff6ff;">
+            <div class="counter-label" style="color: #1d4ed8;">Market Target (+18%)</div>
+            <div class="counter-val" style="color: #1e3a8a;">₹ {c_targ:.1f} LPA</div>
+            <div class="counter-desc">Fair market alignment. Anchors around the 75th percentile of role peers.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+with col_cnt3:
+    st.markdown(
+        f"""
+        <div class="counter-box">
+            <div class="counter-label" style="color: #b45309;">Stretch (+35%)</div>
+            <div class="counter-val">₹ {c_strt:.1f} LPA</div>
+            <div class="counter-desc">High-leverage ask. For candidates with competing offers or scarce niche skills.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# OUTPUT 4: RED-FLAG LINE PER EMPLOYER FROM REDDIT LAYER (1 LINE MAX)
+# ═══════════════════════════════════════════════════════════════════════════════
+# Match company in reddit_benchmarks
+rd_match_key = None
+for k in reddit_benchmarks.keys():
+    if k.lower() == input_company.strip().lower():
+        rd_match_key = k
+        break
+
+if rd_match_key:
+    rf_data = reddit_benchmarks[rd_match_key].get("red_flags", {})
+    np_days = rf_data.get("notice_period_days", 60)
+    b_risk = rf_data.get("bench_risk_level", "Moderate")
+    pip_flag = "🚨 Active PIP/quota alerts reported" if rf_data.get("pip_quota_alert") else "Standard appraisal cycles"
+    appr_str = rf_data.get("reported_appraisals", "3–6% merit hikes")
+    rf_line = f"⚠️ <strong>{rd_match_key} Red Flags:</strong> {np_days}-day notice period · Bench risk: {b_risk} · PIP: {pip_flag} · Real appraisals: {appr_str}"
+else:
+    rf_line = "⚠️ <strong>Market Notice:</strong> Verify notice period length (90-day locks are standard in IT services), bonus clawback clauses, and whether variable pay requires 100% project billing."
+
+st.markdown(f'<div class="red-flag-box">{rf_line}</div>', unsafe_allow_html=True)
+
+
+# ── FOOTER & INDUSTRY CONTEXT ─────────────────────────────────────────────────
+st.caption(
+    "💡 **Looking for aggregate company-wide medians across 1.5M records?** "
+    "Consult [Weekday's Salary Directory](https://www.weekday.works/salaries). "
+    "This tool focuses specifically on evaluating this single offer's take-home pay, calibrated uncertainty, and contract terms."
+)
+
+
+# Hidden surfaces retained from v1; see RETROSPECTIVE.md.
+if os.getenv("DEV_MODE") == "1":
+    import plotly.express as px
+    import plotly.graph_objects as go
+
+    st.markdown("---")
+    st.header("🛠️ Developer Mode: Retained v1 Surfaces")
+    st.caption("All multi-tab exploratory surfaces, RAG copilot, and Head-to-Head compare retained from v1.")
+
+    dev_tab1, dev_tab2, dev_tab3, dev_tab4 = st.tabs(
+        [
+            "📊 Salary & Career Deep Dive",
+            "⚖️ Compare Two Offers",
+            "🔥 Reddit Unfiltered (r/developersIndia)",
+            "🤖 AmbitionBox AI Copilot",
+        ]
+    )
+
+    with dev_tab1:
+        st.subheader("💰 Monthly Take-Home & Tax Breakdown")
+        quick_th = calculate_take_home(predicted_market_ctc)
+        th_c1, th_c2 = st.columns([1.2, 1.8], gap="large")
+
+        with th_c1:
+            breakdown_labels = ["Net Take-Home Pay", "Income Tax (TDS)", "Employee EPF", "Professional Tax"]
+            breakdown_values = [
+                quick_th["net_annual"],
+                quick_th["tax_annual"],
+                quick_th["epf_annual"],
+                quick_th["pt_annual"],
+            ]
+            fig_donut = go.Figure(
+                data=[
+                    go.Pie(
+                        labels=breakdown_labels,
+                        values=breakdown_values,
+                        hole=0.6,
+                        marker=dict(colors=["#10b981", "#f43f5e", "#6366f1", "#f59e0b"]),
+                        textinfo="percent",
+                        hoverinfo="label+value",
+                    )
+                ]
+            )
+            fig_donut.update_layout(height=280, margin=dict(l=10, r=10, t=10, b=10), showlegend=True)
+            st.plotly_chart(fig_donut, use_container_width=True)
+
+        with th_c2:
+            st.markdown(
+                f"""
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.25rem;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.5rem 0; color: #64748b;">Annual Cost to Company (CTC)</td>
+                            <td style="padding: 0.5rem 0; text-align: right; font-weight: 700; color: #0f172a;">₹ {int(quick_th['ctc']):,}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.5rem 0; color: #64748b;">Estimated Basic (40% of CTC)</td>
+                            <td style="padding: 0.5rem 0; text-align: right; font-weight: 600;">₹ {int(quick_th['basic']):,}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.5rem 0; color: #dc2626;">(-) Income Tax (New Regime TDS)</td>
+                            <td style="padding: 0.5rem 0; text-align: right; font-weight: 600; color: #dc2626;">- ₹ {int(quick_th['tax_annual']):,}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.5rem 0; color: #4338ca;">(-) Employee EPF (Retirement)</td>
+                            <td style="padding: 0.5rem 0; text-align: right; font-weight: 600; color: #4338ca;">- ₹ {int(quick_th['epf_annual']):,}</td>
+                        </tr>
+                        <tr style="border-bottom: 2px solid #e2e8f0;">
+                            <td style="padding: 0.5rem 0; color: #d97706;">(-) Professional Tax</td>
+                            <td style="padding: 0.5rem 0; text-align: right; font-weight: 600; color: #d97706;">- ₹ {int(quick_th['pt_annual']):,}</td>
+                        </tr>
+                        <tr style="background: #f0fdf4;">
+                            <td style="padding: 0.75rem 0.5rem; font-weight: 700; color: #047857;">Estimated Net Bank Credit</td>
+                            <td style="padding: 0.75rem 0.5rem; text-align: right; font-weight: 800; font-size: 1.05rem; color: #047857;">₹ {int(quick_th['monthly_in_hand']):,}/mo</td>
+                        </tr>
+                    </table>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        # 15-Year Career Trajectory
+        st.subheader("📈 15-Year Career Trajectory Simulator")
+        exp_steps = [0.0, 1.0, 2.0, 3.0, 5.0, 7.0, 9.0, 12.0, 15.0, 18.0]
+        traj_records = []
+        for step in exp_steps:
+            sub_df = pd.DataFrame([{"Company": comp_match_key or "TCS", "Job_Title": input_role, "Industry": industry, "Role_Family": detected_family, "Seniority_Level": detected_seniority, "Rating": rating, "Avg_Exp": step}])
+            p_val = round(float(pipeline.predict(sub_df)[0]), 1)
+            traj_records.append({"Experience": step, "Salary": p_val})
+
+        traj_df = pd.DataFrame(traj_records)
+        fig_traj = go.Figure()
+        fig_traj.add_trace(go.Scatter(x=traj_df["Experience"], y=traj_df["Salary"], mode="lines+markers", line=dict(color="#4f46e5", width=3), name="Estimated Trendline"))
+        fig_traj.update_layout(xaxis_title="Years of Experience", yaxis_title="Salary (LPA)", height=350, template="plotly_white")
+        st.plotly_chart(fig_traj, use_container_width=True)
+
+    with dev_tab2:
+        st.subheader("⚖️ Head-to-Head Offer Compare")
+        st.caption("Retained from v1 for comparative analysis.")
+        cmp_a, cmp_b = st.columns(2)
+        with cmp_a:
+            comp_choice_a = st.selectbox("Company A", companies, index=0, key="dev_cmp_a")
+        with cmp_b:
+            comp_choice_b = st.selectbox("Company B", companies, index=min(1, len(companies)-1), key="dev_cmp_b")
+
+        df_a = pd.DataFrame([{"Company": comp_choice_a, "Job_Title": input_role, "Industry": "IT Services & Consulting", "Role_Family": detected_family, "Seniority_Level": detected_seniority, "Rating": 3.8, "Avg_Exp": float(input_exp)}])
+        df_b = pd.DataFrame([{"Company": comp_choice_b, "Job_Title": input_role, "Industry": "IT Services & Consulting", "Role_Family": detected_family, "Seniority_Level": detected_seniority, "Rating": 3.8, "Avg_Exp": float(input_exp)}])
+        pred_a = round(float(pipeline.predict(df_a)[0]), 1)
+        pred_b = round(float(pipeline.predict(df_b)[0]), 1)
+        st.write(f"**{comp_choice_a}:** ₹ {pred_a} LPA vs **{comp_choice_b}:** ₹ {pred_b} LPA")
+
+    with dev_tab3:
+        st.subheader("🔥 Reddit Unfiltered (r/developersIndia)")
+        rd_sel = st.selectbox("Select Employer", sorted(list(reddit_benchmarks.keys())), key="dev_rd_sel")
+        rd_item = reddit_benchmarks.get(rd_sel, {})
+        if rd_item:
+            st.json(rd_item.get("red_flags", {}))
+            st.markdown(f"**Threads Indexed:** {len(rd_item.get('top_threads', []))}")
+
+    with dev_tab4:
+        st.subheader("🤖 AmbitionBox AI Copilot (FAISS Semantic Search)")
+        q = st.text_input("Ask about workplace culture or appraisal reality:", "How are appraisals and work-life balance?")
+        if st.button("Search Reviews"):
+            try:
+                import rag_assistant
+                retrieved = rag_assistant.retrieve_reviews(q, company=comp_match_key, k=4)
+                for r in retrieved:
+                    st.write(f"• **{r['company']} ({r['rating']}⭐):** {r['likes']}")
+            except Exception as e:
+                st.error(f"Error: {e}")

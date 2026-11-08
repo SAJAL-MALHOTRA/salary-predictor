@@ -1,211 +1,153 @@
-# 🇮🇳 India Salary & Career Intelligence Platform
+# 🇮🇳 India Tech Offer Evaluator & Salary Intelligence
 
 [![CI Test Suite](https://github.com/SAJAL-MALHOTRA/salary-predictor/actions/workflows/ci.yml/badge.svg)](https://github.com/SAJAL-MALHOTRA/salary-predictor/actions/workflows/ci.yml)
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io)
 ![Python 3.11 | 3.12](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white)
 ![Scikit-Learn](https://img.shields.io/badge/scikit--learn-Voting%20Ensemble-F7931E?logo=scikit-learn&logoColor=white)
-![FAISS Vector Index](https://img.shields.io/badge/FAISS-33k%20Vectors-0468FF?logo=meta&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-A production-grade compensation and career intelligence platform combining **Voting Ensemble Machine Learning (RF + HGB)**, **Retrieval-Augmented Generation (FAISS + Gemini/Extractive RAG)**, **NLP Role Taxonomy Normalization**, and **Multi-Source Cross-Validation (AmbitionBox + Kaggle Glassdoor India + US DOL OFLC H-1B Disclosures)**.
-
-> 📖 **Deep Dive Technical Report:** Read the complete [Machine Learning Methodology, Cross-Validation & Ablation Report](METHODOLOGY.md) for 5-fold CV breakdowns, segment-level error analysis, log-transform trade-offs, and cold-start shrinkage.
+A portfolio project built to evaluate Indian tech job offers during candidate decision windows. Given an employer, job title, years of experience, offered CTC, and variable pay percentage, the tool computes monthly in-hand bank credit under India's New Tax Regime (Budget 2024), places the offer against a cross-validated peer distribution with finite-sample conformal prediction intervals, provides three concrete negotiation counter-figures, and surfaces employer contract risks (such as 90-day notice periods and bench policies) extracted from developer discussions on `r/developersIndia`.
 
 ---
 
-## 🚀 Key Modules & Capabilities
+## 1. The Problem
 
-### 1. 🎯 Precision Salary Estimation with Voting Ensemble
-- **Ensemble Architecture:** `sklearn.pipeline.Pipeline` with `ColumnTransformer` + `VotingRegressor`:
-  - **Estimator 1:** `RandomForestRegressor` (150 estimators, max depth 22, min samples split 3).
-  - **Estimator 2:** `HistGradientBoostingRegressor` (200 iterations, 31 max leaves).
-- **Rigorous Evaluation:**
-  - **5-Fold Cross-Validation:** **$R^2 = 0.4993 \pm 0.0620$** | $\text{MAE} = 3.95 \pm 0.18\text{ LPA}$ | $\text{RMSE} = 6.45 \pm 0.45\text{ LPA}$
-  - Single 15% holdout reported as secondary check ($R^2 = 0.5661$, $\text{MAE} = 3.84\text{ LPA}$), not headline.
-- Outputs **80% Conformal Prediction Intervals** ($\pm 6.01\text{ LPA}$, certified 80.0% coverage) alongside tree-variance bands (71.2% empirical OOF coverage).
-- Displays verified **AmbitionBox ground-truth min/max/mean ranges** when exact matches exist.
-- Surfaces **Cold-Start confidence notices** when an employer has $< 3$ records on file.
+In the Indian technology market, an offer letter quoting "₹15 LPA CTC" rarely translates to ₹1.25 Lakhs deposited into an engineer's bank account. Between statutory Employee Provident Fund deductions (12% of basic), professional tax, New Tax Regime income tax slabs, and variable pay clauses (10% to 25% tied to performance appraisal or project billability), candidates regularly face negative surprises on their first monthly payday. When variable payout is delayed or reduced, guaranteed monthly income drops significantly below expectations.
 
-### 2. 🏷️ NLP Role Family & Seniority Normalization
-- Automatically maps 750+ noisy, scraped job headlines into **15 Canonical Role Families**:
-  - *Data Science & AI, Data & Analytics, Frontend & Mobile, Software & Systems Engineering, Cloud/DevOps & Cybersecurity, QA & Testing, Enterprise Solutions (SAP/SF), Product & Project Management, Sales & BD, Marketing, Finance & Banking, HR, Customer Support & BPO, Operations & Supply Chain, General Corporate.*
-- Detects **5 Seniority Levels**: *Entry / Junior, Mid-Level, Senior / Lead, Manager / Lead, Executive / Director*.
-- Enhances model generalization and enables browsing roles by functional domain.
-
-### 3. 🤖 Ask AmbitionBox AI: RAG Review Assistant
-- Embedded **33,200+ employee review vectors** using `all-MiniLM-L6-v2` and indexed with **FAISS**.
-- Allows users to ask natural questions like:
-  - *"How is the work-life balance and client management at TCS?"*
-  - *"Are salary hikes and appraisals fair at Flipkart compared to other product companies?"*
-  - *"What do freshers say about the bench period and learning curve?"*
-- **Two-tier Intelligence Engine:**
-  - **Generative AI:** Powers synthesis using Google Gemini when an API key is provided.
-  - **Local Semantic AI Fallback:** Zero-API, instant extractive synthesis with verified review quotes and ratings.
-
-### 4. 🏢 Deep Company Intelligence & Employee Voice
-- Enriched with metadata from 10,000+ company profiles: **AmbitionBox Rating (out of 5.0)**, **Total Reviews**, **Industry**, and **HQ City**.
-- Displays **Real Employee Likes & Dislikes** synthesized from 43,000+ AmbitionBox reviews.
-
-### 5. ⚖️ Company vs Company Offer Comparison
-- Side-by-side benchmark for job seekers evaluating two offers or target employers.
-- Compares CTC, estimated take-home pay delta, culture ratings, total reviews, and top pros/cons.
-
-### 6. 💰 In-Hand / Take-Home Pay Calculator (India New Tax Regime)
-- Converts CTC into **actual monthly bank credit** under Budget 2024 / FY 2024-25 & 2025-26 rules:
-  - Standard deduction of ₹75,000
-  - Slabs: 3-7L (5%), 7-10L (10%), 10-12L (15%), 12-15L (20%), >15L (30%)
-  - Section 87A rebate (tax-free CTC up to ~₹7.75 Lakhs)
-  - EPF deductions (12% of basic) and Professional Tax (₹2,400/yr)
-- Interactive donut chart showing CTC breakdown.
-
-### 7. 📈 15-Year Career Trajectory Simulator
-- Simulates how compensation evolves across 0 to 18 years of experience for any role at any company.
-- Plots milestone stages: Fresh Graduate, Mid-Level, Senior, and Lead/Principal.
-
-### 8. 🇺🇸 US Onsite H-1B Prevailing Wage Intelligence (US DOL OFLC Data)
-- Integrates **100% legal, public government disclosure records** from the **U.S. Department of Labor (DOL)** Office of Foreign Labor Certification (OFLC).
-- Tracks over **1,000,000+ certified H-1B visa petitions** across 50 tier-1 Indian IT and multinational technology firms (Infosys: 200k, TCS: 126k, Cognizant: 125k, Google: 42k, etc.).
-- Compares **Offshore India CTC** against **US Onsite H-1B Median Wages** with both Direct FX (USD to INR @ 86) and World Bank Purchasing Power Parity (PPP @ 23.5).
-- Displays federal prevailing wage tiers (Level I Entry to Level IV Leadership) pursuant to 20 CFR § 656.40.
-
-### 9. 📊 Multi-Source Kaggle Glassdoor India Cross-Validation
-- Ingested open research salary benchmarks from Kaggle's Glassdoor India repository (`ruchi798/software-industry-salary-dataset-2022`).
-- Matched **2,836 validated individual salary records across 73 target companies**, providing direct offshore triangulation against AmbitionBox figures.
-- Live comparison card in the platform displays:
-  - Total Glassdoor submission counts per company
-  - Empirical P10, P50 (median), and P90 benchmarks
-  - Real-time delta between ensemble predictions and Glassdoor medians.
-
-### 10. 🔥 Reddit Unfiltered: The Real Developer Truth Engine (r/developersIndia)
-- Directly addresses corporate review sanitization by harvesting and structuring authentic developer discussions from `r/developersIndia` and `r/cscareerquestionsIN`.
-- **Culture X-Ray (Corporate PR vs. Reddit Reality):**
-  - Side-by-side comparison of polished HR scores vs raw developer sentiment distributions (% Positive, Neutral, Negative, Toxic).
-  - Indian tech **Dark Pattern & Red-Flag Radar**: 90-Day Notice Period traps, unbilled bench ultimatums (RMG), silent PIP / stack-ranking quotas (Amazon URA), and delayed/low appraisal stats.
-- **Community Leaked CTCs & Compensation Explorer:**
-  - Real community-disclosed packages detailing Base, Variable, and ESOPs across IT services, Unicorns, and FAANG/Tier-1 GCCs.
-- **Interactive Reddit Offer Evaluator:**
-  - Enter proposed CTC, company, and YoE to get an instant, unfiltered community verdict and negotiation risk checklist.
+Compounding this, compensation in India follows an extreme bimodal distribution. Legacy IT service firms (TCS, Infosys, Wipro, Cognizant) anchor early-career engineers at ₹3.5–₹5.0 LPA, while global capability centers (GCCs), high-growth unicorns, and product engineering teams (Google, Uber, Sprinklr, Razorpay) start freshers at ₹20–₹35 LPA. Candidates evaluating lateral moves cannot rely on generic national averages; they need to know where an offer sits across this divide, what monthly cash flow it delivers, and what counter-offer is defensible.
 
 ---
 
-## 🛠️ Quickstart & Setup
+## 2. Model Performance
+
+All primary model metrics are 5-fold cross-validated (`KFold`, `n_splits=5`, `shuffle=True`, `random_state=42`) across the training dataset. A single 15% holdout split is reported only as a secondary check; leading with holdout metrics overstates generalization performance on datasets of this size.
+
+| Evaluation Metric | 5-Fold Cross-Validation (Headline) | Secondary Holdout Split (15%, n=131) |
+|---|---|---|
+| **$R^2$ Score** | **`0.4993 ± 0.0620`** | `0.5661` |
+| **Mean Absolute Error (MAE)** | **`3.95 ± 0.18 LPA`** | `3.84 LPA` |
+| **Root Mean Squared Error (RMSE)** | **`6.45 ± 0.45 LPA`** | `5.78 LPA` |
+
+> **Methodological Note:** The single holdout $R^2$ of `0.5661` represented a favorable random split. Under 5-fold cross-validation, the model achieves `0.4993 ± 0.0620`. We lead with the cross-validated figure of ~0.50 as the honest measure of out-of-sample predictive capacity.
+
+---
+
+## 3. The 3-Way Ablation
+
+Earlier iterations bundled NLP taxonomy normalization and model ensembling into a single comparison (+14.1% lift), confounding the feature representation effect with the model complexity effect. To isolate attribution cleanly, we evaluated three distinct configurations across the exact same 5 cross-validation folds (identical seed and splits):
+
+| Arm | Configuration | Feature Representation | Estimator | 5-Fold CV $R^2$ | 5-Fold CV MAE | Fold Improvement vs Baseline |
+|---|---|---|---|---|---|---|
+| **Arm A** | Baseline | Raw job titles (sparse one-hot) | Single Random Forest | `0.4243 ± 0.1007` | `4.24 ± 0.28 LPA` | Base |
+| **Arm B** | Taxonomy | Canonical Role Families & Seniority | Single Random Forest | `0.4774 ± 0.0714` | `4.06 ± 0.20 LPA` | **5 / 5 folds improved** (+0.0531 mean lift) |
+| **Arm C** | Taxonomy + Ensemble | Canonical Role Families & Seniority | Voting Regressor (RF + HGB) | **`0.4993 ± 0.0620`** | **`3.95 ± 0.18 LPA`** | **5 / 5 folds improved** (+0.0750 mean lift) |
+
+### Key Findings:
+1. **Dominant Effect:** The NLP taxonomy accounts for over 70% of total performance improvement and produces a **29% reduction in cross-fold variance** ($\sigma: 0.1007 \to 0.0714$).
+2. **Per-Fold Consistency:** Across all 5 folds, Arm B strictly outperformed Arm A (+0.0412, +0.0257, +0.1060, +0.0207, +0.0718).
+3. **Ensemble Contribution:** Ensembling (RF + HistGradientBoosting) provided a modest incremental lift (+0.0219 $R^2$) on this 867-row dataset, confirming that reducing categorical sparsity in job titles matters significantly more than adding model capacity.
+
+---
+
+## 4. Interval Calibration
+
+### Tree-Variance Under-Coverage Audit
+In initial builds, uncertainty intervals were derived from the empirical standard deviation across individual trees in the Random Forest ($\hat{y} \pm 1.28 \cdot \sigma_{\text{trees}}$ for nominal 80% coverage). An out-of-fold audit revealed severe under-coverage:
+- **Nominal Target Coverage:** 80.0%
+- **Empirical Out-of-Fold Coverage:** **71.2%**
+
+Tree variance underestimates epistemic uncertainty because trees in a forest are correlated and cannot account for systematic residual bias or unobserved compensation determinants (negotiation leverage, equity cliffs).
+
+### Certified Conformal Intervals
+We replaced heuristic tree variance with **split conformal prediction** calibrated on out-of-fold cross-validation residuals:
+- **Conformal Margin (80% level):** $q = \pm 6.01\text{ LPA}$
+- **Empirical Coverage on Test Data:** **80.0%** (exact finite-sample calibration)
+- **Interpretation:** The conformal interval ($\hat{y} \pm 6.01\text{ LPA}$) reflects model prediction uncertainty, whereas the interquartile range (P25–P75) reflects observable market spread. The application displays both distinctly.
+
+---
+
+## 5. Training Data vs. Benchmark Data
+
+To maintain audit integrity, data sources used for model training are kept strictly separate from external context and validation sources:
+
+| Source | Role in System | Records | Outlier & Preprocessing Policy | Notes |
+|---|---|---|---|---|
+| **AmbitionBox (Scraped Snapshot)** | **Model Training** | 867 company-role aggregated benchmarks across 118 employers | Excluded founder/intern titles, values $< ₹1.5\text{ LPA}$ and $> ₹150\text{ LPA}$, mapped to 15 canonical role families | Primary ground truth used in `train_model.py` pipeline |
+| **Kaggle Glassdoor India** | Secondary Validation | 2,836 individual records across 73 employers | Matched canonical employers; extracted P10, P50, P90 | Independent offshore cross-check; not mixed into training rows |
+| **U.S. DOL OFLC H-1B Filings** | Legal Wage Floor Benchmark | 1,000,000+ certified petitions across 50 employers | Extracted median USD wages and Levels I–IV prevailing wages | **Not converted to INR or blended with Indian wages.** H-1B figures reflect statutory US immigration floors, not domestic comp |
+| **Reddit `r/developersIndia`** | Contract Risk & Sentiment | 22 top tech employers | NLP regex extraction for notice periods, bench policies, PIP alerts | Unmoderated qualitative layer surfacing terms HR scorecards omit |
+
+### Tax Engine Baseline:
+The in-hand calculation assumes **40% basic pay** (standard across Indian IT services and consulting agreements). Standard deduction is fixed at ₹75,000 under Budget 2024 / FY 2024-25 (AY 2025-26). Some product engineering firms structure basic pay at 50% of CTC, which slightly increases monthly employee PF deductions.
+
+---
+
+## 6. Positioning vs. Industry Aggregators (The Weekday Contrast)
+
+Industry salary platforms like **Weekday** (YC W21) operate at substantial scale: 412 companies, roughly 15 lakh (1.5 million) salary records, 30-record company thresholds, and inflation adjustments. Their data is generated as the operational exhaust of an active hiring marketplace.
+
+In a direct company-directory comparison ("what does Company X pay on average?"), an independent 867-row model cannot and should not attempt to compete with a 1.5-million-record hiring engine.
+
+**This project does not build a salary directory; it builds an offer decision engine.**
+
+| Dimension | Directory Platforms (e.g. Weekday) | This Project (Offer Evaluator) |
+|---|---|---|
+| **Primary Question** | "What does this company pay in aggregate?" | "Is *this specific offer letter* good for *me*, right now?" |
+| **Core Output** | Median fixed CTC and P25–P75 percentiles | Monthly in-hand range (accounting for variable pay discount), counter targets, red flags |
+| **Uncertainty** | Sample spread across candidates | Calibrated 80% conformal interval ($\pm 6.01\text{ LPA}$) around the user's specific parameters |
+| **Contract Terms** | Compensation figures only | 90-day notice period traps, bench risks, and PIP quotas from `r/developersIndia` |
+| **Use Case** | Passive market browsing | 48-hour active offer evaluation and negotiation preparation |
+
+> *Benchmark data is a commodity; offer evaluation, variable-pay discount modeling, and calibrated uncertainty is the wedge.*
+
+---
+
+## 7. What I Got Wrong
+
+Engineering honest machine learning requires documenting errors caught during review:
+
+1. **Holdout Cherry-Picking:** I initially cited a single-split holdout $R^2$ of `0.5661` as the headline performance metric. It was an optimistic split. I restructured the evaluation to lead with 5-fold cross-validation (`0.4993 ± 0.0620`).
+2. **Confounded Ablation:** I claimed a "+14.1% lift from the taxonomy," but the test script had simultaneously upgraded the model from a single Random Forest to a Voting Ensemble. When I decoupled them in a 3-way ablation on identical folds, the taxonomy alone delivered the primary variance reduction (+0.0531 lift, 5/5 folds), while the ensemble added a modest +0.0219.
+3. **Uncalibrated Heuristic Intervals:** I assumed the inter-tree standard deviation from Random Forest estimators produced valid 80% confidence bands. An empirical audit showed it only achieved 71.2% coverage. I replaced it with split conformal prediction to certify finite-sample 80.0% coverage.
+4. **Log-Target Framing:** While training on $\log(y)$ narrowed percentage relative error on junior brackets, it distorted nominal rupee errors on high-value senior compensation. I retained linear targets evaluated via MAE and certified conformal margins.
+
+---
+
+## 8. What This Project Doesn't Do
+
+- **No Live Hiring Exhaust:** Data relies on an 867-row scraped snapshot across 118 employers; unindexed companies fall back to domain-level and seniority priors.
+- **No Equity / ESOP Modeling:** Does not model stock appreciation, 1-year cliff terms, or backloaded vesting schedules.
+- **Simplified Tax Scope:** Implements the Budget 2024 New Tax Regime with standard deductions; bespoke flexi-benefits, HRA claims under the Old Regime, or surcharge adjustments for ultra-high earners ($> ₹50\text{ LPA}$) are omitted.
+- **No Production Traffic Yet:** Traffic and submission hypotheses are documented with explicit kill/continue criteria in [`RETROSPECTIVE.md`](RETROSPECTIVE.md).
+
+---
+
+## 9. Setup & Verification
 
 ```bash
-# 1. Clone repository and navigate inside
+# 1. Clone repository
+git clone https://github.com/SAJAL-MALHOTRA/salary-predictor.git
 cd salary-predictor
 
-# 2. Install pinned dependencies (including CPU PyTorch, Pytest & PRAW)
+# 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Run automated verification test suite
+# 3. Run automated verification suite (8 tests)
 pytest tests/ -v
 
-# 4. (Optional) Re-train model pipeline & generate company intelligence assets
-python train_model.py
-
-# 5. (Optional) Refresh multi-source benchmarks (DOL H-1B, Glassdoor, & Reddit)
-python ingest_h1b_dol_data.py
-python ingest_glassdoor_data.py
-python reddit_harvester.py
-python reddit_nlp_extractor.py
-
-# 6. Launch the Streamlit web application
+# 4. Launch single-screen Offer Evaluator
 streamlit run app.py
+
+# 5. (Optional) Run with developer surfaces enabled (Tabs 2-4, RAG copilot)
+DEV_MODE=1 streamlit run app.py
 ```
 
 ---
 
-## 📁 Project Architecture
+## 10. Key References & Project Links
 
-| File / Directory | Description |
-|---|---|
-| `app.py` | Multi-tab Streamlit platform with 4 modules: Salary Deep Dive, Offer Compare, Reddit Unfiltered, and AI Copilot |
-| `taxonomy.py` | Single source of truth for NLP regex job categorization across 15 Role Families & 5 Seniority Levels |
-| `reddit_harvester.py` | Harvester module supporting live Reddit PRAW API crawling and high-fidelity seed corpus fallback |
-| `reddit_nlp_extractor.py` | Regex & NLP parser extracting compensation figures, YoE, red flags (90-day notice, bench, PIP), and sentiment |
-| `reddit_benchmarks.json` | Pre-computed Reddit scorecards across 22 top tech employers (sentiment, red flags, leaked CTCs, threads) |
-| `reddit_threads_cleaned.csv` | Normalized tabular dataset of parsed Reddit developer threads and offer disclosures |
-| `reddit_raw_posts.json` | Raw ingested post bodies, scores, permalinks, and top comment trees from r/developersIndia |
-| `rag_assistant.py` | RAG module: lazy FAISS loading, review parsing, semantic search, and Gemini/extractive synthesis |
-| `faiss_index/` | Local vector index (`index.faiss` + `index.pkl`) storing 33,200+ review embeddings |
-| `train_model.py` | Ingests data, applies NLP role normalization, executes 5-fold CV, trains Voting Ensemble |
-| `ingest_h1b_dol_data.py` | Ingestion script pulling official US Department of Labor OFLC H-1B LCA public disclosure data |
-| `h1b_lca_benchmarks.json` | Pre-computed US DOL H-1B benchmarks for 50 employers (filings, median wage, wage levels) |
-| `h1b_summary.csv` | Summary table of top employers by certified H-1B filings and approval rates |
-| `ingest_glassdoor_data.py` | Ingestion & normalization script for Kaggle Glassdoor India compensation dataset |
-| `glassdoor_benchmarks.json` | Pre-computed Glassdoor benchmarks across 73 employers (sample counts, P10, P50, P90) |
-| `glassdoor_salaries_cleaned.csv` | Normalized Glassdoor records mapped to canonical company and role taxonomy |
-| `generate_evaluation_plots.py` | Publication-grade evaluation plotting script generating calibration & residual curves |
-| `assets/` | High-resolution evaluation charts (`model_evaluation_dashboard.png`, `calibration_plot.png`, etc.) |
-| `tests/test_platform.py` | Automated Pytest verification suite covering inference, taxonomy, tax math, and data schemas |
-| `.github/workflows/ci.yml` | GitHub Actions CI workflow executing pytest suite on push and pull requests |
-| `METHODOLOGY.md` | In-depth technical report: ablation study, 5-fold CV breakdown, segment error analysis, US DOL data integration |
-| `evaluation_report.json` | Programmatically exported cross-validation metrics, segment MAEs, and fold scores |
-| `salary_data.csv` | Cleaned, deduplicated salary dataset with company ratings, industry, role family, and seniority |
-| `company_insights.json` | Pre-aggregated company ratings, review counts, HQ locations, top likes/dislikes |
-| `salary_pipeline.pkl` | Trained `sklearn.pipeline.Pipeline` with `VotingRegressor` (RF + HGB) |
-| `model_metadata.pkl` | Metadata dictionary: companies, company-job map, role taxonomy, experience caps, test & CV metrics |
-| `requirements.txt` | Version-pinned dependencies with CPU-optimized PyTorch wheels for fast container deployment |
-
----
-
-## 📊 Model Performance
-
-Primary metrics are 5-fold cross-validated (`KFold`, `n_splits=5`, `shuffle=True`, `random_state=42`). A single 15% holdout is reported only as a secondary check; it is not the headline number.
-
-### 5-Fold Cross-Validation & Unconfounded 3-Way Ablation
-
-| Protocol | CV R² | CV MAE (LPA) | CV RMSE (LPA) |
-|---|---|---|---|
-| **Arm A:** Baseline — raw job titles, single RF | `0.4243 ± 0.1007` | `4.24 ± 0.28` | `6.87 ± 0.61` |
-| **Arm B:** NLP taxonomy, single RF *(isolates taxonomy)* | `0.4774 ± 0.0714` | `4.06 ± 0.20` | `6.59 ± 0.49` |
-| **Arm C:** NLP taxonomy + voting ensemble *(RF + HGB)* | **`0.4993 ± 0.0620`** | **`3.95 ± 0.18`** | **`6.45 ± 0.45`** |
-
-### Per-Fold Breakdown & Sign Consistency (Arm B vs Arm A)
-
-| Fold | Arm A (Raw RF) | Arm B (Taxonomy RF) | Delta (B − A) | Arm C (Ensemble) |
-|---|---|---|---|---|
-| Fold 1 | 0.4559 | 0.4971 | **+0.0412** | 0.5003 |
-| Fold 2 | 0.5178 | 0.5435 | **+0.0257** | 0.5786 |
-| Fold 3 | 0.3043 | 0.4103 | **+0.1060** | 0.4096 |
-| Fold 4 | 0.5370 | 0.5578 | **+0.0207** | 0.5533 |
-| Fold 5 | 0.3066 | 0.3784 | **+0.0718** | 0.4546 |
-| **Mean ± Std** | `0.4243 ± 0.1007` | `0.4774 ± 0.0714` | **+0.0531 (5/5 positive)** | **`0.4993 ± 0.0620`** |
-
-**The dominant effect is variance reduction, not mean lift.** Fold-to-fold standard deviation falls 38% for R² (0.100 → 0.062), 42% for MAE, and 29% for RMSE. Notice especially Fold 3 (+0.1060) and Fold 5 (+0.0718) — the worst-performing slices without taxonomy gained the most. Resolving categorical sparsity across 750+ free-text Indian job titles makes performance *predictable across data slices* — which matters more than a marginal mean gain when serving a long tail of role families and seniority tiers. Adding the `HistGradientBoosting` ensemble further lifts R² to 0.4993 and tightens σ to 0.062.
-
-## 🎯 Interval Calibration & Split Conformal Prediction
-
-Tree-variance P10–P90 bands were audited against out-of-fold actuals:
-
-- Nominal coverage: 80.0%
-- Empirical out-of-fold coverage: **71.2%**
-
-The raw tree-variance bands under-cover by ~9 points — they are overconfident and should not be read as calibrated 80% intervals. To provide a rigorous guarantee, we implemented **Split Conformal Prediction on out-of-fold residuals**:
-
-$$\hat{C}(x) = [\hat{y} - q_{\text{val}}, \hat{y} + q_{\text{val}}] \quad \text{where } q_{\text{val}} = \pm 6.01\text{ LPA}$$
-
-- **Conformal Margin ($1-\alpha=0.80$):** $\pm 6.01\text{ LPA}$
-- **Empirical Out-of-Fold Coverage:** **80.0%** (finite-sample marginal coverage guarantee)
-
-In the UI, the corridor is explicitly labeled with both the certified **80% Conformal Interval** ($\pm 6.01\text{ LPA}$) and the empirical **model-variance band** (71.2% coverage).
-
-## 🗄️ Training Data vs. Benchmark Data
-
-Only one source trains the model. The rest validate or contextualize it.
-
-| Source | Rows | Role in system |
-|---|---|---|
-| **AmbitionBox India** | 867 | **Supervised training set** (X, y) |
-| **Glassdoor India** | 2,836 | Post-prediction offshore validation card (UI) |
-| **US DOL H-1B OFLC** | 1M+ | Standalone US onsite legal-floor reference table |
-| **Reddit (22 firms)** | qual. | Qualitative culture X-ray / dark-pattern radar |
-
-H-1B prevailing wages are **legal minimum floors for US-based petitions, not observed wages**, and are never converted, blended, or used as model features. They are surfaced only as an independent offshore-vs-onsite relocation benchmark.
-
----
-
-## ⚠️ Disclaimers & Fair Use
-- AmbitionBox data is self-reported by employees and job candidates, harvested as a mid-2026 snapshot.
-- This platform is an educational, non-commercial portfolio project intended for market benchmarking and machine learning research. It is not affiliated with, endorsed by, or sponsored by AmbitionBox or Info Edge India Ltd.
-- Compensation figures may vary based on performance bonuses, RSUs/ESOPs, academic tier, specific technology stacks, and negotiation skill. Estimates do not constitute formal tax or legal counsel.
+- **Technical Report & Ablation Details:** [`METHODOLOGY.md`](METHODOLOGY.md)
+- **Six-Week Launch Retrospective & Metrics:** [`RETROSPECTIVE.md`](RETROSPECTIVE.md)
+- **Full Model Metrics & Calibration Artifact:** [`evaluation_report.json`](evaluation_report.json)
+- **High-Resolution Evaluation Plots:** [`assets/`](assets/)
+- **Aggregate Directory Reference:** [Weekday India Salaries](https://www.weekday.works/salaries)
