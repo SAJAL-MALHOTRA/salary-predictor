@@ -5,7 +5,7 @@ Production-grade FinTech / HR-Tech Architecture.
 Positioning:
 "Know what your offer is actually worth."
 Understand actual monthly take-home, uncover compensation traps,
-benchmark offers against relevant market tiers, and negotiate with confidence.
+benchmark offers against peer tiers, model equity, compare offers, and negotiate with confidence.
 """
 
 import json
@@ -21,6 +21,11 @@ import streamlit as st
 import community_notes as cn
 import contract_auditor as ca
 import company_tiers as ct
+import decision_matrix as dm
+import equity_engine as ee
+import negotiation_war_room as nwr
+import offer_parser as op
+import report_generator as rg
 from taxonomy import categorize_job
 
 # ── Paths ────────────────────────────────────────────────────────────────────
@@ -38,8 +43,8 @@ st.set_page_config(
 st.markdown(
     """
     <head>
-        <meta name="description" content="Understand what your Indian tech offer is actually worth. Calculate actual monthly take-home under Budget 2024 New Tax Regime, uncover gratuity and clawback contract traps, benchmark peer percentiles, and generate informed negotiation strategies." />
-        <meta name="keywords" content="salary calculator India, tech salary India, in-hand salary calculator, CTC to in-hand India, 90 day notice period, TCS salary, Infosys salary, Google salary India, offer negotiation email" />
+        <meta name="description" content="Understand what your Indian tech offer is actually worth. Calculate actual monthly take-home under Budget 2024 New Tax Regime, uncover gratuity and clawback contract traps, benchmark peer percentiles, model startup ESOPs, and generate informed negotiation strategies." />
+        <meta name="keywords" content="salary calculator India, tech salary India, in-hand salary calculator, CTC to in-hand India, 90 day notice period, TCS salary, Infosys salary, Google salary India, offer negotiation email, ESOP calculator India" />
         <meta property="og:title" content="Offer Intelligence | India Tech Compensation Analyzer" />
         <meta property="og:description" content="Calculate real monthly take-home, uncover contract traps, benchmark your offer, and negotiate with confidence." />
         <meta property="og:type" content="website" />
@@ -71,7 +76,7 @@ st.markdown(
             }
             el.setAttribute('content', content);
           };
-          setMeta('name', 'description', 'Understand what your Indian tech offer is actually worth. Calculate monthly take-home, uncover contract traps, and benchmark peer percentiles.');
+          setMeta('name', 'description', 'Understand what your Indian tech offer is actually worth. Calculate monthly take-home, uncover contract traps, benchmark peer percentiles, and model equity.');
           setMeta('property', 'og:title', 'Offer Intelligence | India Tech Compensation Analyzer');
           setMeta('property', 'og:description', 'Calculate real monthly take-home, uncover contract traps, and benchmark peer percentiles.');
         } catch(e) {}
@@ -356,7 +361,7 @@ html, body, [class*="css"] {
     padding-top: 0.35rem;
 }
 
-/* Negotiation Strategy Box */
+/* Strategy Box */
 .strategy-card {
     background: #FFFFFF;
     border: 1px solid #E5E7EB;
@@ -435,6 +440,26 @@ button[data-testid="baseButton-primary"]:hover {
     background: #EEF4FF;
     color: #3538CD;
     border-color: #C7D7FE;
+}
+
+/* Tabs styling */
+div[data-baseweb="tab-list"] {
+    gap: 8px;
+    background-color: #F2F4F7;
+    padding: 5px;
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+}
+div[data-baseweb="tab"] {
+    border-radius: 6px;
+    font-weight: 600;
+    padding: 6px 16px;
+    color: #475467;
+}
+div[data-baseweb="tab"][aria-selected="true"] {
+    background-color: #FFFFFF;
+    color: #151922;
+    box-shadow: 0 1px 3px rgba(16,24,40,0.08);
 }
 
 /* Responsive Breakpoints */
@@ -607,7 +632,52 @@ st.markdown(
 )
 
 
-# ── 6. OFFER INPUT WORKSPACE ──────────────────────────────────────────────────
+# ── 6. DOCUMENT INGESTION / AUTO-PARSER (PILLAR 1) ────────────────────────────
+with st.expander("📁 Auto-Extract from Offer Letter PDF or Salary Annexure", expanded=False):
+    st.caption("Upload your offer letter PDF or paste salary annexure text. The parser extracts employer, CTC, basic salary, variable pay, joining bonus, notice period, and gratuity terms in 1 second.")
+    parse_t1, parse_t2 = st.tabs(["Upload Offer PDF", "Paste Offer Text"])
+
+    with parse_t1:
+        uploaded_pdf = st.file_uploader("Upload Offer Letter PDF", type=["pdf"], key="offer_pdf_upload")
+        if uploaded_pdf is not None:
+            with st.spinner("Extracting offer terms from PDF..."):
+                pdf_text = op.extract_text_from_pdf(uploaded_pdf)
+                parsed = op.parse_offer_text(pdf_text)
+                if "error" not in parsed:
+                    st.success(f"✓ Extracted terms from {parsed['company']} ({parsed['ctc_lpa']} LPA) with {int(parsed['confidence']*100)}% confidence.")
+                    st.session_state.cfg_company = parsed["company"]
+                    st.session_state.cfg_role = parsed["role"]
+                    st.session_state.cfg_ctc = parsed["ctc_lpa"]
+                    st.session_state.cfg_var = parsed["variable_pct"]
+                    st.session_state.cfg_jb = parsed["joining_bonus_lpa"]
+                    st.session_state.cfg_grat = parsed["gratuity_included"]
+                    st.session_state.cfg_vfreq = parsed["variable_freq"]
+                    st.session_state.cfg_tenure = 2.0
+                    st.rerun()
+                else:
+                    st.error("Could not parse offer terms. Please paste text in the second tab.")
+
+    with parse_t2:
+        pasted_text = st.text_area(
+            "Paste Offer Letter / Salary Annexure Text:",
+            placeholder="e.g. Total CTC: INR 24,00,000 per annum, Basic Salary: INR 9,60,000, Variable Pay: 15%, Joining Bonus: INR 2,00,000, Notice Period: 60 days...",
+            height=110,
+        )
+        if st.button("Parse & Populate Form", use_container_width=True):
+            if pasted_text.strip():
+                parsed = op.parse_offer_text(pasted_text)
+                st.session_state.cfg_company = parsed["company"]
+                st.session_state.cfg_role = parsed["role"]
+                st.session_state.cfg_ctc = parsed["ctc_lpa"]
+                st.session_state.cfg_var = parsed["variable_pct"]
+                st.session_state.cfg_jb = parsed["joining_bonus_lpa"]
+                st.session_state.cfg_grat = parsed["gratuity_included"]
+                st.session_state.cfg_vfreq = parsed["variable_freq"]
+                st.success(f"✓ Populated terms for {parsed['company']} ({parsed['ctc_lpa']} LPA).")
+                st.rerun()
+
+
+# ── 7. OFFER INPUT WORKSPACE ──────────────────────────────────────────────────
 if "cfg_company" not in st.session_state:
     st.session_state.cfg_company = "Infosys"
 if "cfg_role" not in st.session_state:
@@ -820,187 +890,9 @@ low_mo = int(th_0["monthly_in_hand"])
 mid_mo = int(th_50["monthly_in_hand"])
 high_mo = int(th_100["monthly_in_hand"])
 
+target_comp_name = comp_match_key if comp_match_key else input_company.strip()
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# RESULTS — 8-PART EXECUTIVE COMPENSATION REPORT
-# ═══════════════════════════════════════════════════════════════════════════════
-
-st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
-st.markdown("### Compensation Analysis Report")
-
-# 01 — OFFER CONTEXT STRIP
-st.markdown(
-    f"""
-    <div style="margin-bottom: 1.25rem;">
-        <span class="context-badge context-badge-indigo">{tier_info['tier_badge']}</span>
-        <span class="context-badge">{detected_family}</span>
-        <span class="context-badge">{detected_seniority}</span>
-        <span class="context-badge">{input_city}</span>
-        <span class="context-badge">{rating} / 5.0 Rating</span>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# 02 — EXECUTIVE COMPENSATION SUMMARY
-st.markdown(
-    f"""
-    <div class="surface-card">
-        <div class="card-title-sm">02 — Estimated Monthly Take-Home (Net Bank Credit)</div>
-        <div class="figure-hero">₹ {int(low_mo):,} – ₹ {int(high_mo):,} <span class="figure-hero-sub">/ month</span></div>
-        <div style="font-size: 0.86rem; color: #475467; margin-top: 0.4rem; line-height: 1.5;">
-            Guaranteed monthly floor: <strong>₹ {int(low_mo):,}/mo</strong> (on ₹ {fixed_ctc:.1f}L fixed CTC) ·
-            Expected payout: <strong>₹ {int(mid_mo):,}/mo</strong> (~50% variable) ·
-            Maximum payout: <strong>₹ {int(high_mo):,}/mo</strong> (100% variable target).
-        </div>
-        <div style="font-size: 0.78rem; color: #667085; margin-top: 0.45rem;">
-            Budget 2024 New Tax Regime (FY 2024-25, AY 2025-26) · ₹75,000 standard deduction · 40% basic salary assumption.
-        </div>
-        <div class="scenario-grid">
-            <div class="scenario-card" style="border-top: 3px solid #DC2626;">
-                <div class="scenario-type" style="color: #DC2626;">Guaranteed Floor</div>
-                <div class="scenario-value">₹ {int(low_mo):,}</div>
-                <div class="scenario-desc">0% variable payout. Guaranteed fixed CTC: ₹ {fixed_ctc:.1f}L.</div>
-            </div>
-            <div class="scenario-card" style="border-top: 3px solid #4F46E5; background: #F8FAFC;">
-                <div class="scenario-type" style="color: #4F46E5;">Expected Payout</div>
-                <div class="scenario-value">₹ {int(mid_mo):,}</div>
-                <div class="scenario-desc">Realistic ~50% payout based on normal appraisal cycles.</div>
-            </div>
-            <div class="scenario-card" style="border-top: 3px solid #079669;">
-                <div class="scenario-type" style="color: #079669;">Maximum Target</div>
-                <div class="scenario-value">₹ {int(high_mo):,}</div>
-                <div class="scenario-desc">100% payout of full ₹ {float(input_ctc):.1f}L CTC. Not guaranteed income.</div>
-            </div>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# 03 — MONTHLY SALARY BREAKDOWN (ITEMIZED TABLE)
-with st.expander("03 — Itemized Monthly Salary Breakdown (View Calculation Steps)", expanded=False):
-    st.caption("Detailed deduction formula under Budget 2024 New Tax Regime. Distinguishes contractual items from statutory estimates.")
-    st.markdown(
-        f"""
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.86rem;">
-            <tr style="border-bottom: 1px solid #EAECF0;">
-                <th style="padding: 0.5rem 0; text-align: left; color: #667085; font-weight: 600;">Salary Component</th>
-                <th style="padding: 0.5rem 0; text-align: right; color: #667085; font-weight: 600;">Annual Amount</th>
-                <th style="padding: 0.5rem 0; text-align: right; color: #667085; font-weight: 600;">Monthly Credit / Deduction</th>
-                <th style="padding: 0.5rem 0; text-align: right; color: #667085; font-weight: 600;">Type / Formula</th>
-            </tr>
-            <tr style="border-bottom: 1px solid #EAECF0;">
-                <td style="padding: 0.45rem 0; font-weight: 600;">Offered Cost to Company (CTC)</td>
-                <td style="padding: 0.45rem 0; text-align: right; font-weight: 600;">₹ {int(th_100['ctc']):,}</td>
-                <td style="padding: 0.45rem 0; text-align: right;">₹ {int(th_100['ctc']/12):,}/mo</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #667085;">Contractual Input</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #EAECF0;">
-                <td style="padding: 0.45rem 0; color: #344054;">Basic Salary</td>
-                <td style="padding: 0.45rem 0; text-align: right;">₹ {int(th_100['basic']):,}</td>
-                <td style="padding: 0.45rem 0; text-align: right;">₹ {int(th_100['basic']/12):,}/mo</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #667085;">40% of CTC Baseline</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #EAECF0;">
-                <td style="padding: 0.45rem 0; color: #344054;">Special & Other Allowances</td>
-                <td style="padding: 0.45rem 0; text-align: right;">₹ {int(th_100['gross'] - th_100['basic']):,}</td>
-                <td style="padding: 0.45rem 0; text-align: right;">₹ {int((th_100['gross'] - th_100['basic'])/12):,}/mo</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #667085;">Fixed Gross Balance</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #EAECF0;">
-                <td style="padding: 0.45rem 0; color: #DC2626;">(-) Income Tax (New Regime TDS)</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #DC2626;">- ₹ {int(th_100['tax_annual']):,}</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #DC2626;">- ₹ {int(th_100['tax_monthly']):,}/mo</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #667085;">FY 2024-25 Slabs + 4% Cess</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #EAECF0;">
-                <td style="padding: 0.45rem 0; color: #4F46E5;">(-) Employee EPF (Retirement)</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #4F46E5;">- ₹ {int(th_100['epf_annual']):,}</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #4F46E5;">- ₹ {int(th_100['epf_monthly']):,}/mo</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #667085;">12% Basic (Statutory Rule)</td>
-            </tr>
-            <tr style="border-bottom: 2px solid #D0D5DD;">
-                <td style="padding: 0.45rem 0; color: #D97706;">(-) Professional Tax</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #D97706;">- ₹ {int(th_100['pt_annual']):,}</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #D97706;">- ₹ {int(th_100['pt_annual']/12):,}/mo</td>
-                <td style="padding: 0.45rem 0; text-align: right; color: #667085;">₹200/mo Standard</td>
-            </tr>
-            <tr style="background: #F8FAFC;">
-                <td style="padding: 0.65rem 0.5rem; font-weight: 700; color: #079669;">Estimated Net Bank Credit</td>
-                <td style="padding: 0.65rem 0.5rem; text-align: right; font-weight: 700; font-size: 1.05rem; color: #079669;">₹ {int(th_100['net_annual']):,}</td>
-                <td style="padding: 0.65rem 0.5rem; text-align: right; font-weight: 700; font-size: 1.05rem; color: #079669;">₹ {int(th_100['monthly_in_hand']):,}/mo</td>
-                <td style="padding: 0.65rem 0.5rem; text-align: right; font-weight: 600; color: #079669;">Net Monthly Cash</td>
-            </tr>
-        </table>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-# 04 — OFFER STRUCTURE ANALYSIS ("What's actually inside your CTC?")
-pct_var = max(0.0, min(100.0, round(float(input_var_pct), 1)))
-pct_grat = max(0.0, min(100.0, round((contract_audit["phantom_gratuity_loss_rupees"] / (float(input_ctc) * 100000.0)) * 100.0, 1)))
-pct_guar = max(0.0, min(100.0, round(100.0 - pct_var - pct_grat, 1)))
-
-st.markdown(
-    f"""
-    <div class="surface-card">
-        <div class="card-title-sm">04 — Offer Structure Analysis (What is actually inside your CTC?)</div>
-        <div style="font-size: 0.88rem; color: #344054; line-height: 1.5;">
-            Visualizing guaranteed monthly cash flow versus conditional or forfeited provisions:
-        </div>
-        <div class="composition-bar">
-            <div class="bar-segment" style="width: {pct_guar}%; background: #079669;" title="Guaranteed Fixed Cash: {pct_guar}%"></div>
-            <div class="bar-segment" style="width: {pct_var}%; background: #D97706;" title="Variable Bonus At-Risk: {pct_var}%"></div>
-            <div class="bar-segment" style="width: {pct_grat}%; background: #DC2626;" title="Phantom Gratuity Deduction: {pct_grat}%"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 0.74rem; font-weight: 600; margin-top: 0.4rem;">
-            <span style="color: #079669;">● Guaranteed Cash: {pct_guar}% (₹{contract_audit['guaranteed_year1_cash_lpa']}L)</span>
-            <span style="color: #D97706;">● Variable At-Risk: {pct_var}% (₹{contract_audit['variable_lpa']}L)</span>
-            <span style="color: #DC2626;">● Phantom Gratuity: {pct_grat}% (₹{int(contract_audit['phantom_gratuity_loss_rupees']):,})</span>
-        </div>
-        <div style="background: #F9FAFB; border: 1px solid #EAECF0; border-radius: 8px; padding: 0.85rem 1rem; margin-top: 0.85rem;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                <span style="font-size: 0.82rem; font-weight: 600; color: #344054;">Paper CTC Inflation Gap:</span>
-                <span style="font-size: 0.95rem; font-weight: 700; color: #DC2626;">{contract_audit['paper_inflation_gap_pct']}% at-risk</span>
-            </div>
-            <div style="font-size: 0.78rem; color: #667085; margin-top: 0.2rem;">
-                ₹ {int(contract_audit['paper_inflation_gap_rupees']):,} of your quoted ₹ {float(input_ctc):.1f} LPA is contingent on variable payout or forfeitable upon departure before 5 years.
-            </div>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# 05 — CONTRACTUAL RISK ANALYSIS (STRUCTURED REPORT)
-st.markdown('<div class="card-title-sm">05 — Contractual & Legal Risk Report</div>', unsafe_allow_html=True)
-
-structured_risks = contract_audit.get("structured_risks", [])
-for r in structured_risks:
-    badge_cls = f"risk-badge-{r['severity_level']}"
-    st.markdown(
-        f"""
-        <div class="risk-card">
-            <div class="risk-header">
-                <span class="risk-title">{r['category']}: {r['title']}</span>
-                <span class="risk-badge {badge_cls}">{r['severity']}</span>
-            </div>
-            <div class="risk-body">{r['why_it_matters']}</div>
-            <div class="risk-impact">Financial impact: {r['financial_impact']}</div>
-            <div class="risk-action"><strong>What to verify in offer letter:</strong> {r['verification_step']}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-# 06 — MARKET BENCHMARKING
-st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+# Market spread & counters
 tier_spread = ct.get_tier_market_spread(tier_info["tier_num"], detected_seniority)
 p25 = tier_spread["p25"]
 p50 = tier_spread["median"]
@@ -1018,241 +910,579 @@ else:
 position_label = "above tier median" if float(input_ctc) >= p50 else "below tier median"
 marker_left = min(91, max(9, percentile))
 
-st.markdown(
-    f"""
-    <div class="surface-card">
-        <div class="card-title-sm">06 — Market Benchmarking (How does your offer compare?)</div>
-        <div style="font-size: 1.35rem; font-weight: 700; color: #151922; margin-bottom: 0.35rem;">
-            {percentile}th Percentile <span style="font-size: 0.95rem; font-weight: 400; color: #667085;">for {detected_family} ({detected_seniority} · {tier_info['tier_badge']})</span>
-        </div>
-        <div style="font-size: 0.86rem; color: #475467; line-height: 1.55;">
-            An offer of <strong>₹ {float(input_ctc):.1f} LPA</strong> sits <strong>{position_label}</strong> (tier median: ₹ {p50} LPA).<br>
-            • <strong>80% Conformal Uncertainty Interval:</strong> <strong>₹ {conf_low}L – ₹ {conf_high}L</strong> (calibrated ±{conf_margin} LPA finite-sample uncertainty margin)<br>
-            • <strong>Middle 50% Tier Market Spread (P25–P75):</strong> <strong>₹ {p25}L – ₹ {p75}L</strong> for {tier_info['tier_name']}.
-        </div>
-        <!-- Percentile Track -->
-        <div class="percentile-track">
-            <div class="percentile-pin" style="left: {marker_left}%;">You ({percentile}%)</div>
-            <div class="percentile-fill" style="width: {percentile}%;"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #667085; font-weight: 600;">
-            <span>P25: ₹{p25}L</span>
-            <span>Median: ₹{p50}L</span>
-            <span>P75: ₹{p75}L</span>
-        </div>
-        <div style="font-size: 0.76rem; color: #98A2B3; margin-top: 0.75rem; border-top: 1px solid #EAECF0; padding-top: 0.5rem;">
-            <strong>Data Attribution:</strong> Benchmarks derived from an 867-row AmbitionBox training benchmark snapshot across Indian tech roles, certified via split conformal prediction on cross-validation residuals. Secondary offshore references cross-checked against Kaggle Glassdoor India (2,836 records) and US DOL LCA H-1B filings. Unindexed firms fall back to domain-level empirical priors.
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# 07 — NEGOTIATION INTELLIGENCE
 c_cons = round(float(input_ctc) * 1.08, 1)
 c_targ = round(max(float(input_ctc) * 1.18, p75), 1)
 c_strt = round(max(float(input_ctc) * 1.35, p75 * 1.15), 1)
 
-st.markdown('<div class="card-title-sm">07 — Negotiation Intelligence & Counter-Offer Strategy</div>', unsafe_allow_html=True)
 
-col_st1, col_st2, col_st3 = st.columns(3, gap="small")
-with col_st1:
-    st.markdown(
-        f"""
-        <div class="strategy-card">
-            <div class="strategy-label" style="color: #079669;">1. Conservative Ask (+8%)</div>
-            <div class="strategy-figure">₹ {c_cons:.1f} LPA</div>
-            <div class="strategy-desc">Safe ask citing inflation and lateral transition costs; negligible friction or revocation risk.</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-with col_st2:
-    st.markdown(
-        f"""
-        <div class="strategy-card" style="border-color: #C7D7FE; background: #F8F9FF;">
-            <div class="strategy-label" style="color: #3538CD;">2. Market Target (+18%)</div>
-            <div class="strategy-figure" style="color: #1E1B4B;">₹ {c_targ:.1f} LPA</div>
-            <div class="strategy-desc">Anchors around the 75th percentile of role peers. Defensible with domain benchmark data.</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-with col_st3:
-    st.markdown(
-        f"""
-        <div class="strategy-card">
-            <div class="strategy-label" style="color: #D97706;">3. Stretch Ask (+35%)</div>
-            <div class="strategy-figure">₹ {c_strt:.1f} LPA</div>
-            <div class="strategy-desc">High-leverage ask appropriate if you hold competing offers or rare domain specialization.</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+# ═══════════════════════════════════════════════════════════════════════════════
+# MAIN WORKSPACE TABS: OFFER EVALUATOR, COMPARISON, EQUITY, WAR ROOM
+# ═══════════════════════════════════════════════════════════════════════════════
+st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
 
-st.markdown(
-    f"""
-    <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 8px; padding: 0.95rem 1.15rem; margin-top: 0.75rem; font-size: 0.84rem; color: #475467; line-height: 1.5;">
-        <div style="font-weight: 600; color: #151922; margin-bottom: 0.25rem;">
-            Tactical Playbook ({tier_info['tier_name']})
-        </div>
-        <div>{tier_info['negotiation_playbook']}</div>
-        <div style="font-size: 0.78rem; color: #667085; margin-top: 0.4rem;">
-            Equity Norms: <strong>{tier_info['equity_structure']}</strong> · Bonus Norms: <strong>{tier_info['variable_norm']}</strong>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
+main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs(
+    [
+        "📋 Offer Audit & Report",
+        "⚖️ Multi-Offer Decision Matrix",
+        "📈 Total Rewards & Equity Modeler",
+        "🛡️ Recruiter Objection War Room",
+    ]
 )
 
 
-# NEGOTIATION SUITE (Interactive Email & Share Card)
-st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-tab_email, tab_share = st.tabs(["Negotiation Counter Email", "WhatsApp / Mentor Share Card"])
+# ─────────────────────────────────────────────────────────────────────────────
+# TAB 1: OFFER AUDIT & 8-PART REPORT
+# ─────────────────────────────────────────────────────────────────────────────
+with main_tab1:
+    # 1-Click Executive PDF Memo Download Button
+    pdf_bytes = rg.generate_pdf_audit_memo(
+        offer_data={"company": target_comp_name, "role": input_role, "exp": float(input_exp), "city": input_city, "ctc_lpa": float(input_ctc), "variable_pct": int(input_var_pct)},
+        take_home_data={"low_mo": low_mo, "high_mo": high_mo, "th_100": th_100},
+        contract_audit=contract_audit,
+        market_data={"percentile": percentile, "family": detected_family, "tier_badge": tier_info["tier_badge"], "p25": p25, "p50": p50, "p75": p75, "conf_low": conf_low, "conf_high": conf_high},
+        counter_data={"c_cons": c_cons, "c_targ": c_targ, "c_strt": c_strt},
+    )
 
-target_comp_name = comp_match_key if comp_match_key else input_company.strip()
-
-with tab_email:
-    col_em1, col_em2 = st.columns(2)
-    with col_em1:
-        email_angle = st.selectbox(
-            "Negotiation Angle",
-            ["Market Alignment (Anchor P75)", "Restructure Variable to Fixed", "Competing Offer Leverage"],
-        )
-    with col_em2:
-        email_tone = st.selectbox(
-            "Tone",
-            ["Professional", "Firm", "Diplomatic"],
-        )
-
-    # Tone adjustments
-    if email_tone == "Firm":
-        tone_salutation = f"I am writing to address the compensation terms for the {input_role} role at {target_comp_name}."
-        tone_close = "Reaching this number is a prerequisite for me to decline pending opportunities and execute the offer letter."
-    elif email_tone == "Diplomatic":
-        tone_salutation = f"Thank you for extending the offer for {input_role}. I am very enthusiastic about {target_comp_name}'s trajectory and the team's engineering roadmap."
-        tone_close = "I am eager to find a mutually agreeable structure and look forward to joining the team."
-    else:  # Professional
-        tone_salutation = f"Thank you for extending the offer for the {input_role} position at {target_comp_name}. I have reviewed the proposed terms with interest."
-        tone_close = "Reaching this benchmark would make my acceptance immediate. I look forward to your thoughts."
-
-    if "Market Alignment" in email_angle:
-        email_body = f"""Subject: Regarding the offer for {input_role} - {target_comp_name}
-
-Dear Hiring Team,
-
-{tone_salutation}
-
-I evaluated the package of ₹ {float(input_ctc):.1f} LPA CTC. Based on current compensation benchmarks for lateral hiring in {detected_family} ({detected_seniority}), I would like to explore if we can align the total compensation closer to ₹ {c_targ:.1f} LPA.
-
-This figure reflects market alignment for this role level, and accounts for my {input_exp} years of specialized experience.
-
-{tone_close}
-
-Best regards,
-[Your Name]"""
-    elif "Restructure" in email_angle:
-        email_body = f"""Subject: Regarding compensation structure for {input_role} - {target_comp_name}
-
-Dear Hiring Team,
-
-{tone_salutation}
-
-I noticed the proposed package of ₹ {float(input_ctc):.1f} LPA includes a {input_var_pct}% variable component. To ensure predictable monthly cash flow alignment, I would like to explore if we can:
-1. Adjust the fixed-to-variable ratio by bringing fixed base pay closer to ₹ {c_targ:.1f} LPA, or
-2. Add a one-time signing bonus to bridge the gap while maintaining your internal base pay bands.
-
-{tone_close}
-
-Best regards,
-[Your Name]"""
-    else:
-        email_body = f"""Subject: Regarding offer terms for {input_role} - {target_comp_name}
-
-Dear Hiring Team,
-
-{tone_salutation}
-
-{target_comp_name} remains my preferred destination due to the technical roadmap and team culture. However, I am currently evaluating a competing offer in the range of ₹ {c_strt:.1f} LPA.
-
-Because {target_comp_name} is my top choice, I am prepared to decline competing discussions immediately if we can align total compensation closer to ₹ {c_targ:.1f} LPA.
-
-{tone_close}
-
-Best regards,
-[Your Name]"""
-
-    st.text_area("Generated Counter-Offer Email (Editable):", value=email_body, height=220)
-    st.caption("Tip: Copy and customize before sending to your recruiter.")
-
-with tab_share:
-    st.caption("Formatted summary to share with a mentor or peer for a second opinion:")
-    whatsapp_summary = f"""Offer Evaluation Summary — {target_comp_name}
-• Role: {input_role} ({input_exp} YoE · {tier_info['tier_badge']})
-• Offered CTC: ₹{float(input_ctc):.1f} LPA (Variable: {input_var_pct}%)
-• Estimated Monthly Take-Home: ₹{int(low_mo):,} – ₹{int(high_mo):,} / mo
-• Guaranteed Cash: ₹{contract_audit['guaranteed_year1_cash_lpa']} LPA ({contract_audit['paper_inflation_gap_pct']}% Paper CTC Gap)
-• Tier Standing: {percentile}th percentile for {detected_family} ({detected_seniority})
-• 80% Conformal Range: ₹{conf_low}L – ₹{conf_high}L
-• Market Target Ask: ₹{c_targ:.1f} LPA (+18%)
-• Notice Period: {detected_np} days"""
-    st.code(whatsapp_summary, language="text")
-
-
-# 08 — COMMUNITY OFFER INTEL
-st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
-st.markdown(f'<div class="card-title-sm">08 — Community Offer Intel ({target_comp_name})</div>', unsafe_allow_html=True)
-
-recent_notes = cn.get_notes(target_comp_name, detected_family, limit=3)
-if recent_notes:
-    for nt in recent_notes:
+    memo_c1, memo_c2 = st.columns([2.5, 1.5])
+    with memo_c1:
         st.markdown(
             f"""
-            <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-left: 3px solid #4F46E5; border-radius: 8px; padding: 0.85rem 1.05rem; margin-bottom: 0.6rem;">
-                <div style="font-size: 0.86rem; color: #344054; line-height: 1.45;">"{nt['note_text']}"</div>
-                <div style="font-size: 0.74rem; color: #667085; margin-top: 0.35rem;">
-                    <strong>{nt['author_tag']}</strong> · {nt['role_family']} · Added {nt['created_at']}
-                </div>
+            <div style="margin-bottom: 0.5rem;">
+                <span class="context-badge context-badge-indigo">{tier_info['tier_badge']}</span>
+                <span class="context-badge">{detected_family}</span>
+                <span class="context-badge">{detected_seniority}</span>
+                <span class="context-badge">{input_city}</span>
+                <span class="context-badge">{rating} / 5.0 Rating</span>
             </div>
             """,
             unsafe_allow_html=True,
         )
-else:
-    st.caption("No specific community notes for this employer yet. Add verified terms below.")
-
-with st.expander("Submit an Anonymous Offer Note"):
-    st.caption("Share verified terms: variable payout reality, notice period enforcement, or joining bonus clawbacks. Automatically moderated.")
-    with st.form("add_offer_note_form_v2", clear_on_submit=True):
-        note_text_in = st.text_area(
-            "Offer Details / Terms (10–280 characters):",
-            placeholder="e.g. Variable bonus paid out at 75% last year. Notice period is strictly 90 days with zero buyout approvals.",
-            max_chars=280,
+    with memo_c2:
+        st.download_button(
+            label="📄 Download Executive Memo (PDF)",
+            data=pdf_bytes,
+            file_name=f"Offer_Audit_Memo_{target_comp_name.replace(' ', '_')}.pdf",
+            mime="application/pdf",
+            use_container_width=True,
         )
-        sub_c1, sub_c2 = st.columns([1.5, 1])
-        with sub_c1:
-            note_tag_in = st.selectbox(
-                "Your Context:",
-                ["Verified Offer Letter", "Current Employee", "Ex-Employee", "Interview Loop"],
-            )
-        with sub_c2:
-            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-            submit_note_btn = st.form_submit_button("Post Intel", use_container_width=True)
 
-        if submit_note_btn:
-            ok, msg = cn.add_note(
-                company=target_comp_name,
-                role_family=detected_family,
-                note_text=note_text_in,
-                yoe=float(input_exp),
-                ctc_lpa=float(input_ctc),
-                author_tag=note_tag_in,
+    # 02 — EXECUTIVE COMPENSATION SUMMARY
+    st.markdown(
+        f"""
+        <div class="surface-card">
+            <div class="card-title-sm">02 — Estimated Monthly Take-Home (Net Bank Credit)</div>
+            <div class="figure-hero">₹ {int(low_mo):,} – ₹ {int(high_mo):,} <span class="figure-hero-sub">/ month</span></div>
+            <div style="font-size: 0.86rem; color: #475467; margin-top: 0.4rem; line-height: 1.5;">
+                Guaranteed monthly floor: <strong>₹ {int(low_mo):,}/mo</strong> (on ₹ {fixed_ctc:.1f}L fixed CTC) ·
+                Expected payout: <strong>₹ {int(mid_mo):,}/mo</strong> (~50% variable) ·
+                Maximum payout: <strong>₹ {int(high_mo):,}/mo</strong> (100% variable target).
+            </div>
+            <div style="font-size: 0.78rem; color: #667085; margin-top: 0.45rem;">
+                Budget 2024 New Tax Regime (FY 2024-25, AY 2025-26) · ₹75,000 standard deduction · 40% basic salary assumption.
+            </div>
+            <div class="scenario-grid">
+                <div class="scenario-card" style="border-top: 3px solid #DC2626;">
+                    <div class="scenario-type" style="color: #DC2626;">Guaranteed Floor</div>
+                    <div class="scenario-value">₹ {int(low_mo):,}</div>
+                    <div class="scenario-desc">0% variable payout. Guaranteed fixed CTC: ₹ {fixed_ctc:.1f}L.</div>
+                </div>
+                <div class="scenario-card" style="border-top: 3px solid #4F46E5; background: #F8FAFC;">
+                    <div class="scenario-type" style="color: #4F46E5;">Expected Payout</div>
+                    <div class="scenario-value">₹ {int(mid_mo):,}</div>
+                    <div class="scenario-desc">Realistic ~50% payout based on normal appraisal cycles.</div>
+                </div>
+                <div class="scenario-card" style="border-top: 3px solid #079669;">
+                    <div class="scenario-type" style="color: #079669;">Maximum Target</div>
+                    <div class="scenario-value">₹ {int(high_mo):,}</div>
+                    <div class="scenario-desc">100% payout of full ₹ {float(input_ctc):.1f}L CTC. Not guaranteed income.</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 03 — MONTHLY SALARY BREAKDOWN (ITEMIZED TABLE)
+    with st.expander("03 — Itemized Monthly Salary Breakdown (View Calculation Steps)", expanded=False):
+        st.caption("Detailed deduction formula under Budget 2024 New Tax Regime. Distinguishes contractual items from statutory estimates.")
+        st.markdown(
+            f"""
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.86rem;">
+                <tr style="border-bottom: 1px solid #EAECF0;">
+                    <th style="padding: 0.5rem 0; text-align: left; color: #667085; font-weight: 600;">Salary Component</th>
+                    <th style="padding: 0.5rem 0; text-align: right; color: #667085; font-weight: 600;">Annual Amount</th>
+                    <th style="padding: 0.5rem 0; text-align: right; color: #667085; font-weight: 600;">Monthly Credit / Deduction</th>
+                    <th style="padding: 0.5rem 0; text-align: right; color: #667085; font-weight: 600;">Type / Formula</th>
+                </tr>
+                <tr style="border-bottom: 1px solid #EAECF0;">
+                    <td style="padding: 0.45rem 0; font-weight: 600;">Offered Cost to Company (CTC)</td>
+                    <td style="padding: 0.45rem 0; text-align: right; font-weight: 600;">₹ {int(th_100['ctc']):,}</td>
+                    <td style="padding: 0.45rem 0; text-align: right;">₹ {int(th_100['ctc']/12):,}/mo</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #667085;">Contractual Input</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EAECF0;">
+                    <td style="padding: 0.45rem 0; color: #344054;">Basic Salary</td>
+                    <td style="padding: 0.45rem 0; text-align: right;">₹ {int(th_100['basic']):,}</td>
+                    <td style="padding: 0.45rem 0; text-align: right;">₹ {int(th_100['basic']/12):,}/mo</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #667085;">40% of CTC Baseline</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EAECF0;">
+                    <td style="padding: 0.45rem 0; color: #344054;">Special & Other Allowances</td>
+                    <td style="padding: 0.45rem 0; text-align: right;">₹ {int(th_100['gross'] - th_100['basic']):,}</td>
+                    <td style="padding: 0.45rem 0; text-align: right;">₹ {int((th_100['gross'] - th_100['basic'])/12):,}/mo</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #667085;">Fixed Gross Balance</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EAECF0;">
+                    <td style="padding: 0.45rem 0; color: #DC2626;">(-) Income Tax (New Regime TDS)</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #DC2626;">- ₹ {int(th_100['tax_annual']):,}</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #DC2626;">- ₹ {int(th_100['tax_monthly']):,}/mo</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #667085;">FY 2024-25 Slabs + 4% Cess</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #EAECF0;">
+                    <td style="padding: 0.45rem 0; color: #4F46E5;">(-) Employee EPF (Retirement)</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #4F46E5;">- ₹ {int(th_100['epf_annual']):,}</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #4F46E5;">- ₹ {int(th_100['epf_monthly']):,}/mo</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #667085;">12% Basic (Statutory Rule)</td>
+                </tr>
+                <tr style="border-bottom: 2px solid #D0D5DD;">
+                    <td style="padding: 0.45rem 0; color: #D97706;">(-) Professional Tax</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #D97706;">- ₹ {int(th_100['pt_annual']):,}</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #D97706;">- ₹ {int(th_100['pt_annual']/12):,}/mo</td>
+                    <td style="padding: 0.45rem 0; text-align: right; color: #667085;">₹200/mo Standard</td>
+                </tr>
+                <tr style="background: #F8FAFC;">
+                    <td style="padding: 0.65rem 0.5rem; font-weight: 700; color: #079669;">Estimated Net Bank Credit</td>
+                    <td style="padding: 0.65rem 0.5rem; text-align: right; font-weight: 700; font-size: 1.05rem; color: #079669;">₹ {int(th_100['net_annual']):,}</td>
+                    <td style="padding: 0.65rem 0.5rem; text-align: right; font-weight: 700; font-size: 1.05rem; color: #079669;">₹ {int(th_100['monthly_in_hand']):,}/mo</td>
+                    <td style="padding: 0.65rem 0.5rem; text-align: right; font-weight: 600; color: #079669;">Net Monthly Cash</td>
+                </tr>
+            </table>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # 04 — OFFER STRUCTURE ANALYSIS
+    pct_var = max(0.0, min(100.0, round(float(input_var_pct), 1)))
+    pct_grat = max(0.0, min(100.0, round((contract_audit["phantom_gratuity_loss_rupees"] / (float(input_ctc) * 100000.0)) * 100.0, 1)))
+    pct_guar = max(0.0, min(100.0, round(100.0 - pct_var - pct_grat, 1)))
+
+    st.markdown(
+        f"""
+        <div class="surface-card">
+            <div class="card-title-sm">04 — Offer Structure Analysis (What is actually inside your CTC?)</div>
+            <div style="font-size: 0.88rem; color: #344054; line-height: 1.5;">
+                Visualizing guaranteed monthly cash flow versus conditional or forfeited provisions:
+            </div>
+            <div class="composition-bar">
+                <div class="bar-segment" style="width: {pct_guar}%; background: #079669;" title="Guaranteed Fixed Cash: {pct_guar}%"></div>
+                <div class="bar-segment" style="width: {pct_var}%; background: #D97706;" title="Variable Bonus At-Risk: {pct_var}%"></div>
+                <div class="bar-segment" style="width: {pct_grat}%; background: #DC2626;" title="Phantom Gratuity Deduction: {pct_grat}%"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 0.74rem; font-weight: 600; margin-top: 0.4rem;">
+                <span style="color: #079669;">● Guaranteed Cash: {pct_guar}% (₹{contract_audit['guaranteed_year1_cash_lpa']}L)</span>
+                <span style="color: #D97706;">● Variable At-Risk: {pct_var}% (₹{contract_audit['variable_lpa']}L)</span>
+                <span style="color: #DC2626;">● Phantom Gratuity: {pct_grat}% (₹{int(contract_audit['phantom_gratuity_loss_rupees']):,})</span>
+            </div>
+            <div style="background: #F9FAFB; border: 1px solid #EAECF0; border-radius: 8px; padding: 0.85rem 1rem; margin-top: 0.85rem;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                    <span style="font-size: 0.82rem; font-weight: 600; color: #344054;">Paper CTC Inflation Gap:</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; color: #DC2626;">{contract_audit['paper_inflation_gap_pct']}% at-risk</span>
+                </div>
+                <div style="font-size: 0.78rem; color: #667085; margin-top: 0.2rem;">
+                    ₹ {int(contract_audit['paper_inflation_gap_rupees']):,} of your quoted ₹ {float(input_ctc):.1f} LPA is contingent on variable payout or forfeitable upon departure before 5 years.
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 05 — CONTRACTUAL RISK ANALYSIS (STRUCTURED REPORT)
+    st.markdown('<div class="card-title-sm">05 — Contractual & Legal Risk Report</div>', unsafe_allow_html=True)
+    structured_risks = contract_audit.get("structured_risks", [])
+    for r in structured_risks:
+        badge_cls = f"risk-badge-{r['severity_level']}"
+        st.markdown(
+            f"""
+            <div class="risk-card">
+                <div class="risk-header">
+                    <span class="risk-title">{r['category']}: {r['title']}</span>
+                    <span class="risk-badge {badge_cls}">{r['severity']}</span>
+                </div>
+                <div class="risk-body">{r['why_it_matters']}</div>
+                <div class="risk-impact">Financial impact: {r['financial_impact']}</div>
+                <div class="risk-action"><strong>What to verify in offer letter:</strong> {r['verification_step']}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # 06 — MARKET BENCHMARKING
+    st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="surface-card">
+            <div class="card-title-sm">06 — Market Benchmarking (How does your offer compare?)</div>
+            <div style="font-size: 1.35rem; font-weight: 700; color: #151922; margin-bottom: 0.35rem;">
+                {percentile}th Percentile <span style="font-size: 0.95rem; font-weight: 400; color: #667085;">for {detected_family} ({detected_seniority} · {tier_info['tier_badge']})</span>
+            </div>
+            <div style="font-size: 0.86rem; color: #475467; line-height: 1.55;">
+                An offer of <strong>₹ {float(input_ctc):.1f} LPA</strong> sits <strong>{position_label}</strong> (tier median: ₹ {p50} LPA).<br>
+                • <strong>80% Conformal Uncertainty Interval:</strong> <strong>₹ {conf_low}L – ₹ {conf_high}L</strong> (calibrated ±{conf_margin} LPA finite-sample uncertainty margin)<br>
+                • <strong>Middle 50% Tier Market Spread (P25–P75):</strong> <strong>₹ {p25}L – ₹ {p75}L</strong> for {tier_info['tier_name']}.
+            </div>
+            <div class="percentile-track">
+                <div class="percentile-pin" style="left: {marker_left}%;">You ({percentile}%)</div>
+                <div class="percentile-fill" style="width: {percentile}%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #667085; font-weight: 600;">
+                <span>P25: ₹{p25}L</span>
+                <span>Median: ₹{p50}L</span>
+                <span>P75: ₹{p75}L</span>
+            </div>
+            <div style="font-size: 0.76rem; color: #98A2B3; margin-top: 0.75rem; border-top: 1px solid #EAECF0; padding-top: 0.5rem;">
+                <strong>Data Attribution:</strong> Benchmarks derived from an 867-row AmbitionBox training benchmark snapshot across Indian tech roles, certified via split conformal prediction on cross-validation residuals. Secondary offshore references cross-checked against Kaggle Glassdoor India (2,836 records) and US DOL LCA H-1B filings.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 07 — NEGOTIATION INTELLIGENCE
+    st.markdown('<div class="card-title-sm">07 — Negotiation Intelligence & Counter-Offer Strategy</div>', unsafe_allow_html=True)
+    col_st1, col_st2, col_st3 = st.columns(3, gap="small")
+    with col_st1:
+        st.markdown(
+            f"""
+            <div class="strategy-card">
+                <div class="strategy-label" style="color: #079669;">1. Conservative Ask (+8%)</div>
+                <div class="strategy-figure">₹ {c_cons:.1f} LPA</div>
+                <div class="strategy-desc">Safe ask citing inflation and lateral transition costs; zero revocation risk.</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with col_st2:
+        st.markdown(
+            f"""
+            <div class="strategy-card" style="border-color: #C7D7FE; background: #F8F9FF;">
+                <div class="strategy-label" style="color: #3538CD;">2. Market Target (+18%)</div>
+                <div class="strategy-figure" style="color: #1E1B4B;">₹ {c_targ:.1f} LPA</div>
+                <div class="strategy-desc">Anchors around the 75th percentile of role peers. Defensible with domain benchmark data.</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with col_st3:
+        st.markdown(
+            f"""
+            <div class="strategy-card">
+                <div class="strategy-label" style="color: #D97706;">3. Stretch Ask (+35%)</div>
+                <div class="strategy-figure">₹ {c_strt:.1f} LPA</div>
+                <div class="strategy-desc">High-leverage ask appropriate if you hold competing offers or rare domain specialization.</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # 08 — COMMUNITY OFFER INTEL
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    st.markdown(f'<div class="card-title-sm">08 — Community Offer Intel ({target_comp_name})</div>', unsafe_allow_html=True)
+
+    recent_notes = cn.get_notes(target_comp_name, detected_family, limit=3)
+    if recent_notes:
+        for nt in recent_notes:
+            st.markdown(
+                f"""
+                <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-left: 3px solid #4F46E5; border-radius: 8px; padding: 0.85rem 1.05rem; margin-bottom: 0.6rem;">
+                    <div style="font-size: 0.86rem; color: #344054; line-height: 1.45;">"{nt['note_text']}"</div>
+                    <div style="font-size: 0.74rem; color: #667085; margin-top: 0.35rem;">
+                        <strong>{nt['author_tag']}</strong> · {nt['role_family']} · Added {nt['created_at']}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
             )
-            if ok:
-                st.success(msg)
-                st.rerun()
-            else:
-                st.error(msg)
+    else:
+        st.caption("No specific community notes for this employer yet. Add verified terms below.")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TAB 2: MULTI-OFFER DECISION MATRIX (PILLAR 2)
+# ─────────────────────────────────────────────────────────────────────────────
+with main_tab2:
+    st.markdown("### ⚖️ Multi-Offer Comparative Decision Matrix")
+    st.caption("Evaluate Offer A vs. a competing Offer B or your Current Baseline. Quantifies net monthly in-hand delta, career mobility, and notice period buyout recovery.")
+
+    comp_c1, comp_c2 = st.columns(2, gap="large")
+
+    with comp_c1:
+        st.markdown(f"**Offer A: {input_company} (Primary)**")
+        st.write(f"• **Quoted CTC:** ₹ {float(input_ctc):.1f} LPA")
+        st.write(f"• **Variable Pay:** {input_var_pct}% (₹ {float(input_ctc)*float(input_var_pct)/100.0:.1f}L)")
+        st.write(f"• **Net Take-Home:** ₹ {int(low_mo):,} – ₹ {int(high_mo):,} / mo")
+        st.write(f"• **Notice Period:** {detected_np} Days")
+        st.write(f"• **Guaranteed Cash:** ₹ {contract_audit['guaranteed_year1_cash_lpa']} LPA")
+
+    with comp_c2:
+        st.markdown("**Offer B / Current Job Baseline**")
+        comp_b_name = st.text_input("Employer B Name", value="Swiggy", key="comp_b_name")
+        comp_b_ctc = st.number_input("Offered Annual CTC (₹ LPA)", min_value=1.0, max_value=250.0, value=20.0, step=0.5, key="comp_b_ctc")
+        comp_b_var = st.slider("Variable Pay (%)", min_value=0, max_value=60, value=15, step=1, key="comp_b_var")
+        comp_b_jb = st.number_input("Joining Bonus (₹ LPA)", min_value=0.0, max_value=30.0, value=2.0, step=0.5, key="comp_b_jb")
+        comp_b_np = st.selectbox("Notice Period (Days)", [30, 60, 90], index=1, key="comp_b_np")
+
+    # Evaluate profiles
+    th_b_fixed = calculate_take_home(float(comp_b_ctc) * (1.0 - float(comp_b_var)/100.0))
+    tier_b_info = ct.classify_employer_tier(comp_b_name)
+
+    audit_b = ca.audit_offer_contract(
+        ctc_lpa=comp_b_ctc,
+        variable_pct=comp_b_var,
+        gratuity_included=True,
+        joining_bonus_lpa=comp_b_jb,
+        notice_period_days=comp_b_np,
+        expected_tenure_years=2.0,
+    )
+
+    prof_a = dm.evaluate_offer_profile(
+        name=f"Offer A ({input_company})",
+        ctc_lpa=float(input_ctc),
+        variable_pct=float(input_var_pct),
+        joining_bonus_lpa=float(input_jb),
+        notice_period_days=detected_np,
+        gratuity_included=input_grat,
+        expected_tenure_years=float(input_tenure),
+        take_home_monthly=low_mo,
+        guaranteed_year1_cash_lpa=contract_audit["guaranteed_year1_cash_lpa"],
+        tier_num=tier_info["tier_num"],
+    )
+
+    prof_b = dm.evaluate_offer_profile(
+        name=f"Offer B ({comp_b_name})",
+        ctc_lpa=float(comp_b_ctc),
+        variable_pct=float(comp_b_var),
+        joining_bonus_lpa=float(comp_b_jb),
+        notice_period_days=comp_b_np,
+        gratuity_included=True,
+        expected_tenure_years=2.0,
+        take_home_monthly=th_b_fixed["monthly_in_hand"],
+        guaranteed_year1_cash_lpa=audit_b["guaranteed_year1_cash_lpa"],
+        tier_num=tier_b_info["tier_num"],
+    )
+
+    comp_res = dm.compare_two_offers(prof_a, prof_b)
+
+    # Comparative Delta Hero Card
+    diff_mo = comp_res["diff_monthly"]
+    diff_sign = "+" if diff_mo >= 0 else "-"
+    diff_color = "#079669" if diff_mo >= 0 else "#DC2626"
+
+    st.markdown(
+        f"""
+        <div class="surface-card" style="border-left: 4px solid {diff_color};">
+            <div class="card-title-sm">Net Monthly Bank Credit Delta</div>
+            <div style="font-size: 2rem; font-weight: 700; color: {diff_color}; font-variant-numeric: tabular-nums;">
+                {diff_sign} ₹ {abs(int(diff_mo)):,} <span style="font-size: 1rem; color: #667085; font-weight: 400;">/ month in bank</span>
+            </div>
+            <div style="font-size: 0.86rem; color: #344054; margin-top: 0.35rem;">
+                Annual net cash delta: <strong>{diff_sign} ₹ {abs(int(comp_res['diff_annual_net'])):,}</strong> ·
+                Guaranteed cash delta: <strong>{comp_res['diff_guaranteed_lpa']:+0.2f} LPA</strong>.
+            </div>
+            <div style="font-size: 0.8rem; color: #667085; margin-top: 0.3rem;">
+                {comp_res['breakeven_text']}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Side-by-Side Comparison Table
+    st.markdown(
+        f"""
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-bottom: 1rem;">
+            <tr style="border-bottom: 1px solid #EAECF0;">
+                <th style="padding: 0.5rem 0; text-align: left; color: #667085;">Evaluation Metric</th>
+                <th style="padding: 0.5rem 0; text-align: right; color: #151922;">{prof_a['name']}</th>
+                <th style="padding: 0.5rem 0; text-align: right; color: #151922;">{prof_b['name']}</th>
+            </tr>
+            <tr style="border-bottom: 1px solid #EAECF0;">
+                <td style="padding: 0.45rem 0; color: #475467;">Quoted Annual CTC</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 600;">₹ {prof_a['ctc_lpa']} LPA</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 600;">₹ {prof_b['ctc_lpa']} LPA</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #EAECF0;">
+                <td style="padding: 0.45rem 0; color: #475467;">Guaranteed Year-1 Cash</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 600;">₹ {prof_a['guaranteed_year1_cash_lpa']} LPA</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 600;">₹ {prof_b['guaranteed_year1_cash_lpa']} LPA</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #EAECF0;">
+                <td style="padding: 0.45rem 0; color: #475467;">Guaranteed Monthly Floor</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 700; color: #079669;">₹ {prof_a['take_home_monthly']:,}/mo</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 700; color: #079669;">₹ {prof_b['take_home_monthly']:,}/mo</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #EAECF0;">
+                <td style="padding: 0.45rem 0; color: #475467;">Notice Period Lock</td>
+                <td style="padding: 0.45rem 0; text-align: right;">{prof_a['notice_period_days']} Days</td>
+                <td style="padding: 0.45rem 0; text-align: right;">{prof_b['notice_period_days']} Days</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #EAECF0;">
+                <td style="padding: 0.45rem 0; color: #475467;">Risk-Adjusted Comp Score</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 700;">{prof_a['composite_score']} / 100</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 700;">{prof_b['composite_score']} / 100</td>
+            </tr>
+        </table>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Verdict Card
+    st.markdown(
+        f"""
+        <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 8px; padding: 0.95rem 1.15rem;">
+            <div style="font-size: 0.76rem; font-weight: 700; color: #667085; text-transform: uppercase;">Decision Synthesis</div>
+            <div style="font-size: 1.05rem; font-weight: 600; color: {comp_res['verdict_color']}; margin: 0.25rem 0;">
+                {comp_res['verdict_title']}
+            </div>
+            <div style="font-size: 0.84rem; color: #475467; line-height: 1.45;">
+                Factoring in guaranteed monthly cash, variable haircut exposure, and notice period exit mobility.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TAB 3: TOTAL REWARDS & EQUITY MODELER (PILLAR 3)
+# ─────────────────────────────────────────────────────────────────────────────
+with main_tab3:
+    st.markdown("### 📈 Total Rewards & Equity Valuation Engine")
+    st.caption("Model Global Tech RSUs or Indian Startup ESOPs: 4-year vesting schedules, liquidity probability haircuts, 90-day exercise traps, and Section 17(2) perquisite tax.")
+
+    eq_c1, eq_c2 = st.columns(2, gap="large")
+
+    with eq_c1:
+        eq_type = st.radio("Equity Structure", ["RSU (Public Listed Tech)", "ESOP (Private Indian Startup)"], horizontal=True)
+        eq_grant = st.number_input("Total 4-Year Grant Value (₹ LPA)", min_value=1.0, max_value=300.0, value=24.0, step=1.0)
+        eq_stage = st.selectbox(
+            "Company Liquidity Profile",
+            ["Public Tech / GCC", "Late-Stage Unicorn (Frequent Buybacks)", "Early-Stage Startup"],
+            index=0 if "RSU" in eq_type else 1,
+        )
+
+    with eq_c2:
+        eq_vest = st.selectbox(
+            "Vesting Schedule",
+            ["Standard 25/25/25/25 (with 1-Yr Cliff)", "Amazon Back-Loaded (5/15/40/40)", "Frontloaded (33/33/22/12)"],
+        )
+        eq_window = st.selectbox(
+            "Post-Departure Exercise Window (Days)",
+            [30, 90, 180, 365, 1825],
+            index=1,
+            help="Crucial for unlisted startups: how many days you have to exercise vested options after resigning.",
+        )
+
+    # Run Equity Evaluation
+    equity_eval = ee.evaluate_equity_component(
+        equity_type="RSU" if "RSU" in eq_type else "ESOP",
+        grant_value_lpa=eq_grant,
+        vesting_schedule=eq_vest,
+        company_stage=eq_stage,
+        exercise_window_days=eq_window,
+        annual_base_ctc_lpa=float(input_ctc),
+    )
+
+    # Total Rewards Hero Card
+    st.markdown(
+        f"""
+        <div class="surface-card">
+            <div class="card-title-sm">Year-1 Total Rewards (Base Cash + Liquid Equity)</div>
+            <div class="figure-hero">₹ {equity_eval['total_y1_realizable_rewards_lpa']} LPA <span class="figure-hero-sub">realizable Year-1 rewards</span></div>
+            <div style="font-size: 0.86rem; color: #475467; margin-top: 0.35rem;">
+                Quoted Year-1 Rewards: <strong>₹ {equity_eval['total_y1_quoted_rewards_lpa']} LPA</strong> (₹ {input_ctc}L base CTC + ₹ {equity_eval['y1_vest_lpa']}L Year-1 vest).
+            </div>
+            <div style="font-size: 0.8rem; color: #667085; margin-top: 0.25rem;">
+                {equity_eval['liquidity_desc']}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 4-Year Vesting Trajectory Cards
+    st.markdown('<div class="card-title-sm">4-Year Vesting Trajectory</div>', unsafe_allow_html=True)
+    v_c1, v_c2, v_c3, v_c4 = st.columns(4)
+    with v_c1:
+        st.markdown(f"""<div class="scenario-card"><div class="scenario-type">Year 1 ({int(equity_eval['vest_splits'][0]*100)}%)</div><div class="scenario-value">₹ {equity_eval['y1_vest_lpa']}L</div><div class="scenario-desc">Realizable: ₹{equity_eval['y1_realizable_lpa']}L</div></div>""", unsafe_allow_html=True)
+    with v_c2:
+        st.markdown(f"""<div class="scenario-card"><div class="scenario-type">Year 2 ({int(equity_eval['vest_splits'][1]*100)}%)</div><div class="scenario-value">₹ {equity_eval['y2_vest_lpa']}L</div><div class="scenario-desc">Vests at Month 24</div></div>""", unsafe_allow_html=True)
+    with v_c3:
+        st.markdown(f"""<div class="scenario-card"><div class="scenario-type">Year 3 ({int(equity_eval['vest_splits'][2]*100)}%)</div><div class="scenario-value">₹ {equity_eval['y3_vest_lpa']}L</div><div class="scenario-desc">Vests at Month 36</div></div>""", unsafe_allow_html=True)
+    with v_c4:
+        st.markdown(f"""<div class="scenario-card"><div class="scenario-type">Year 4 ({int(equity_eval['vest_splits'][3]*100)}%)</div><div class="scenario-value">₹ {equity_eval['y4_vest_lpa']}L</div><div class="scenario-desc">Vests at Month 48</div></div>""", unsafe_allow_html=True)
+
+    # Exercise Window Trap Warning
+    for flag in equity_eval["exercise_trap_flags"]:
+        st.markdown(f"""<div style="background: #FFFBEB; border-left: 4px solid #D97706; padding: 0.85rem 1rem; border-radius: 6px; font-size: 0.84rem; color: #92400E; margin-top: 0.9rem;">{flag}</div>""", unsafe_allow_html=True)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TAB 4: RECRUITER OBJECTION REBUTTAL WAR ROOM (PILLAR 4)
+# ─────────────────────────────────────────────────────────────────────────────
+with main_tab4:
+    st.markdown("### 🛡️ Recruiter Objection Rebuttal War Room")
+    st.caption("Indian recruiters rely on 5 standard pushbacks to shut down negotiations. Select the objection you received to generate battle-tested rebuttal scripts.")
+
+    objections = nwr.get_all_objections()
+    obj_options = [obj["title"] for obj in objections]
+    selected_obj_title = st.selectbox("Select Recruiter Objection", obj_options)
+
+    selected_obj = next(o for o in objections if o["title"] == selected_obj_title)
+
+    # Analysis Card
+    st.markdown(
+        f"""
+        <div class="surface-card">
+            <div style="font-size: 0.74rem; font-weight: 700; color: #DC2626; text-transform: uppercase;">The Recruiter's Hidden Constraint</div>
+            <div style="font-size: 0.88rem; color: #344054; margin: 0.35rem 0 0.75rem 0; line-height: 1.45;">
+                {selected_obj['recruiter_motive']}
+            </div>
+            <div style="font-size: 0.74rem; font-weight: 700; color: #079669; text-transform: uppercase;">Your Strategic Leverage</div>
+            <div style="font-size: 0.88rem; color: #344054; margin-top: 0.35rem; line-height: 1.45;">
+                {selected_obj['winning_leverage']}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Rebuttal Scripts
+    reb_t1, reb_t2 = st.tabs(["Written Email Rebuttal", "Verbal Phone Script"])
+
+    with reb_t1:
+        customized_email = (
+            selected_obj["email_script"]
+            .replace("[Role]", input_role)
+            .replace("[Company]", target_comp_name)
+            .replace("[Target CTC]", f"{c_targ:.1f}")
+            .replace("[Target Bonus]", f"{round(float(input_ctc)*0.10, 1)}")
+            .replace("[Buyout Amount]", f"{int(float(input_ctc)*100000*0.4/12*2):,}")
+            .replace("[Amount]", f"{round(float(input_ctc)*0.10, 1)}")
+        )
+        st.text_area("Customized Counter Email (Ready to Send):", value=customized_email, height=220)
+        st.caption("Tip: Select and copy text to paste into your email reply.")
+
+    with reb_t2:
+        st.markdown(
+            f"""
+            <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; padding: 1rem 1.15rem; font-size: 0.88rem; color: #1E293B; line-height: 1.55;">
+                {selected_obj['verbal_script']}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.caption("Use this script when negotiating verbally over the phone with your HR recruiter or talent partner.")
 
 
 # ── 09 — METHODOLOGY, PRIVACY & LEGAL TRANSPARENCY ────────────────────────────

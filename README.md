@@ -126,13 +126,18 @@ Engineering honest machine learning requires documenting errors caught during re
 
 | Module | Purpose | Key Mechanics |
 |---|---|---|
-| [`app.py`](app.py) | Single-Screen Offer Evaluator | Phone-responsive UI with 0%/50%/100% in-hand scenarios, calibrated conformal intervals, and 1-click negotiation toolkit |
+| [`app.py`](app.py) | Offer Intelligence Platform | Linear/Stripe design system with 4 core views: Single-Offer Audit, Multi-Offer Decision Matrix, Total Rewards Equity Modeler, and Recruiter War Room |
+| [`offer_parser.py`](offer_parser.py) | Offer Letter PDF & Text Parser | Automated extraction of employer, CTC, basic pay, variable pay, joining bonus, notice period, and gratuity via `pdfplumber` and regex |
 | [`contract_auditor.py`](contract_auditor.py) | Statutory Contract Trap Auditor | Audits Payment of Gratuity Act 1972 provisions (4.81% basic), Section 89(1) clawbacks, and computes True Guaranteed Cash |
-| [`company_tiers.py`](company_tiers.py) | Employer Tier & Negotiation Playbook | Categorizes firms into 4 compensation tiers (Global Tech, Unicorns, Consultancies, IT Services) with tactical playbooks |
-| [`community_notes.py`](community_notes.py) | Crowdsourced Offer Terms Layer | SQLite-backed offer notes engine with solo moderation (URL, email, phone, and anti-doxxing regex guards) |
+| [`decision_matrix.py`](decision_matrix.py) | Multi-Offer Decision Matrix | Evaluates Offer A vs Offer B vs Current Job with net monthly cash delta, composite risk scores, and notice period buyout breakeven |
+| [`equity_engine.py`](equity_engine.py) | Total Rewards & Equity Modeler | Models 4-year vesting schedules (standard 25/25/25/25, Amazon 5/15/40/40), 90-day post-termination exercise traps, and Section 17(2) perquisite tax |
+| [`negotiation_war_room.py`](negotiation_war_room.py) | Recruiter Objection War Room | Battle-tested verbal and written rebuttals for the 5 biggest recruiter objections (20% hike caps, variable shifts, 90-day notice, exploding offers) |
+| [`report_generator.py`](report_generator.py) | Executive PDF Audit Memo | 1-click publication-grade 2-page Offer Audit Memo generated in-memory via `ReportLab` |
+| [`company_tiers.py`](company_tiers.py) | Employer Tier & Negotiation Playbook | Categorizes firms into 4 compensation tiers (Global Tech, Unicorns, Consultancies, IT Services) with empirical P25/Median/P75 bands |
+| [`community_notes.py`](community_notes.py) | Crowdsourced Offer Terms Layer | SQLite-backed offer notes engine with solo regex moderation (URL, email, phone, and anti-doxxing guards) |
 | [`taxonomy.py`](taxonomy.py) | NLP Job Title Normalization | Maps free-text scraped headlines into 15 Canonical Role Families and 5 Seniority Levels |
 | [`train_model.py`](train_model.py) | ML Training & Conformal Calibration | Scikit-learn Pipeline with ColumnTransformer + VotingRegressor (RF + HGB) and split conformal prediction |
-| [`tests/test_platform.py`](tests/test_platform.py) | Automated CI Verification | 11 unit tests covering ML inference, Budget 2024 tax engine, H-1B/Glassdoor data, Reddit extraction, community notes, contract traps, and employer tiers |
+| [`tests/test_platform.py`](tests/test_platform.py) | Automated CI Verification | 16 unit tests covering ML inference, Budget 2024 tax engine, PDF parser, equity vesting, decision matrix, war room, and PDF generator |
 
 ---
 
@@ -146,10 +151,10 @@ cd salary-predictor
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Run automated verification suite (11 tests)
+# 3. Run automated verification suite (16 tests)
 pytest tests/ -v
 
-# 4. Launch single-screen Offer Evaluator
+# 4. Launch Offer Intelligence application
 streamlit run app.py
 
 # 5. (Optional) Run with developer surfaces enabled (Tabs 2-4, RAG copilot)

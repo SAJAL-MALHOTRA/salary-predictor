@@ -327,4 +327,138 @@ def test_company_tier_classification():
     assert t_unk["tier_num"] == 3
 
 
+def test_offer_parser_extraction():
+    """Verify regex & heuristic parsing on typical Indian offer letter text."""
+    import offer_parser as op
+
+    sample_doc = """
+    OFFER OF EMPLOYMENT
+    Company: Swiggy (Bundl Technologies Pvt Ltd)
+    Designation: SDE 2 - Backend
+    Total CTC: INR 26,00,000 per annum
+    Basic Salary: INR 10,40,000
+    Variable Pay: 15% of annual CTC
+    Joining Bonus: INR 3,00,000 (Subject to 12 months clawback)
+    Notice Period: 60 days
+    Gratuity: Included as per Payment of Gratuity Act 1972
+    Variable payout: Quarterly variable disbursement
+    """
+    parsed = op.parse_offer_text(sample_doc)
+    assert parsed["company"] == "Swiggy"
+    assert "SDE 2" in parsed["role"]
+    assert parsed["ctc_lpa"] == 26.0
+    assert parsed["variable_pct"] == 15
+    assert parsed["joining_bonus_lpa"] == 3.0
+    assert parsed["clawback_months"] == 12
+    assert parsed["notice_period_days"] == 60
+    assert parsed["gratuity_included"] is True
+    assert "Quarterly" in parsed["variable_freq"]
+    assert parsed["confidence"] >= 0.70
+
+
+def test_equity_engine_mechanics():
+    """Verify RSU & ESOP vesting schedules, exercise traps, and Section 17(2) perquisite tax."""
+    import equity_engine as ee
+
+    # Test Public Tech RSU grant ($40,000 ~ 32 LPA total 4-year grant)
+    rsu_res = ee.evaluate_equity_component(
+        equity_type="RSU",
+        grant_value_lpa=32.0,
+        vesting_schedule="Standard 25/25/25/25",
+        company_stage="Public Tech / GCC",
+        exercise_window_days=90,
+        annual_base_ctc_lpa=28.0,
+    )
+    assert rsu_res["y1_vest_lpa"] == 8.0
+    assert rsu_res["liquidity_factor"] == 1.00
+    assert rsu_res["total_y1_quoted_rewards_lpa"] == 36.0
+    assert "Public RSU Grant" in rsu_res["exercise_trap_flags"][0]
+
+    # Test Startup ESOP with 90-day exercise trap
+    esop_res = ee.evaluate_equity_component(
+        equity_type="ESOP",
+        grant_value_lpa=20.0,
+        vesting_schedule="Standard 25/25/25/25",
+        company_stage="Late-Stage Unicorn (Frequent Buybacks)",
+        exercise_window_days=90,
+        annual_base_ctc_lpa=20.0,
+    )
+    assert esop_res["y1_vest_lpa"] == 5.0
+    assert esop_res["liquidity_factor"] == 0.65
+    assert esop_res["y1_realizable_lpa"] == 3.25
+    assert "90-Day Golden Handcuffs Trap" in esop_res["exercise_trap_flags"][0]
+
+
+def test_decision_matrix_comparisons():
+    """Verify multi-offer comparative scoring, monthly take-home delta, and notice buyout timeline."""
+    import decision_matrix as dm
+
+    # Offer A: 12 LPA, 100% cash, 90-day notice, Tier 4
+    prof_a = dm.evaluate_offer_profile(
+        name="Offer A (TCS)",
+        ctc_lpa=12.0,
+        variable_pct=15.0,
+        joining_bonus_lpa=0.0,
+        notice_period_days=90,
+        gratuity_included=True,
+        expected_tenure_years=2.0,
+        take_home_monthly=78000,
+        guaranteed_year1_cash_lpa=9.97,
+        tier_num=4,
+    )
+    # Offer B: 24 LPA, 15% variable, 30-day notice, Tier 1
+    prof_b = dm.evaluate_offer_profile(
+        name="Offer B (Google)",
+        ctc_lpa=24.0,
+        variable_pct=15.0,
+        joining_bonus_lpa=3.0,
+        notice_period_days=30,
+        gratuity_included=False,
+        expected_tenure_years=2.0,
+        take_home_monthly=145000,
+        guaranteed_year1_cash_lpa=20.4,
+        tier_num=1,
+    )
+
+    comp = dm.compare_two_offers(prof_a, prof_b)
+    assert comp["diff_monthly"] == 67000
+    assert comp["diff_annual_net"] == 67000 * 12
+    assert comp["diff_guaranteed_lpa"] > 10.0
+    assert prof_b["mobility_score"] > prof_a["mobility_score"]
+    assert "Offer B" in comp["verdict_title"]
+
+
+def test_negotiation_war_room_playbooks():
+    """Verify recruiter objection playbooks have complete email and verbal scripts."""
+    import negotiation_war_room as nwr
+
+    playbooks = nwr.get_all_objections()
+    assert len(playbooks) == 5
+
+    for p in playbooks:
+        assert "email_script" in p and len(p["email_script"]) > 100
+        assert "verbal_script" in p and len(p["verbal_script"]) > 50
+        assert "winning_leverage" in p and len(p["winning_leverage"]) > 20
+
+    hike_cap = nwr.get_objection_by_id("hike_cap")
+    assert "20%" in hike_cap["title"]
+
+
+def test_executive_pdf_memo_generation():
+    """Verify ReportLab generation of 2-page executive Offer Audit Memo."""
+    import report_generator as rg
+
+    pdf_bytes = rg.generate_pdf_audit_memo(
+        offer_data={"company": "Infosys", "role": "Senior Engineer", "exp": 3.5, "city": "Bangalore", "ctc_lpa": 12.0, "variable_pct": 15},
+        take_home_data={"low_mo": 75000, "high_mo": 88000, "th_100": {"ctc": 1200000, "basic": 480000, "gross": 1200000, "tax_annual": 75000, "epf_annual": 57600, "pt_annual": 2400, "net_annual": 1000000}},
+        contract_audit={"structured_risks": [], "paper_inflation_gap_pct": 17.0, "paper_inflation_gap_rupees": 204000, "guaranteed_year1_cash_lpa": 9.96},
+        market_data={"percentile": 55, "family": "Software Engineering", "tier_badge": "Tier 4", "p25": 10.0, "p50": 13.5, "p75": 17.0, "conf_low": 6.0, "conf_high": 18.0},
+        counter_data={"c_cons": 13.0, "c_targ": 14.5, "c_strt": 16.5},
+    )
+    assert isinstance(pdf_bytes, bytes)
+    assert len(pdf_bytes) > 2000
+    assert pdf_bytes.startswith(b"%PDF")
+
+
+
 
