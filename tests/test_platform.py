@@ -264,3 +264,41 @@ def test_community_notes_moderation_and_storage():
         conn.execute("DELETE FROM offer_notes WHERE company = ?", (test_comp,))
     conn.close()
 
+
+def test_contract_auditor_mechanics():
+    """Verify Payment of Gratuity Act 1972 statutory math, inflation gap, and contract traps."""
+    import contract_auditor as ca
+
+    # Test 12 LPA offer with 15% variable and gratuity included for 2 years tenure
+    audit1 = ca.audit_offer_contract(
+        ctc_lpa=12.0,
+        variable_pct=15.0,
+        gratuity_included=True,
+        joining_bonus_lpa=1.0,
+        clawback_months=12,
+        notice_period_days=90,
+        variable_freq="Annual",
+        expected_tenure_years=2.0,
+    )
+
+    # Basic is 40% of 12L = 4.8L. Gratuity is (15/26/12)*4.8L = 23,076.92
+    assert 23000 <= audit1["annual_gratuity_rupees"] <= 23100
+    assert audit1["phantom_gratuity_loss_rupees"] == audit1["annual_gratuity_rupees"]
+    # Guaranteed cash: 10.2L fixed - 0.23077L gratuity = ~9.97 LPA
+    assert 9.90 <= audit1["guaranteed_year1_cash_lpa"] <= 10.05
+    assert 16.0 <= audit1["paper_inflation_gap_pct"] <= 18.0
+    assert "Section 89(1)" in audit1["clawback_flag"]
+    assert "90-Day Notice Lock" in audit1["notice_flag"]
+
+    # Test tenure >= 5 years (gratuity is not lost)
+    audit2 = ca.audit_offer_contract(
+        ctc_lpa=12.0,
+        variable_pct=0.0,
+        gratuity_included=True,
+        expected_tenure_years=5.0,
+    )
+    assert audit2["phantom_gratuity_loss_rupees"] == 0.0
+    assert audit2["guaranteed_year1_cash_lpa"] == 12.0
+    assert audit2["paper_inflation_gap_pct"] == 0.0
+
+

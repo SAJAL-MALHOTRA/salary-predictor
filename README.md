@@ -122,7 +122,20 @@ Engineering honest machine learning requires documenting errors caught during re
 
 ---
 
-## 9. Setup & Verification
+## 9. Product & Engineering Architecture
+
+| Module | Purpose | Key Mechanics |
+|---|---|---|
+| [`app.py`](app.py) | Single-Screen Offer Evaluator | Phone-responsive UI with 0%/50%/100% in-hand scenarios, calibrated conformal intervals, and 1-click negotiation toolkit |
+| [`contract_auditor.py`](contract_auditor.py) | Statutory Contract Trap Auditor | Audits Payment of Gratuity Act 1972 provisions (4.81% basic), Section 89(1) clawbacks, and computes True Guaranteed Cash |
+| [`community_notes.py`](community_notes.py) | Crowdsourced Offer Terms Layer | SQLite-backed offer notes engine with solo moderation (URL, email, phone, and anti-doxxing regex guards) |
+| [`taxonomy.py`](taxonomy.py) | NLP Job Title Normalization | Maps free-text scraped headlines into 15 Canonical Role Families and 5 Seniority Levels |
+| [`train_model.py`](train_model.py) | ML Training & Conformal Calibration | Scikit-learn Pipeline with ColumnTransformer + VotingRegressor (RF + HGB) and split conformal prediction |
+| [`tests/test_platform.py`](tests/test_platform.py) | Automated CI Verification | 10 unit tests covering ML inference, Budget 2024 tax engine, H-1B/Glassdoor data, Reddit extraction, community notes, and contract traps |
+
+---
+
+## 10. Setup & Verification
 
 ```bash
 # 1. Clone repository
@@ -132,7 +145,7 @@ cd salary-predictor
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Run automated verification suite (9 tests)
+# 3. Run automated verification suite (10 tests)
 pytest tests/ -v
 
 # 4. Launch single-screen Offer Evaluator
@@ -144,7 +157,7 @@ DEV_MODE=1 streamlit run app.py
 
 ---
 
-## 10. Key References & Project Links
+## 11. Key References & Project Links
 
 - **Technical Report & Ablation Details:** [`METHODOLOGY.md`](METHODOLOGY.md)
 - **Six-Week Launch Retrospective & Metrics:** [`RETROSPECTIVE.md`](RETROSPECTIVE.md)

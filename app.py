@@ -1,12 +1,13 @@
 """
 app.py -- India Salary & Career Intelligence Platform.
-Single-screen Offer Evaluator flow:
-  1. Monthly in-hand pay (range when variable % > 0, single point when variable % == 0)
-  2. Peer percentile with 80% conformal interval & P25-P75 market spread
-  3. Three concrete counter-offer numbers
-  4. One-line employer red-flag radar (notice period / bench / PIP)
-  5. Community offer intelligence notes & lightweight contribution flow
-  6. 1-Click negotiation counter-offer email generator & WhatsApp share card
+World-class YC-caliber Single-screen Offer Evaluator:
+  1. Monthly in-hand pay (0%, 50%, and 100% variable payout scenarios + pay slip breakdown)
+  2. Offer Trap Detector & Paper CTC Reality Check (Payment of Gratuity Act 1972, Section 89(1) clawbacks)
+  3. Calibrated peer percentile with 80% conformal uncertainty interval & P25-P75 market spread
+  4. Three concrete negotiation counters (Conservative, Market Target, Stretch)
+  5. Employer red-flag radar (notice period / bench / PIP quotas from r/developersIndia)
+  6. Crowdsourced offer intelligence notes with automated solo moderation
+  7. High-converting negotiation email suite (3 templates) & WhatsApp review card
 
 Hidden surfaces retained from v1 (Tabs 2-4, RAG copilot, culture x-ray)
 are gated behind os.getenv("DEV_MODE") == "1". See RETROSPECTIVE.md.
@@ -23,11 +24,12 @@ import pandas as pd
 import streamlit as st
 
 import community_notes as cn
+import contract_auditor as ca
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 _BASE = Path(__file__).resolve().parent
 
-# ── 1. PAGE SETUP & RESPONSIVE DESIGN SYSTEM CSS ──────────────────────────────
+# ── 1. PAGE SETUP & DESIGN SYSTEM CSS ─────────────────────────────────────────
 st.set_page_config(
     page_title="Offer Evaluator | India Tech Salary Intelligence",
     page_icon="💼",
@@ -51,71 +53,117 @@ html, body, [class*="css"] {
     color: #4f46e5;
     font-size: 0.78rem;
     font-weight: 700;
-    padding: 0.25rem 0.75rem;
+    padding: 0.3rem 0.85rem;
     border-radius: 9999px;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.5rem;
 }
 .app-title {
-    font-size: 2.1rem;
+    font-size: 2.25rem;
     font-weight: 800;
     color: #0f172a;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.035em;
     line-height: 1.15;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.3rem;
 }
 .app-subtitle {
-    font-size: 0.98rem;
+    font-size: 1rem;
     color: #64748b;
-    margin-bottom: 1.25rem;
-    line-height: 1.45;
+    margin-bottom: 1.4rem;
+    line-height: 1.5;
 }
 
-/* Cards */
+/* Main Cards */
 .output-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 1.1rem 1.25rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 1.15rem;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
 }
 .output-card-highlight {
     background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
     border: 1px solid #86efac;
-    border-radius: 12px;
-    padding: 1.1rem 1.25rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.06);
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 1.15rem;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.06);
 }
 .card-caption {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 700;
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.35rem;
 }
 .inhand-range {
-    font-size: 2rem;
+    font-size: 2.15rem;
     font-weight: 800;
     color: #047857;
     line-height: 1.15;
 }
 .percentile-val {
-    font-size: 1.65rem;
+    font-size: 1.75rem;
     font-weight: 800;
     color: #1e1b4b;
     line-height: 1.2;
+}
+
+/* Scenario Pills */
+.scenario-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem;
+    text-align: center;
+}
+.scenario-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+}
+.scenario-val {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0.2rem 0;
+}
+.scenario-sub {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+/* Trap Detector Card */
+.trap-card {
+    background: #fffbfa;
+    border: 1px solid #fed7aa;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+.trap-metric-val {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #c2410c;
+}
+.trap-flag-line {
+    font-size: 0.85rem;
+    color: #7c2d12;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid #ffedd5;
 }
 
 /* Counter offer pills */
 .counter-box {
     background: #f8fafc;
     border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    padding: 0.95rem 1.1rem;
     margin-bottom: 0.5rem;
 }
 .counter-label {
@@ -125,7 +173,7 @@ html, body, [class*="css"] {
     letter-spacing: 0.04em;
 }
 .counter-val {
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     font-weight: 800;
     color: #0f172a;
     margin: 0.15rem 0;
@@ -133,6 +181,7 @@ html, body, [class*="css"] {
 .counter-desc {
     font-size: 0.82rem;
     color: #475569;
+    line-height: 1.4;
 }
 
 /* Red flag box */
@@ -140,7 +189,7 @@ html, body, [class*="css"] {
     background: #fff7ed;
     border-left: 4px solid #f97316;
     border-radius: 8px;
-    padding: 0.85rem 1rem;
+    padding: 0.9rem 1.1rem;
     margin-top: 0.5rem;
     margin-bottom: 1rem;
     font-size: 0.88rem;
@@ -153,28 +202,28 @@ html, body, [class*="css"] {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 10px;
-    padding: 0.85rem 1rem;
-    margin-bottom: 0.5rem;
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 0.6rem;
     border-left: 3px solid #6366f1;
 }
 .intel-text {
     font-size: 0.88rem;
     color: #1e293b;
-    line-height: 1.4;
+    line-height: 1.45;
 }
 .intel-meta {
-    font-size: 0.75rem;
+    font-size: 0.76rem;
     color: #64748b;
-    margin-top: 0.35rem;
+    margin-top: 0.4rem;
 }
 
 /* Badges */
 .badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.2rem 0.6rem;
+    padding: 0.22rem 0.65rem;
     border-radius: 9999px;
-    font-size: 0.75rem;
+    font-size: 0.76rem;
     font-weight: 600;
     margin-right: 0.35rem;
     margin-bottom: 0.35rem;
@@ -182,8 +231,9 @@ html, body, [class*="css"] {
 .badge-indigo { background: #e0e7ff; color: #4338ca; }
 .badge-slate { background: #f1f5f9; color: #475569; }
 .badge-amber { background: #fef3c7; color: #92400e; }
+.badge-emerald { background: #d1fae5; color: #065f46; }
 
-/* Dev mode tabs styling */
+/* Dev mode styling */
 div[data-baseweb="tab-list"] {
     gap: 8px;
     background-color: #f1f5f9;
@@ -201,24 +251,6 @@ div[data-baseweb="tab"][aria-selected="true"] {
     background-color: #ffffff;
     color: #0f172a;
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-.pros-quote {
-    background: #f0fdf4;
-    border-left: 4px solid #22c55e;
-    border-radius: 8px;
-    padding: 0.85rem 1rem;
-    margin-bottom: 0.6rem;
-    font-size: 0.9rem;
-    color: #166534;
-}
-.cons-quote {
-    background: #fff1f2;
-    border-left: 4px solid #f43f5e;
-    border-radius: 8px;
-    padding: 0.85rem 1rem;
-    margin-bottom: 0.6rem;
-    font-size: 0.9rem;
-    color: #9f1239;
 }
 </style>
 """,
@@ -245,7 +277,6 @@ def load_assets():
     rd_file = _BASE / "reddit_benchmarks.json"
     reddit_benchmarks = json.load(open(rd_file, "r", encoding="utf-8")) if rd_file.exists() else {}
 
-    # Initialize lightweight SQLite community notes
     cn.init_db()
 
     return pipeline, metadata, df, company_insights, h1b_benchmarks, glassdoor_benchmarks, reddit_benchmarks
@@ -374,10 +405,10 @@ def calculate_take_home(ctc_lpa):
 
 
 # ── 4. HEADER ────────────────────────────────────────────────────────────────
-st.markdown('<div class="header-badge">Offer Decision Engine</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-badge">🇮🇳 India Tech Compensation Engine</div>', unsafe_allow_html=True)
 st.markdown('<h1 class="app-title">Is this offer good?</h1>', unsafe_allow_html=True)
 st.markdown(
-    '<p class="app-subtitle">Evaluate your Indian tech offer letter: monthly bank credit, calibrated peer percentile, counter-offer targets, and employer red flags.</p>',
+    '<p class="app-subtitle">Evaluate your Indian tech offer letter: monthly bank credit, detect contract traps, benchmark calibrated peer percentiles, and generate negotiation leverage.</p>',
     unsafe_allow_html=True,
 )
 
@@ -387,7 +418,7 @@ with st.container(border=True):
     col_f1, col_f2 = st.columns(2, gap="medium")
 
     with col_f1:
-        input_company = st.text_input("🏢 Company", value="Infosys", help="Free text employer name (e.g. Infosys, Swiggy, Google)")
+        input_company = st.text_input("🏢 Company", value="Infosys", help="Free text employer name (e.g. Infosys, Swiggy, Google, TCS)")
         input_role = st.text_input("👤 Role / Job Title", value="Senior Software Engineer", help="e.g. Senior Software Engineer, ML Engineer, Data Analyst")
         input_city = st.text_input("📍 City", value="Bangalore", help="Location of employment (e.g. Bangalore, Hyderabad, Pune)")
 
@@ -406,7 +437,7 @@ with st.container(border=True):
 # Normalize role and lookup employer insights
 detected_family, detected_seniority = categorize_job(input_role)
 
-# Case-insensitive company lookup in company_insights
+# Case-insensitive company lookup
 comp_match_key = None
 for k in company_insights.keys():
     if k.lower() == input_company.strip().lower():
@@ -445,7 +476,7 @@ conf_high = round(predicted_market_ctc + conf_margin, 1)
 # Contextual tags
 st.markdown(
     f"""
-    <div style="margin-top: -0.25rem; margin-bottom: 0.85rem;">
+    <div style="margin-top: -0.25rem; margin-bottom: 0.95rem;">
         <span class="badge badge-indigo">Domain: {detected_family}</span>
         <span class="badge badge-slate">Level: {detected_seniority}</span>
         <span class="badge badge-amber">⭐ {rating} / 5.0 Rating</span>
@@ -457,16 +488,18 @@ st.markdown(
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# OUTPUT 1: MONTHLY IN-HAND AS A RANGE (OR SINGLE POINT IF VARIABLE % == 0)
+# OUTPUT 1: MONTHLY IN-HAND AS A RANGE (0%, 50%, 100% SCENARIOS)
 # ═══════════════════════════════════════════════════════════════════════════════
 fixed_ratio = 1.0 - (float(input_var_pct) / 100.0)
 fixed_ctc = float(input_ctc) * fixed_ratio
 
-th_fixed = calculate_take_home(fixed_ctc)
-th_full = calculate_take_home(input_ctc)
+th_0 = calculate_take_home(fixed_ctc)
+th_50 = calculate_take_home(fixed_ctc + (float(input_ctc) * float(input_var_pct) / 200.0))
+th_100 = calculate_take_home(input_ctc)
 
-low_mo = int(th_fixed["monthly_in_hand"])
-high_mo = int(th_full["monthly_in_hand"])
+low_mo = int(th_0["monthly_in_hand"])
+mid_mo = int(th_50["monthly_in_hand"])
+high_mo = int(th_100["monthly_in_hand"])
 
 if input_var_pct > 0:
     st.markdown(
@@ -484,6 +517,42 @@ if input_var_pct > 0:
         """,
         unsafe_allow_html=True,
     )
+
+    # 3-Tier Variable Payout Scenario Breakdown
+    sc1, sc2, sc3 = st.columns(3, gap="small")
+    with sc1:
+        st.markdown(
+            f"""
+            <div class="scenario-box">
+                <div class="scenario-title">0% Variable (Floor)</div>
+                <div class="scenario-val" style="color: #dc2626;">₹ {int(low_mo):,}</div>
+                <div class="scenario-sub">Guaranteed ₹ {fixed_ctc:.1f}L Fixed</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with sc2:
+        st.markdown(
+            f"""
+            <div class="scenario-box" style="border-color: #cbd5e1; background: #f8fafc;">
+                <div class="scenario-title">50% Variable (Realistic)</div>
+                <div class="scenario-val" style="color: #4338ca;">₹ {int(mid_mo):,}</div>
+                <div class="scenario-sub">Average Industry Payout</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with sc3:
+        st.markdown(
+            f"""
+            <div class="scenario-box" style="border-color: #86efac; background: #f0fdf4;">
+                <div class="scenario-title">100% Variable (Target)</div>
+                <div class="scenario-val" style="color: #047857;">₹ {int(high_mo):,}</div>
+                <div class="scenario-sub">Full ₹ {float(input_ctc):.1f}L CTC</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 else:
     st.markdown(
         f"""
@@ -491,7 +560,7 @@ else:
             <div class="card-caption">1. Estimated Monthly In-Hand (Net Bank Credit)</div>
             <div class="inhand-range">₹ {int(high_mo/1000):,}k <span style="font-size: 1.1rem; font-weight:600; color:#065f46;">/ month</span> (₹ {high_mo:,})</div>
             <div style="font-size: 0.88rem; color: #166534; margin-top: 0.4rem;">
-                <strong>100% Fixed Salary:</strong> No variable pay deduction. Annual net credit: <strong>₹ {int(th_full['net_annual']/100000):.1f} Lakhs</strong>.
+                <strong>100% Fixed Salary:</strong> No variable pay deduction. Annual net credit: <strong>₹ {int(th_100['net_annual']/100000):.1f} Lakhs</strong>.
             </div>
             <div style="font-size: 0.78rem; color: #64748b; margin-top: 0.35rem;">
                 Budget 2024 New Tax Regime (FY 2024-25, AY 2025-26) with ₹75k standard deduction & 40% basic pay assumption.
@@ -501,10 +570,121 @@ else:
         unsafe_allow_html=True,
     )
 
+# Detailed Payslip Deductions Expander
+with st.expander("🧾 View Itemized Monthly Pay Slip Breakdown"):
+    st.markdown(
+        f"""
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 0.45rem 0; color: #64748b;">Annual Cost to Company (CTC)</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 700;">₹ {int(th_100['ctc']):,}</td>
+                <td style="padding: 0.45rem 0; text-align: right; color: #64748b;">₹ {int(th_100['ctc']/12):,}/mo</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 0.45rem 0; color: #64748b;">Basic Salary (40% of CTC)</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 600;">₹ {int(th_100['basic']):,}</td>
+                <td style="padding: 0.45rem 0; text-align: right; color: #64748b;">₹ {int(th_100['basic']/12):,}/mo</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 0.45rem 0; color: #dc2626;">(-) Income Tax (New Regime TDS)</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 600; color: #dc2626;">- ₹ {int(th_100['tax_annual']):,}</td>
+                <td style="padding: 0.45rem 0; text-align: right; color: #dc2626;">- ₹ {int(th_100['tax_monthly']):,}/mo</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 0.45rem 0; color: #4338ca;">(-) Employee EPF (Retirement)</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 600; color: #4338ca;">- ₹ {int(th_100['epf_annual']):,}</td>
+                <td style="padding: 0.45rem 0; text-align: right; color: #4338ca;">- ₹ {int(th_100['epf_monthly']):,}/mo</td>
+            </tr>
+            <tr style="border-bottom: 2px solid #e2e8f0;">
+                <td style="padding: 0.45rem 0; color: #d97706;">(-) Professional Tax</td>
+                <td style="padding: 0.45rem 0; text-align: right; font-weight: 600; color: #d97706;">- ₹ {int(th_100['pt_annual']):,}</td>
+                <td style="padding: 0.45rem 0; text-align: right; color: #d97706;">- ₹ {int(th_100['pt_annual']/12):,}/mo</td>
+            </tr>
+            <tr style="background: #f0fdf4;">
+                <td style="padding: 0.65rem 0.5rem; font-weight: 700; color: #047857;">Estimated Net Bank Credit</td>
+                <td style="padding: 0.65rem 0.5rem; text-align: right; font-weight: 800; font-size: 1.05rem; color: #047857;">₹ {int(th_100['net_annual']):,}</td>
+                <td style="padding: 0.65rem 0.5rem; text-align: right; font-weight: 800; font-size: 1.05rem; color: #047857;">₹ {int(th_100['monthly_in_hand']):,}/mo</td>
+            </tr>
+        </table>
+        """,
+        unsafe_allow_html=True,
+    )
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# OUTPUT 2: PEER PERCENTILE & CONFORMAL INTERVAL VISIBLE
+# OUTPUT 2: OFFER TRAP DETECTOR & PAPER CTC REALITY CHECK
 # ═══════════════════════════════════════════════════════════════════════════════
+st.markdown("<div style='height: 5px;'></div>", unsafe_allow_html=True)
+
+with st.expander("🛡️ Offer Trap Detector & Paper CTC Reality Check", expanded=True):
+    st.caption("Quantify hidden deductions: Payment of Gratuity Act 1972 phantom provisions, annual variable locks, and Section 89(1) clawbacks.")
+
+    trap_col1, trap_col2 = st.columns(2)
+    with trap_col1:
+        gratuity_inc = st.checkbox("Gratuity included in CTC sheet?", value=True, help="Standard in >80% of Indian IT offers (4.81% of basic salary)")
+        var_freq = st.radio("Variable Pay Payout Frequency", ["Annual Payout (High Forfeiture Risk)", "Quarterly Payout"], horizontal=True)
+
+    with trap_col2:
+        jb_amt = st.number_input("Joining / Sign-on Bonus (₹ LPA, optional)", min_value=0.0, max_value=50.0, value=0.0, step=0.5)
+        exp_tenure = st.slider("Expected Tenure at this Company (Years)", min_value=1.0, max_value=6.0, value=2.0, step=0.5)
+
+    # Match notice period for audit
+    rd_match_key = None
+    for k in reddit_benchmarks.keys():
+        if k.lower() == input_company.strip().lower():
+            rd_match_key = k
+            break
+    rf_data_temp = reddit_benchmarks[rd_match_key].get("red_flags", {}) if rd_match_key else {}
+    detected_np = rf_data_temp.get("notice_period_days", 90 if "Services" in industry else 60)
+
+    contract_audit = ca.audit_offer_contract(
+        ctc_lpa=input_ctc,
+        variable_pct=input_var_pct,
+        gratuity_included=gratuity_inc,
+        joining_bonus_lpa=jb_amt,
+        clawback_months=12 if jb_amt > 0 else 0,
+        notice_period_days=detected_np,
+        variable_freq="Quarterly" if "Quarterly" in var_freq else "Annual",
+        expected_tenure_years=exp_tenure,
+    )
+
+    t_res1, t_res2 = st.columns(2)
+    with t_res1:
+        st.markdown(
+            f"""
+            <div class="trap-card">
+                <div class="scenario-title" style="color: #9a3412;">True Guaranteed Year-1 Cash</div>
+                <div class="trap-metric-val">₹ {contract_audit['guaranteed_year1_cash_lpa']} LPA</div>
+                <div class="scenario-sub">Fixed CTC minus phantom gratuity provisions</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with t_res2:
+        st.markdown(
+            f"""
+            <div class="trap-card">
+                <div class="scenario-title" style="color: #9a3412;">Paper CTC Inflation Gap</div>
+                <div class="trap-metric-val">{contract_audit['paper_inflation_gap_pct']}% Gap</div>
+                <div class="scenario-sub">₹ {int(contract_audit['paper_inflation_gap_rupees']):,} uncollected if variable drops or early exit</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # Diagnostic flag warnings
+    st.markdown(f'<div class="trap-flag-line">{contract_audit["gratuity_flag"]}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="trap-flag-line">{contract_audit["variable_timing_flag"]}</div>', unsafe_allow_html=True)
+    if jb_amt > 0:
+        st.markdown(f'<div class="trap-flag-line">{contract_audit["clawback_flag"]}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="trap-flag-line">{contract_audit["notice_flag"]}</div>', unsafe_allow_html=True)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# OUTPUT 3: PEER PERCENTILE & CONFORMAL INTERVAL VISIBLE
+# ═══════════════════════════════════════════════════════════════════════════════
+st.markdown("<div style='height: 5px;'></div>", unsafe_allow_html=True)
+
 fam_df = df[df["Role_Family"] == detected_family]
 if len(fam_df) < 5:
     fam_df = df
@@ -521,10 +701,10 @@ position_label = "above market median" if float(input_ctc) >= p50 else "below ma
 st.markdown(
     f"""
     <div class="output-card">
-        <div class="card-caption">2. Peer Percentile & Market Benchmark</div>
-        <div class="percentile-val">{percentile}th Percentile <span style="font-size: 1rem; font-weight: 500; color: #64748b;">for {detected_family} ({detected_seniority})</span></div>
-        <div style="margin-top: 0.5rem; font-size: 0.88rem; color: #334155; line-height: 1.5;">
-            An offer of <strong>₹ {float(input_ctc):.1f} LPA</strong> sits <strong>{position_label}</strong> (median: ₹ {p50} LPA).<br>
+        <div class="card-caption">3. Peer Percentile & Market Benchmark</div>
+        <div class="percentile-val">{percentile}th Percentile <span style="font-size: 1.05rem; font-weight: 500; color: #64748b;">for {detected_family} ({detected_seniority})</span></div>
+        <div style="margin-top: 0.5rem; font-size: 0.88rem; color: #334155; line-height: 1.55;">
+            An offer of <strong>₹ {float(input_ctc):.1f} LPA</strong> sits <strong>{position_label}</strong> (market median: ₹ {p50} LPA).<br>
             • <strong>80% Conformal Prediction Interval:</strong> <strong style="color:#4338ca;">₹ {conf_low}L – ₹ {conf_high}L</strong> (calibrated ±{conf_margin} LPA uncertainty margin with finite-sample 80.0% coverage guarantee)<br>
             • <strong>Middle 50% Market Spread (P25–P75):</strong> <strong>₹ {p25}L – ₹ {p75}L</strong> across verified peer disclosures.
         </div>
@@ -535,13 +715,13 @@ st.markdown(
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# OUTPUT 3: THREE CONCRETE COUNTER-OFFER NUMBERS
+# OUTPUT 4: THREE CONCRETE COUNTER-OFFER NUMBERS
 # ═══════════════════════════════════════════════════════════════════════════════
 c_cons = round(float(input_ctc) * 1.08, 1)
 c_targ = round(max(float(input_ctc) * 1.18, p75), 1)
 c_strt = round(max(float(input_ctc) * 1.35, p75 * 1.15), 1)
 
-st.markdown('<div class="card-caption" style="margin-top: 0.25rem;">3. Concrete Negotiation Counters</div>', unsafe_allow_html=True)
+st.markdown('<div class="card-caption" style="margin-top: 0.25rem;">4. Concrete Negotiation Counters</div>', unsafe_allow_html=True)
 col_cnt1, col_cnt2, col_cnt3 = st.columns(3, gap="small")
 
 with col_cnt1:
@@ -582,14 +762,8 @@ with col_cnt3:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# OUTPUT 4: RED-FLAG LINE PER EMPLOYER FROM REDDIT LAYER (1 LINE MAX)
+# OUTPUT 5: RED-FLAG LINE PER EMPLOYER FROM REDDIT LAYER (1 LINE MAX)
 # ═══════════════════════════════════════════════════════════════════════════════
-rd_match_key = None
-for k in reddit_benchmarks.keys():
-    if k.lower() == input_company.strip().lower():
-        rd_match_key = k
-        break
-
 if rd_match_key:
     rf_data = reddit_benchmarks[rd_match_key].get("red_flags", {})
     np_days = rf_data.get("notice_period_days", 60)
@@ -604,12 +778,12 @@ st.markdown(f'<div class="red-flag-box">{rf_line}</div>', unsafe_allow_html=True
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# OUTPUT 5: COMMUNITY OFFER INTEL (LIGHTWEIGHT THREAD & SUBMISSION)
+# OUTPUT 6: COMMUNITY OFFER INTEL (LIGHTWEIGHT THREAD & SUBMISSION)
 # ═══════════════════════════════════════════════════════════════════════════════
 target_comp_name = comp_match_key if comp_match_key else input_company.strip()
 recent_notes = cn.get_notes(target_comp_name, detected_family, limit=3)
 
-st.markdown(f'<div class="card-caption">5. Community Offer Intel & Terms ({target_comp_name})</div>', unsafe_allow_html=True)
+st.markdown(f'<div class="card-caption">6. Community Offer Intel & Terms ({target_comp_name})</div>', unsafe_allow_html=True)
 
 if recent_notes:
     for nt in recent_notes:
@@ -660,29 +834,63 @@ with st.expander("➕ Add an Offer Note / Negotiation Intel (No Signup Required)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# OUTPUT 6: YC-LEVEL TOOLKIT: NEGOTIATION EMAIL SCRIPT & WHATSAPP SHARE CARD
+# OUTPUT 7: NEGOTIATION SUITE (3 SPECIALIZED TEMPLATES & SHARE CARD)
 # ═══════════════════════════════════════════════════════════════════════════════
 st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
 
-tool_tab1, tool_tab2 = st.tabs(["📝 1-Click Counter Email", "📤 WhatsApp / Mentor Share Card"])
+tool_tab1, tool_tab2 = st.tabs(["📝 1-Click Negotiation Emails", "📤 WhatsApp / Mentor Share Card"])
 
 with tool_tab1:
-    st.caption("Copy-paste professional negotiation email formatted with your evaluated figures:")
-    email_draft = f"""Subject: Regarding the offer for {input_role} - {input_company}
+    st.caption("Select your negotiation scenario to generate an instant, high-converting counter-offer email:")
+    email_mode = st.radio(
+        "Negotiation Angle",
+        ["1. Market Alignment (Anchor P75)", "2. Restructure Variable to Fixed", "3. Competing Offer Leverage"],
+        horizontal=True,
+    )
+
+    if "Market Alignment" in email_mode:
+        email_body = f"""Subject: Regarding the offer for {input_role} - {input_company}
 
 Dear Hiring Team,
 
-Thank you very much for extending the offer for the {input_role} role at {target_comp_name}. I am genuinely excited about the team's roadmap and the opportunity to contribute my {input_exp} years of experience in {detected_family}.
+Thank you very much for extending the offer for the {input_role} position at {target_comp_name}. I am enthusiastic about the team's roadmap and the opportunity to contribute my {input_exp} years of experience in {detected_family}.
 
-I reviewed the proposed package of ₹ {float(input_ctc):.1f} LPA CTC (with a {input_var_pct}% variable component). Based on my market research, current domain benchmarks for {detected_family} ({detected_seniority}), and comparable lateral compensation, I would like to explore if we can align the total compensation closer to ₹ {c_targ:.1f} LPA. 
+I reviewed the proposed package of ₹ {float(input_ctc):.1f} LPA CTC. Based on my research and current domain benchmarks for {detected_family} ({detected_seniority}), I would like to explore if we can align the total compensation closer to ₹ {c_targ:.1f} LPA.
 
-Alternatively, if the total CTC is constrained by internal banding, I would be very open to adjusting the fixed-to-variable ratio or exploring a signing bonus to bridge the gap and secure a guaranteed monthly take-home closer to market expectation.
-
-I am enthusiastic about joining {target_comp_name} and would welcome a brief discussion to finalize terms.
+This figure reflects market alignment for lateral hiring in this tier, and reaching this level would make my acceptance an immediate decision. I look forward to your thoughts.
 
 Best regards,
 [Your Name]"""
-    st.code(email_draft, language="markdown")
+    elif "Restructure" in email_mode:
+        email_body = f"""Subject: Regarding the compensation structure for {input_role} - {input_company}
+
+Dear Hiring Team,
+
+Thank you for extending the offer for {input_role} at {target_comp_name}. I am excited about joining the organization.
+
+I noticed the offer of ₹ {float(input_ctc):.1f} LPA includes a {input_var_pct}% variable component. To ensure guaranteed monthly cash flow alignment, I would like to explore if we can either:
+1. Adjust the fixed-to-variable ratio by bringing fixed pay closer to ₹ {c_targ:.1f} LPA, or
+2. Add a one-time joining bonus to bridge the gap while maintaining your internal base pay bands.
+
+I am eager to finalize terms and begin onboarding with the team.
+
+Best regards,
+[Your Name]"""
+    else:
+        email_body = f"""Subject: Regarding offer terms for {input_role} - {input_company}
+
+Dear Hiring Team,
+
+Thank you for the offer for the {input_role} role. {target_comp_name} remains my top choice due to the technical challenges and team culture.
+
+I am currently in final stages with another organization offering compensation in the range of ₹ {c_strt:.1f} LPA. Because {target_comp_name} is my preferred destination, I would be prepared to decline competing discussions and sign immediately if we can align total compensation closer to ₹ {c_targ:.1f} LPA.
+
+I would appreciate a brief call today to conclude our discussions.
+
+Best regards,
+[Your Name]"""
+
+    st.code(email_body, language="markdown")
 
 with tool_tab2:
     st.caption("Formatted summary to send to a mentor, peer, or group chat for a second opinion:")
@@ -690,6 +898,7 @@ with tool_tab2:
 • *Role:* {input_role} ({input_exp} YoE)
 • *Offered CTC:* ₹{float(input_ctc):.1f} LPA (Variable: {input_var_pct}%)
 • *Net Monthly In-Hand:* ₹{int(low_mo/1000)}k – ₹{int(high_mo/1000)}k / mo (Budget 2024 New Tax Regime)
+• *True Guaranteed Cash:* ₹{contract_audit['guaranteed_year1_cash_lpa']} LPA ({contract_audit['paper_inflation_gap_pct']}% Paper Gap)
 • *Market Standing:* {percentile}th percentile for {detected_family}
 • *80% Conformal Range:* ₹{conf_low}L – ₹{conf_high}L
 • *Market Target Counter:* ₹{c_targ:.1f} LPA (+18%)
@@ -704,7 +913,7 @@ st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
 st.caption(
     "💡 **Looking for aggregate company-wide medians across 1.5M records?** "
     "Consult [Weekday's Salary Directory](https://www.weekday.works/salaries). "
-    "This tool focuses specifically on evaluating this single offer's take-home pay, calibrated uncertainty, and contract terms."
+    "This tool focuses specifically on evaluating this single offer's take-home pay, contract trap risks, and calibrated uncertainty."
 )
 
 
