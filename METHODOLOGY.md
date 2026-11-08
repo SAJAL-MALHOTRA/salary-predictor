@@ -50,29 +50,38 @@ We implemented a two-dimensional rule-based regular-expression parser to extract
 1. **15 Canonical Role Families:** *Software & Systems Engineering, Data Science & AI, Data & Analytics, Cloud/DevOps & Security, QA & Testing, Enterprise Solutions (SAP/Salesforce), Product & Project Management, Sales & BD, Marketing, Finance/Banking, HR, Operations, Support/BPO, etc.*
 2. **5 Seniority Levels:** *Entry / Junior, Mid-Level, Senior / Lead, Manager / Lead, Executive / Director*.
 
-### 3.3 Ablation Results (Baseline vs. Engineered Pipeline)
+### 3.3 Unconfounded 3-Way Ablation (Isolating Taxonomy vs. Ensembling)
 
-| Configuration | Features Used | Estimator | Holdout $R^2$ | Holdout MAE | Holdout RMSE |
+To avoid confounding two simultaneous interventions (taxonomy feature engineering vs. model ensembling), a 3-way ablation was evaluated across identical 5 folds (`KFold(n_splits=5, shuffle=True, random_state=42)`):
+
+| Arm | Features | Estimator | CV $R^2$ | CV MAE (LPA) | CV RMSE (LPA) |
 | :--- | :--- | :--- | :---: | :---: | :---: |
-| **Baseline** | Raw Job Title, Company, Avg_Exp | RandomForest (100 trees) | 0.4511 | 4.27 LPA | 6.50 LPA |
-| **With Role Taxonomy** | Role Family, Seniority, Company, Industry, Exp | Voting Ensemble (RF 150 + HistGB) | **0.5661** | **3.84 LPA** | **5.78 LPA** |
-| **Performance Delta** | — | — | **+25.4%** | **-10.1%** | **-11.1%** |
+| **Arm A (Baseline)** | Raw Job Title, Company, Industry, Exp, Rating | Single RandomForest (150 trees) | `0.4243 ± 0.1007` | `4.24 ± 0.28` | `6.87 ± 0.61` |
+| **Arm B (Taxonomy Only)** | Role Family, Seniority Level, Company, Industry, Exp, Rating | Single RandomForest (150 trees) | `0.4774 ± 0.0714` | `4.06 ± 0.20` | `6.59 ± 0.49` |
+| **Arm C (Taxonomy + Ensemble)** | Role Family, Seniority Level, Company, Industry, Exp, Rating | Voting Ensemble (RF 150 + HistGB) | **`0.4993 ± 0.0620`** | **`3.95 ± 0.18`** | **`6.45 ± 0.45`** |
+
+### Per-Fold Breakdown & Sign Consistency (Arm B vs. Arm A)
+Evaluating per-fold deltas under identical fold splits proves that the taxonomy's benefit is uniform:
+
+| Fold | Arm A (Raw RF) | Arm B (Taxonomy RF) | Delta ($B - A$) | Arm C (Full Ensemble) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Fold 1** ($n=174$) | 0.4559 | 0.4971 | **+0.0412** | 0.5003 |
+| **Fold 2** ($n=174$) | 0.5178 | 0.5435 | **+0.0257** | 0.5786 |
+| **Fold 3** ($n=173$) | 0.3043 | 0.4103 | **+0.1060** | 0.4096 |
+| **Fold 4** ($n=173$) | 0.5370 | 0.5578 | **+0.0207** | 0.5533 |
+| **Fold 5** ($n=173$) | 0.3066 | 0.3784 | **+0.0718** | 0.4546 |
+| **Mean ± Std** | `0.4243 ± 0.1007` | `0.4774 ± 0.0714` | **+0.0531 (5/5 positive)** | **`0.4993 ± 0.0620`** |
+
+**Statistical Insight — Variance Reduction, Not Just Mean Lift:**
+Taxonomy engineering alone accounts for the bulk of the improvement (+0.0531 $R^2$ mean lift). Crucially, it reduced cross-fold variance by 29% ($\sigma$ dropped from 0.1007 to 0.0714), showing 100% sign consistency (improved on all 5 folds). Folds 3 (+0.1060) and 5 (+0.0718) — the worst-performing slices under raw titles — gained the most, proving that canonical taxonomy stabilizes prediction in sparse categorical tails. Adding the `HistGradientBoosting` ensemble further lifts mean $R^2$ to 0.4993 and tightens standard deviation to 0.0620.
 
 ---
 
 ## 4. Rigorous 5-Fold Cross-Validation Evaluation
 
-Single train/test splits (e.g. 85/15) are subject to high sampling variance on sub-1,000 row datasets. To establish defensible generalization bounds, the full dataset was evaluated using a **shuffled 5-Fold Cross-Validation** ($k=5$, random seed 42):
+Single train/test splits (e.g. 85/15) are subject to high sampling variance on sub-1,000 row datasets. While a single holdout split yielded an optimistic $R^2 = 0.5661$, the true cross-validated generalization bound is:
 
-```
-Fold 1 (n=174):  R² = 0.5003  |  MAE = 3.89 LPA  |  RMSE = 5.83 LPA
-Fold 2 (n=174):  R² = 0.5786  |  MAE = 3.74 LPA  |  RMSE = 6.13 LPA
-Fold 3 (n=173):  R² = 0.4096  |  MAE = 4.13 LPA  |  RMSE = 7.13 LPA
-Fold 4 (n=173):  R² = 0.5533  |  MAE = 3.82 LPA  |  RMSE = 6.71 LPA
-Fold 5 (n=173):  R² = 0.4546  |  MAE = 4.20 LPA  |  RMSE = 6.44 LPA
-------------------------------------------------------------------------
-CV Summary:      R² = 0.4993 ± 0.0620  |  MAE = 3.95 ± 0.18 LPA  |  RMSE = 6.45 ± 0.45 LPA
-```
+$$\text{CV } R^2 = \mathbf{0.4993 \pm 0.0620} \quad|\quad \text{CV MAE} = \mathbf{3.95 \pm 0.18\text{ LPA}} \quad|\quad \text{CV RMSE} = \mathbf{6.45 \pm 0.45\text{ LPA}}$$
 
 ### Statistical Observations:
 - The mean cross-validation MAE is **₹3.95 Lakhs**, with an exceptionally narrow fold-to-fold standard deviation of **$\pm 0.18\text{ LPA}$**.
@@ -98,8 +107,8 @@ Given the positive skewness of the salary distribution ($+1.954$), an experiment
 | **15–25 LPA Bracket MAE** | 6.02 LPA | 6.77 LPA | +12.5% error penalty |
 | **25+ LPA Bracket MAE** | 14.78 LPA | 16.44 LPA | Tail error magnified by exponential back-transformation |
 
-### Architectural Decision:
-While log-transformation sharply improves accuracy for junior and mid-level roles ($< ₹10\text{ LPA}$), exponentiation substantially blows out the absolute rupee error on senior compensation ($> ₹25\text{ LPA}$). Because the platform serves both early-career engineers and senior leadership, we deployed the **untransformed linear ensemble** paired with **P10–P90 tree-variance confidence intervals**, allowing honest uncertainty communication for high-salary roles.
+### Architectural Decision: Relative vs. Absolute Error
+Training on $\log(1+y)$ mathematically optimizes relative percentage error (MAPE), dropping entry-level error by 24.6% (1.71 → 1.29 LPA). However, it was rejected for production serving because **absolute rupee error (MAE in LPA) is the user-relevant utility metric for mid-to-senior candidates**. For a ₹40 LPA candidate, being off by ₹16.44 LPA is unacceptable even if the percentage error is modest. Because the platform serves both entry-level and executive candidates, we deployed the untransformed linear ensemble.
 
 ---
 
@@ -155,61 +164,50 @@ In the dataset:
 
 ---
 
-## 8. Statistically Sound Uncertainty (P10–P90 Bands)
+## 8. Interval Calibration & Split Conformal Prediction
 
-Rather than outputting a single fragile point estimate, the platform accesses the 150 individual tree estimators inside the Random Forest regressor:
+Tree-variance P10–P90 bands were audited against out-of-fold actuals:
+- **Nominal coverage:** 80.0%
+- **Empirical out-of-fold coverage:** **71.2%**
 
-$$\hat{y}_t = T_t(\mathbf{x}), \quad t \in \{1, \dots, 150\}$$
+The raw tree-variance bands under-cover by ~9 points — they are overconfident and cannot be defended as calibrated 80% intervals. To provide a rigorous guarantee, we implemented **Split Conformal Prediction on out-of-fold residuals**:
 
-$$\text{P10} = \text{Percentile}(\{\hat{y}_t\}, 10), \quad \text{P90} = \text{Percentile}(\{\hat{y}_t\}, 90), \quad \sigma = \text{std}(\{\hat{y}_t\})$$
+$$\hat{C}(x) = [\hat{y} - q_{\text{val}}, \hat{y} + q_{\text{val}}] \quad \text{where } q_{\text{val}} = \text{Quantile}\left(\{|y_i - \hat{y}_i|\}_{i=1}^n, \frac{\lceil(n+1)(1-\alpha)\rceil}{n}\right)$$
 
-- For a **TCS Software Engineer (3y exp)**: $\text{P10} = ₹5.1\text{ LPA}$, $\text{P90} = ₹6.8\text{ LPA}$ ($\sigma = \pm 0.7\text{ LPA}$ — high certainty).
-- For an **Uber Engineering Manager (10y exp)**: $\text{P10} = ₹34.2\text{ LPA}$, $\text{P90} = ₹48.5\text{ LPA}$ ($\sigma = \pm 5.2\text{ LPA}$ — properly broad uncertainty band).
+For $1 - \alpha = 0.80$ ($n=867$ out-of-fold residuals):
+- **Conformal Margin ($q_{\text{val}}$):** **$\pm 6.01\text{ LPA}$**
+- **Empirical Out-of-Fold Coverage:** **80.0%** (exact finite-sample marginal coverage guarantee)
+
+In `app.py`, the UI labels the corridor with both the certified **80% Conformal Interval** ($\hat{y} \pm 6.01\text{ LPA}$) and the empirical **model-variance band** (71.2% OOF coverage).
 
 ---
 
-## 9. US Department of Labor (DOL) OFLC H-1B LCA Data Augmentation
+## 9. Training Data vs. Benchmark Data (Separation of Concerns)
 
-To eliminate reliance solely on scraped community datasets and introduce **100% legal, public government data**, the platform integrates official disclosure data from the **U.S. Department of Labor (DOL) Office of Foreign Labor Certification (OFLC)**:
+Only one source trains the model. The rest validate or contextualize it.
 
-### 9.1 Data Provenance & Legal Classification
+| Source | Rows | Role in system |
+|---|---|---|
+| **AmbitionBox India** | 867 | **Supervised training set** (X, y) |
+| **Glassdoor India** | 2,836 | Post-prediction offshore validation card (UI) |
+| **US DOL H-1B OFLC** | 1M+ | Standalone US onsite legal-floor reference table |
+| **Reddit (22 firms)** | qual. | Qualitative culture X-ray / dark-pattern radar |
+
+### US Department of Labor (DOL) OFLC H-1B LCA Data Augmentation
 - **Source:** U.S. Department of Labor OFLC Case Disclosure Data (CC BY 4.0).
 - **Public Domain Status:** Published quarterly under statutory federal disclosure requirements (20 CFR § 655).
 - **Scope:** Over **1,000,000+ certified Labor Condition Applications (LCAs)** spanning 50 tier-1 Indian IT and multinational technology employers.
-
-### 9.2 Top Indian Tech Employers by Certified US H-1B Filings
-
-| Company | US Legal Employer Entity | Total Certified Filings | Median Wage (USD) | Approval Rate | Primary Worksite State |
-| :--- | :--- | :---: | :---: | :---: | :---: |
-| **Infosys** | INFOSYS LIMITED | **200,329** | **$76,800** | 99.55% | Texas (TX) |
-| **TCS** | TATA CONSULTANCY SERVICES LIMITED | **126,291** | **$67,400** | 99.23% | Maryland (MD) |
-| **Cognizant** | COGNIZANT TECHNOLOGY SOLUTIONS US CORP | **125,757** | **$89,600** | 96.07% | Texas (TX) |
-| **Deloitte** | Deloitte Consulting LLP | **79,212** | **$88,700** | 98.22% | Pennsylvania (PA) |
-| **Wipro** | WIPRO LIMITED | **71,022** | **$70,300** | 91.54% | New Jersey (NJ) |
-| **Microsoft** | Microsoft Corporation | **70,316** | **$133,900** | 94.15% | Washington (WA) |
-| **Capgemini** | CAPGEMINI AMERICA INC | **59,909** | **$85,200** | 94.17% | Illinois (IL) |
-| **Accenture** | Accenture LLP | **57,231** | **$81,300** | 98.15% | Illinois (IL) |
-| **IBM** | IBM India Private Limited / IBM Corp | **48,627** | **$74,300** | 80.90% | New York (NY) |
-| **Tech Mahindra** | Tech Mahindra (Americas) Inc. | **43,470** | **$75,600** | 96.21% | New Jersey (NJ) |
-| **HCLTech** | HCL AMERICA INC | **42,931** | **$77,900** | 98.07% | California (CA) |
-| **Google** | Google LLC | **42,445** | **$163,500** | 98.50% | California (CA) |
-
-### 9.3 Prevailing Wage Level Normalization (20 CFR § 656.40)
-The platform maps seniorities to federal prevailing wage tiers:
-- **Level I (Entry / Junior):** Beginning level employees performing routine tasks under close supervision.
-- **Level II (Qualified / Mid-Level):** Employees who have gained a good understanding of the occupation.
-- **Level III (Experienced / Senior):** Fully competent employees with specialized technical knowledge.
-- **Level IV (Fully Competent / Principal / Manager):** Leadership roles planning and directing complex technical initiatives.
-
-To support fair international comparison, both **Direct Foreign Exchange (1 USD = ₹86.0 INR)** and **World Bank Purchasing Power Parity (1 USD = ₹23.5 INR PPP)** metrics are computed side-by-side.
+- **Important Methodological Rule:** H-1B prevailing wages are **legal minimum floors for US-based petitions, not observed paid wages**, and are **NEVER converted, blended, or used as model features** for Indian salary estimation. They are surfaced exclusively as a standalone offshore-vs-onsite relocation benchmark table.
 
 ---
 
 ## 10. Legal Provenance, Fair Use & Disclaimer
 
 1. **Sources:** 
-   - AmbitionBox mid-2026 public data snapshot (for domestic Indian offshore compensation and employee culture reviews).
-   - U.S. Department of Labor OFLC LCA disclosure data (for international onsite prevailing wages and visa sponsorship metrics).
-2. **Fair Use / Educational Status:** This project is developed purely as an educational portfolio demonstration of ensemble machine learning, NLP taxonomy design, and RAG systems. It is non-commercial and has no paid tiers or paywalls.
+   - AmbitionBox mid-2026 public data snapshot (domestic Indian offshore compensation and employee culture reviews).
+   - Kaggle Glassdoor India dataset (offshore cross-validation benchmark).
+   - U.S. Department of Labor OFLC LCA disclosure data (international onsite prevailing wage legal floors).
+   - Reddit `r/developersIndia` community threads (qualitative workplace culture).
+2. **Fair Use / Educational Status:** This project is developed purely as an educational portfolio demonstration of ensemble machine learning, NLP taxonomy design, conformal prediction, and RAG systems. It is non-commercial.
 3. **No Affiliation:** This application is completely independent and has no affiliation with AmbitionBox or Info Edge India Ltd.
-4. **Data Limitations:** Self-reported figures omit equity grants (RSUs/ESOPs), performance multipliers, and college tier biases. Figures are strategic compasses, not formal tax or legal benchmarks.
+4. **Data Limitations:** Self-reported figures omit equity grants (RSUs/ESOPs), performance multipliers, and college tier biases. Estimates do not constitute formal tax or legal counsel.

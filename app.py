@@ -298,7 +298,7 @@ def find_comparable_records(dataframe, company, job_title, role_family, experien
 
 def calculate_take_home(ctc_lpa):
     """
-    Compute estimated in-hand salary under India's New Tax Regime (Budget 2024 / FY 2024-25 & 2025-26).
+    Compute estimated in-hand salary under India's New Tax Regime (Budget 2024 / FY 2024-25, AY 2025-26).
     Standard deduction: ₹75,000.
     """
     ctc = float(ctc_lpa) * 100000.0
@@ -312,7 +312,7 @@ def calculate_take_home(ctc_lpa):
     gross_salary = ctc - epf_annual
     pt_annual = 2400.0 if ctc >= 300000 else 0.0
 
-    # New Tax Regime FY 2024-25 / FY 2025-26
+    # New Tax Regime FY 2024-25 (AY 2025-26)
     taxable_income = max(0.0, gross_salary - 75000.0)
     tax = 0.0
 
@@ -445,6 +445,12 @@ tree_predictions = get_tree_predictions(pipeline, user_input_df)
 p10 = round(float(np.percentile(tree_predictions, 10)), 1)
 p90 = round(float(np.percentile(tree_predictions, 90)), 1)
 std_dev = round(float(np.std(tree_predictions)), 1)
+
+# Split conformal prediction interval (finite-sample 80% marginal coverage guarantee)
+conf_margin = float(metadata.get("conformal_margin_80_lpa", 6.01))
+conf_low = max(1.0, round(predicted_salary - conf_margin, 1))
+conf_high = round(predicted_salary + conf_margin, 1)
+
 quick_th = calculate_take_home(predicted_salary)
 exact_matches = df[(df["Company"] == selected_company) & (df["Job_Title"] == selected_job)]
 
@@ -459,7 +465,8 @@ with card_col1:
         <div class="metric-box">
             <div class="metric-caption">Predicted Annual CTC</div>
             <div class="metric-val-ctc">₹ {predicted_salary} <span style="font-size: 1.2rem; font-weight:600; color:#64748b;">LPA</span></div>
-            <div class="metric-sub">Likely Range: <strong>₹ {p10} - {p90} LPA</strong> (±{std_dev}L)</div>
+            <div class="metric-sub">80% Conformal Interval: <strong>₹ {conf_low} - {conf_high} LPA</strong> (±{conf_margin}L)<br>
+            <span style="font-size: 0.78rem; color: #64748b;">Model-variance band: ₹ {p10} - {p90} LPA (71.2% empirical OOF)</span></div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -549,7 +556,7 @@ main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs(
 with main_tab1:
     # ── Section 1: In-Hand Pay Breakdown ──
     st.subheader("💰 Monthly Take-Home & Tax Breakdown")
-    st.caption("How your CTC translates to bank credit under the Indian New Tax Regime (Budget 2024 / FY 2024-25 & 2025-26).")
+    st.caption("How your CTC translates to bank credit under the Indian New Tax Regime (Budget 2024 / FY 2024-25, AY 2025-26).")
 
     th_c1, th_c2 = st.columns([1.2, 1.8], gap="large")
 

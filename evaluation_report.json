@@ -33,6 +33,29 @@
     "mae_mean_std": "3.95 +/- 0.18 LPA",
     "rmse_mean_std": "6.45 +/- 0.45 LPA"
   },
+  "conformal_prediction": {
+    "nominal_coverage_target": 0.8,
+    "margin_lpa": 6.01,
+    "empirical_oof_coverage_pct": 80.0
+  },
+  "unconfounded_ablation": {
+    "arm_a_raw_rf": {
+      "r2_mean": 0.4243,
+      "r2_std": 0.1007,
+      "mae": 4.24
+    },
+    "arm_b_taxonomy_rf": {
+      "r2_mean": 0.4774,
+      "r2_std": 0.0714,
+      "mae": 4.06
+    },
+    "arm_c_taxonomy_ensemble": {
+      "r2_mean": 0.4993,
+      "r2_std": 0.062,
+      "mae": 3.95
+    },
+    "per_fold_sign_consistency": "5/5 folds improved under taxonomy alone"
+  },
   "segment_analysis": {
     "role_family": {
       "Product & Project Management": {

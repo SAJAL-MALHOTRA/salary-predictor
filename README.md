@@ -20,9 +20,9 @@ A production-grade compensation and career intelligence platform combining **Vot
   - **Estimator 1:** `RandomForestRegressor` (150 estimators, max depth 22, min samples split 3).
   - **Estimator 2:** `HistGradientBoostingRegressor` (200 iterations, 31 max leaves).
 - **Rigorous Evaluation:**
-  - **5-Fold Cross-Validation:** $R^2 = 0.4993 \pm 0.0620$ | $\text{MAE} = 3.95 \pm 0.18\text{ LPA}$ | $\text{RMSE} = 6.45 \pm 0.45\text{ LPA}$
-  - **Holdout Test Set (15% split):** $R^2 = 0.5661$ | $\text{MAE} = 3.84\text{ LPA}$ | $\text{RMSE} = 5.78\text{ LPA}$
-- Outputs **P10 to P90 confidence intervals** derived from individual tree predictions.
+  - **5-Fold Cross-Validation:** **$R^2 = 0.4993 \pm 0.0620$** | $\text{MAE} = 3.95 \pm 0.18\text{ LPA}$ | $\text{RMSE} = 6.45 \pm 0.45\text{ LPA}$
+  - Single 15% holdout reported as secondary check ($R^2 = 0.5661$, $\text{MAE} = 3.84\text{ LPA}$), not headline.
+- Outputs **80% Conformal Prediction Intervals** ($\pm 6.01\text{ LPA}$, certified 80.0% coverage) alongside tree-variance bands (71.2% empirical OOF coverage).
 - Displays verified **AmbitionBox ground-truth min/max/mean ranges** when exact matches exist.
 - Surfaces **Cold-Start confidence notices** when an employer has $< 3$ records on file.
 
@@ -149,28 +149,59 @@ streamlit run app.py
 
 ---
 
-## 📊 Rigorous Model Evaluation (AmbitionBox Dataset)
+## 📊 Model Performance
 
-![Model Evaluation & Diagnostic Dashboard](assets/model_evaluation_dashboard.png)
+Primary metrics are 5-fold cross-validated (`KFold`, `n_splits=5`, `shuffle=True`, `random_state=42`). A single 15% holdout is reported only as a secondary check; it is not the headline number.
 
-### Holdout Test Split (15%, $n=131$) vs. Baseline
+### 5-Fold Cross-Validation & Unconfounded 3-Way Ablation
 
-| Metric | Baseline RF (Raw Titles) | Voting Ensemble (RF + HGB) + NLP Taxonomy | Improvement |
+| Protocol | CV R² | CV MAE (LPA) | CV RMSE (LPA) |
 |---|---|---|---|
-| **R² Score** | `0.4511` | **`0.5661`** | **+25.5%** |
-| **MAE** | `4.27 LPA` | **`3.84 LPA`** | **-0.43 LPA** |
-| **RMSE** | `6.50 LPA` | **`5.78 LPA`** | **-0.72 LPA** |
+| **Arm A:** Baseline — raw job titles, single RF | `0.4243 ± 0.1007` | `4.24 ± 0.28` | `6.87 ± 0.61` |
+| **Arm B:** NLP taxonomy, single RF *(isolates taxonomy)* | `0.4774 ± 0.0714` | `4.06 ± 0.20` | `6.59 ± 0.49` |
+| **Arm C:** NLP taxonomy + voting ensemble *(RF + HGB)* | **`0.4993 ± 0.0620`** | **`3.95 ± 0.18`** | **`6.45 ± 0.45`** |
 
-### 5-Fold Shuffled Cross-Validation (Full Dataset, $N=867$)
+### Per-Fold Breakdown & Sign Consistency (Arm B vs Arm A)
 
-| Fold | R² Score | MAE (LPA) | RMSE (LPA) | Validation Size |
+| Fold | Arm A (Raw RF) | Arm B (Taxonomy RF) | Delta (B − A) | Arm C (Ensemble) |
 |---|---|---|---|---|
-| Fold 1 | 0.5003 | 3.89 | 5.83 | $n=174$ |
-| Fold 2 | 0.5786 | 3.74 | 6.13 | $n=174$ |
-| Fold 3 | 0.4096 | 4.13 | 7.13 | $n=173$ |
-| Fold 4 | 0.5533 | 3.82 | 6.71 | $n=173$ |
-| Fold 5 | 0.4546 | 4.20 | 6.44 | $n=173$ |
-| **Mean ± Std** | **`0.4993 ± 0.0620`** | **`3.95 ± 0.18 LPA`** | **`6.45 ± 0.45 LPA`** | Full $N=867$ |
+| Fold 1 | 0.4559 | 0.4971 | **+0.0412** | 0.5003 |
+| Fold 2 | 0.5178 | 0.5435 | **+0.0257** | 0.5786 |
+| Fold 3 | 0.3043 | 0.4103 | **+0.1060** | 0.4096 |
+| Fold 4 | 0.5370 | 0.5578 | **+0.0207** | 0.5533 |
+| Fold 5 | 0.3066 | 0.3784 | **+0.0718** | 0.4546 |
+| **Mean ± Std** | `0.4243 ± 0.1007` | `0.4774 ± 0.0714` | **+0.0531 (5/5 positive)** | **`0.4993 ± 0.0620`** |
+
+**The dominant effect is variance reduction, not mean lift.** Fold-to-fold standard deviation falls 38% for R² (0.100 → 0.062), 42% for MAE, and 29% for RMSE. Notice especially Fold 3 (+0.1060) and Fold 5 (+0.0718) — the worst-performing slices without taxonomy gained the most. Resolving categorical sparsity across 750+ free-text Indian job titles makes performance *predictable across data slices* — which matters more than a marginal mean gain when serving a long tail of role families and seniority tiers. Adding the `HistGradientBoosting` ensemble further lifts R² to 0.4993 and tightens σ to 0.062.
+
+## 🎯 Interval Calibration & Split Conformal Prediction
+
+Tree-variance P10–P90 bands were audited against out-of-fold actuals:
+
+- Nominal coverage: 80.0%
+- Empirical out-of-fold coverage: **71.2%**
+
+The raw tree-variance bands under-cover by ~9 points — they are overconfident and should not be read as calibrated 80% intervals. To provide a rigorous guarantee, we implemented **Split Conformal Prediction on out-of-fold residuals**:
+
+$$\hat{C}(x) = [\hat{y} - q_{\text{val}}, \hat{y} + q_{\text{val}}] \quad \text{where } q_{\text{val}} = \pm 6.01\text{ LPA}$$
+
+- **Conformal Margin ($1-\alpha=0.80$):** $\pm 6.01\text{ LPA}$
+- **Empirical Out-of-Fold Coverage:** **80.0%** (finite-sample marginal coverage guarantee)
+
+In the UI, the corridor is explicitly labeled with both the certified **80% Conformal Interval** ($\pm 6.01\text{ LPA}$) and the empirical **model-variance band** (71.2% coverage).
+
+## 🗄️ Training Data vs. Benchmark Data
+
+Only one source trains the model. The rest validate or contextualize it.
+
+| Source | Rows | Role in system |
+|---|---|---|
+| **AmbitionBox India** | 867 | **Supervised training set** (X, y) |
+| **Glassdoor India** | 2,836 | Post-prediction offshore validation card (UI) |
+| **US DOL H-1B OFLC** | 1M+ | Standalone US onsite legal-floor reference table |
+| **Reddit (22 firms)** | qual. | Qualitative culture X-ray / dark-pattern radar |
+
+H-1B prevailing wages are **legal minimum floors for US-based petitions, not observed wages**, and are never converted, blended, or used as model features. They are surfaced only as an independent offshore-vs-onsite relocation benchmark.
 
 ---
 

@@ -65,6 +65,7 @@ def test_metadata_structure(model_metadata):
         "cv_r2_mean",
         "cv_mae_mean",
         "cv_rmse_mean",
+        "conformal_margin_80_lpa",
     ]
     for key in expected_keys:
         assert key in model_metadata, f"Missing key '{key}' in model_metadata.pkl"
@@ -72,6 +73,7 @@ def test_metadata_structure(model_metadata):
     assert len(model_metadata["companies"]) >= 100, "Expected at least 100 companies"
     assert 0.35 <= model_metadata["cv_r2_mean"] <= 0.70, "CV R2 score outside realistic range"
     assert 2.0 <= model_metadata["cv_mae_mean"] <= 6.0, "CV MAE outside realistic range"
+    assert 4.0 <= model_metadata["conformal_margin_80_lpa"] <= 10.0, "Conformal margin outside expected range"
 
 
 def test_model_prediction(model_pipeline):
