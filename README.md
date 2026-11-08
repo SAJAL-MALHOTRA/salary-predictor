@@ -95,6 +95,8 @@ streamlit run app.py
 
 ## 📊 Rigorous Model Evaluation (AmbitionBox Dataset)
 
+![Model Evaluation & Diagnostic Dashboard](assets/model_evaluation_dashboard.png)
+
 ### Holdout Test Split (15%, $n=131$) vs. Baseline
 
 | Metric | Baseline RF (Raw Titles) | Voting Ensemble (RF + HGB) + NLP Taxonomy | Improvement |

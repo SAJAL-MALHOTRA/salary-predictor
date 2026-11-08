@@ -18,6 +18,8 @@ Rather than relying on uncalibrated single-point estimates or black-box predicti
 4. Granular segment-level error analysis demonstrating exactly where and why the model succeeds or struggles.
 5. Statistically sound cold-start handling for low-sample employers.
 
+![Model Evaluation & Diagnostic Dashboard](assets/model_evaluation_dashboard.png)
+
 ---
 
 ## 2. Dataset Composition & Exploratory Statistics
@@ -76,6 +78,12 @@ CV Summary:      R² = 0.4993 ± 0.0620  |  MAE = 3.95 ± 0.18 LPA  |  RMSE = 6.
 - The mean cross-validation MAE is **₹3.95 Lakhs**, with an exceptionally narrow fold-to-fold standard deviation of **$\pm 0.18\text{ LPA}$**.
 - Fold 3 exhibited lower $R^2$ (0.4096) due to the presence of an extreme compensation outlier in the validation split (₹59.2 LPA principal architect role), illustrating why RMSE is sensitive to tail variance.
 
+<p align="center">
+  <img src="assets/calibration_plot.png" width="48%" alt="Calibration Plot" />
+  <img src="assets/residual_distribution.png" width="48%" alt="Residual Distribution" />
+</p>
+<p align="center"><em>Figure 1: (Left) Actual vs. Predicted Out-of-Fold Calibration with ±20% tolerance corridor. (Right) Gaussian-centered residual distribution demonstrating zero bias.</em></p>
+
 ---
 
 ## 5. Log-Transformation Target Experiment
@@ -128,6 +136,9 @@ While log-transformation sharply improves accuracy for junior and mid-level role
 | **Executive / Director** | 22 | 13.2 | **7.62 LPA** |
 
 *Takeaway:* Model error scales almost monotonically with seniority. Entry/Junior roles exhibit tight compensation standardization ($\text{MAE} \approx 2.1\text{ LPA}$), while Director/Executive roles diverge widely due to non-standard negotiation leverage and performance bonuses.
+
+![Segment Error Analysis](assets/segment_error_analysis.png)
+*Figure 2: Segment-level Mean Absolute Error (MAE) across 15 Canonical Role Families (left) and 5 Seniority Levels (right).*
 
 ---
 
