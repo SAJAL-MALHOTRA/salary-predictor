@@ -1,0 +1,186 @@
+{
+  "holdout_metrics": {
+    "test_size": 0.15,
+    "n_test": 131,
+    "r2": 0.5661,
+    "mae_lpa": 3.84,
+    "rmse_lpa": 5.78
+  },
+  "cv_metrics": {
+    "n_folds": 5,
+    "r2_per_fold": [
+      0.5003,
+      0.5786,
+      0.4096,
+      0.5533,
+      0.4546
+    ],
+    "mae_per_fold": [
+      3.89,
+      3.74,
+      4.13,
+      3.82,
+      4.2
+    ],
+    "rmse_per_fold": [
+      5.83,
+      6.13,
+      7.13,
+      6.71,
+      6.44
+    ],
+    "r2_mean_std": "0.4993 +/- 0.0620",
+    "mae_mean_std": "3.95 +/- 0.18 LPA",
+    "rmse_mean_std": "6.45 +/- 0.45 LPA"
+  },
+  "segment_analysis": {
+    "role_family": {
+      "Product & Project Management": {
+        "count": 17,
+        "mae_lpa": 11.09,
+        "median_salary": 18.6
+      },
+      "Human Resources": {
+        "count": 10,
+        "mae_lpa": 7.23,
+        "median_salary": 5.9
+      },
+      "Frontend & Mobile Engineering": {
+        "count": 7,
+        "mae_lpa": 6.97,
+        "median_salary": 16.0
+      },
+      "Data Science & AI": {
+        "count": 13,
+        "mae_lpa": 6.55,
+        "median_salary": 22.8
+      },
+      "Operations & Supply Chain": {
+        "count": 26,
+        "mae_lpa": 6.34,
+        "median_salary": 6.2
+      },
+      "Cloud, DevOps & Cybersecurity": {
+        "count": 39,
+        "mae_lpa": 6.13,
+        "median_salary": 12.5
+      },
+      "Finance, Banking & Accounting": {
+        "count": 54,
+        "mae_lpa": 5.12,
+        "median_salary": 6.0
+      },
+      "Software & Systems Engineering": {
+        "count": 124,
+        "mae_lpa": 4.95,
+        "median_salary": 8.6
+      },
+      "Data & Analytics": {
+        "count": 37,
+        "mae_lpa": 4.76,
+        "median_salary": 13.0
+      },
+      "Enterprise Solutions & Consulting (SAP/ERP)": {
+        "count": 42,
+        "mae_lpa": 4.31,
+        "median_salary": 15.9
+      },
+      "QA & Quality Engineering": {
+        "count": 39,
+        "mae_lpa": 3.93,
+        "median_salary": 7.2
+      },
+      "General Corporate & Services": {
+        "count": 218,
+        "mae_lpa": 3.39,
+        "median_salary": 5.4
+      },
+      "Sales, BD & Client Relations": {
+        "count": 163,
+        "mae_lpa": 2.35,
+        "median_salary": 4.6
+      },
+      "Marketing & Communications": {
+        "count": 8,
+        "mae_lpa": 2.26,
+        "median_salary": 5.6
+      },
+      "Customer Support & BPO Operations": {
+        "count": 70,
+        "mae_lpa": 1.27,
+        "median_salary": 3.4
+      }
+    },
+    "seniority_level": {
+      "Executive / Director": {
+        "count": 22,
+        "mae_lpa": 7.62,
+        "median_salary": 13.2
+      },
+      "Senior / Lead": {
+        "count": 143,
+        "mae_lpa": 5.92,
+        "median_salary": 13.7
+      },
+      "Manager / Lead": {
+        "count": 198,
+        "mae_lpa": 4.58,
+        "median_salary": 8.6
+      },
+      "Mid-Level": {
+        "count": 491,
+        "mae_lpa": 3.02,
+        "median_salary": 5.3
+      },
+      "Entry / Junior": {
+        "count": 13,
+        "mae_lpa": 2.12,
+        "median_salary": 3.1
+      }
+    },
+    "salary_bracket": {
+      "0-5 LPA": {
+        "count": 325,
+        "mae_lpa": 1.71
+      },
+      "5-10 LPA": {
+        "count": 248,
+        "mae_lpa": 2.93
+      },
+      "10-15 LPA": {
+        "count": 121,
+        "mae_lpa": 4.38
+      },
+      "15-25 LPA": {
+        "count": 107,
+        "mae_lpa": 6.02
+      },
+      "25+ LPA": {
+        "count": 66,
+        "mae_lpa": 14.78
+      }
+    },
+    "cold_start": {
+      "sparse_companies_count": 7,
+      "total_companies": 118,
+      "sparse_pct": 5.9
+    }
+  },
+  "dataset_stats": {
+    "n_records": 867,
+    "n_companies": 118,
+    "n_job_titles": 758,
+    "n_role_families": 15,
+    "salary_skewness": 1.954,
+    "salary_min": 0.5,
+    "salary_max": 59.2,
+    "salary_median": 6.7
+  },
+  "model_config": {
+    "rf_n_estimators": 150,
+    "rf_max_depth": 22,
+    "hgb_max_iter": 200,
+    "hgb_max_leaf_nodes": 31,
+    "log_target": false
+  }
+}

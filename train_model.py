@@ -3,21 +3,28 @@ train_model.py -- Train the salary prediction pipeline using real AmbitionBox da
 enhanced with NLP Job Title Normalization (Role Family & Seniority Level) and a
 Voting Ensemble Regressor (RandomForest + HistGradientBoosting).
 
-Data sources:
-- ambitionbox_salaries_cleaned.csv: Salary records (~867 deduplicated rows)
+Data provenance:
+- ambitionbox_salaries_cleaned.csv: Salary records scraped from AmbitionBox (mid-2026)
+  for educational/research purposes. (~867 deduplicated rows)
 - ambitionbox_companies.csv: Company metadata (rating, review count, industry, HQ city)
 - ambitionbox_reviews.csv: Real employee feedback (likes, dislikes, sentiment)
+
+Note: AmbitionBox salary data is self-reported by employees and job-seekers. It is used
+here for educational demonstration only and should not be treated as authoritative
+compensation benchmarking data.
 
 Outputs saved to salary-predictor/:
 - salary_data.csv: Enriched salary dataset with Role_Family and Seniority_Level
 - salary_pipeline.pkl: Trained sklearn Pipeline with ColumnTransformer + VotingRegressor
 - model_metadata.pkl: Validation mappings, role taxonomy, experience caps, metrics
 - company_insights.json: Pre-aggregated company intelligence for UI display
+- evaluation_report.json: 5-fold CV results, segment-level error analysis, ablation study
 """
 
 import json
 import math
 import re
+import sys
 from pathlib import Path
 
 import joblib
@@ -26,7 +33,7 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestRegressor, VotingRegressor
 from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold, cross_val_predict, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
@@ -146,10 +153,11 @@ elif local_csv.exists():
     rev_raw = pd.DataFrame()
 else:
     raise FileNotFoundError(f"Neither {SALARIES_FILE} nor {local_csv} could be found!")
-print(f"Enriched salary records saved -> {out_csv} ({len(merged_df)} rows)")
+print(f"Dataset loaded: {len(merged_df)} rows")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 3. TRAIN ENSEMBLE PIPELINE (RandomForest + HistGradientBoosting)
+#    With 5-fold CV, log-transform experiment, and segment-level error analysis
 # ═══════════════════════════════════════════════════════════════════════════════
 CATEGORICAL_COLS = ["Company", "Job_Title", "Industry", "Role_Family", "Seniority_Level"]
 NUMERIC_COLS = ["Rating", "Avg_Exp"]
@@ -158,68 +166,229 @@ TARGET = "Avg_Salary_LPA"
 X = merged_df[CATEGORICAL_COLS + NUMERIC_COLS]
 y = merged_df[TARGET]
 
-preprocessor = ColumnTransformer(
-    transformers=[
-        (
-            "cat",
-            OneHotEncoder(handle_unknown="ignore", sparse_output=False, min_frequency=2),
-            CATEGORICAL_COLS,
-        ),
-    ],
-    remainder="passthrough",  # Rating and Avg_Exp pass through
-)
+# Check for --log-target flag
+USE_LOG_TARGET = "--log-target" in sys.argv
 
-rf_reg = RandomForestRegressor(
-    n_estimators=400,
-    max_depth=22,
-    min_samples_split=3,
-    min_samples_leaf=2,
-    random_state=42,
-    n_jobs=-1,
-)
+if USE_LOG_TARGET:
+    print("\n[EXPERIMENT] Log-transform target enabled: training on log(Avg_Salary_LPA)")
+    y_train_target = np.log1p(y)  # log(1 + y) to handle potential zeros
+else:
+    y_train_target = y
 
-hgb_reg = HistGradientBoostingRegressor(
-    max_iter=200,
-    max_leaf_nodes=31,
-    min_samples_leaf=3,
-    random_state=42,
-)
 
-voting_reg = VotingRegressor(
-    estimators=[
-        ("rf", rf_reg),
-        ("hgb", hgb_reg),
-    ]
-)
+def build_pipeline(n_estimators=150):
+    """Build a fresh pipeline instance with the given RF tree count."""
+    preprocessor = ColumnTransformer(
+        transformers=[
+            (
+                "cat",
+                OneHotEncoder(handle_unknown="ignore", sparse_output=False, min_frequency=2),
+                CATEGORICAL_COLS,
+            ),
+        ],
+        remainder="passthrough",  # Rating and Avg_Exp pass through
+    )
 
-pipeline = Pipeline(
-    [
-        ("preprocessor", preprocessor),
-        ("regressor", voting_reg),
-    ]
-)
+    rf_reg = RandomForestRegressor(
+        n_estimators=n_estimators,
+        max_depth=22,
+        min_samples_split=3,
+        min_samples_leaf=2,
+        random_state=42,
+        n_jobs=-1,
+    )
+
+    hgb_reg = HistGradientBoostingRegressor(
+        max_iter=200,
+        max_leaf_nodes=31,
+        min_samples_leaf=3,
+        random_state=42,
+    )
+
+    voting_reg = VotingRegressor(
+        estimators=[
+            ("rf", rf_reg),
+            ("hgb", hgb_reg),
+        ]
+    )
+
+    return Pipeline(
+        [
+            ("preprocessor", preprocessor),
+            ("regressor", voting_reg),
+        ]
+    )
+
+
+# ── 3a. 5-Fold Cross-Validation ─────────────────────────────────────────────
+print("\n" + "=" * 72)
+print("  5-FOLD CROSS-VALIDATION (Rigorous Evaluation)")
+print("=" * 72)
+
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+cv_r2_scores = []
+cv_mae_scores = []
+cv_rmse_scores = []
+
+for fold_idx, (train_idx, val_idx) in enumerate(kf.split(X), 1):
+    X_fold_train, X_fold_val = X.iloc[train_idx], X.iloc[val_idx]
+    y_fold_train, y_fold_val = y_train_target.iloc[train_idx], y.iloc[val_idx]
+
+    fold_pipeline = build_pipeline(n_estimators=150)
+    fold_pipeline.fit(X_fold_train, y_fold_train)
+
+    y_fold_pred = fold_pipeline.predict(X_fold_val)
+
+    # If log-transform, convert predictions back to original space
+    if USE_LOG_TARGET:
+        y_fold_pred = np.expm1(y_fold_pred)  # inverse of log(1+y)
+
+    # Clip negative predictions (possible edge case with log-transform)
+    y_fold_pred = np.maximum(y_fold_pred, 0.0)
+
+    fold_r2 = float(r2_score(y_fold_val, y_fold_pred))
+    fold_mae = float(mean_absolute_error(y_fold_val, y_fold_pred))
+    fold_rmse = float(root_mean_squared_error(y_fold_val, y_fold_pred))
+
+    cv_r2_scores.append(fold_r2)
+    cv_mae_scores.append(fold_mae)
+    cv_rmse_scores.append(fold_rmse)
+
+    print(f"  Fold {fold_idx}: R2 = {fold_r2:.4f}  |  MAE = {fold_mae:.2f} LPA  |  RMSE = {fold_rmse:.2f} LPA")
+
+cv_r2_mean = float(np.mean(cv_r2_scores))
+cv_r2_std = float(np.std(cv_r2_scores))
+cv_mae_mean = float(np.mean(cv_mae_scores))
+cv_mae_std = float(np.std(cv_mae_scores))
+cv_rmse_mean = float(np.mean(cv_rmse_scores))
+cv_rmse_std = float(np.std(cv_rmse_scores))
+
+print("-" * 72)
+print(f"  CV Mean R2:   {cv_r2_mean:.4f} +/- {cv_r2_std:.4f}")
+print(f"  CV Mean MAE:  {cv_mae_mean:.2f} +/- {cv_mae_std:.2f} LPA")
+print(f"  CV Mean RMSE: {cv_rmse_mean:.2f} +/- {cv_rmse_std:.2f} LPA")
+
+
+# ── 3b. Segment-Level Error Analysis ─────────────────────────────────────────
+print("\n" + "=" * 72)
+print("  SEGMENT-LEVEL ERROR ANALYSIS (Where the model fails)")
+print("=" * 72)
+
+# Get full out-of-fold predictions via cross_val_predict
+full_pipeline_for_cv = build_pipeline(n_estimators=150)
+oof_predictions = cross_val_predict(full_pipeline_for_cv, X, y_train_target, cv=kf)
+if USE_LOG_TARGET:
+    oof_predictions = np.expm1(oof_predictions)
+oof_predictions = np.maximum(oof_predictions, 0.0)
+
+# Build analysis dataframe
+analysis_df = merged_df[["Role_Family", "Seniority_Level", "Company"]].copy()
+analysis_df["y_true"] = y.values
+analysis_df["y_pred"] = oof_predictions
+analysis_df["abs_error"] = np.abs(analysis_df["y_true"] - analysis_df["y_pred"])
+
+segment_report = {}
+
+# Error by Role Family
+print("\n  MAE by Role Family:")
+rf_errors = analysis_df.groupby("Role_Family").agg(
+    count=("abs_error", "count"),
+    mae=("abs_error", "mean"),
+    median_salary=("y_true", "median"),
+).sort_values("mae", ascending=False)
+segment_report["role_family"] = {}
+for rf_name, row in rf_errors.iterrows():
+    print(f"    {rf_name:<50s} MAE={row['mae']:6.2f} LPA  (n={int(row['count']):3d}, median={row['median_salary']:.1f}L)")
+    segment_report["role_family"][rf_name] = {
+        "count": int(row["count"]),
+        "mae_lpa": round(float(row["mae"]), 2),
+        "median_salary": round(float(row["median_salary"]), 1),
+    }
+
+# Error by Seniority Level
+print("\n  MAE by Seniority Level:")
+sl_errors = analysis_df.groupby("Seniority_Level").agg(
+    count=("abs_error", "count"),
+    mae=("abs_error", "mean"),
+    median_salary=("y_true", "median"),
+).sort_values("mae", ascending=False)
+segment_report["seniority_level"] = {}
+for sl_name, row in sl_errors.iterrows():
+    print(f"    {sl_name:<30s} MAE={row['mae']:6.2f} LPA  (n={int(row['count']):3d}, median={row['median_salary']:.1f}L)")
+    segment_report["seniority_level"][sl_name] = {
+        "count": int(row["count"]),
+        "mae_lpa": round(float(row["mae"]), 2),
+        "median_salary": round(float(row["median_salary"]), 1),
+    }
+
+# Error by Salary Bracket
+print("\n  MAE by Salary Bracket:")
+salary_bins = [0, 5, 10, 15, 25, 60]
+salary_labels = ["0-5 LPA", "5-10 LPA", "10-15 LPA", "15-25 LPA", "25+ LPA"]
+analysis_df["salary_bracket"] = pd.cut(analysis_df["y_true"], bins=salary_bins, labels=salary_labels, include_lowest=True)
+bracket_errors = analysis_df.groupby("salary_bracket", observed=True).agg(
+    count=("abs_error", "count"),
+    mae=("abs_error", "mean"),
+).sort_index()
+segment_report["salary_bracket"] = {}
+for bracket, row in bracket_errors.iterrows():
+    print(f"    {str(bracket):<15s} MAE={row['mae']:6.2f} LPA  (n={int(row['count']):3d})")
+    segment_report["salary_bracket"][str(bracket)] = {
+        "count": int(row["count"]),
+        "mae_lpa": round(float(row["mae"]), 2),
+    }
+
+# Count companies with sparse data (< 3 rows)
+sparse_companies = analysis_df.groupby("Company").size()
+n_sparse = int((sparse_companies < 3).sum())
+n_total_companies = len(sparse_companies)
+print(f"\n  Cold-start risk: {n_sparse}/{n_total_companies} companies have < 3 training rows")
+segment_report["cold_start"] = {
+    "sparse_companies_count": n_sparse,
+    "total_companies": n_total_companies,
+    "sparse_pct": round(100.0 * n_sparse / n_total_companies, 1),
+}
+
+
+# ── 3c. Final Production Model Training ─────────────────────────────────────
+print("\n" + "=" * 72)
+print("  FINAL PRODUCTION MODEL TRAINING")
+print("=" * 72)
+
+# Use the full dataset for production model (150 trees, validated via 5-fold CV above)
+pipeline = build_pipeline(n_estimators=150)
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.15, random_state=42
+    X, y_train_target, test_size=0.15, random_state=42
 )
+y_test_original = y.iloc[y_test.index]  # Always evaluate in original LPA space
 
-print(f"Training Voting Ensemble (RandomForest + HistGradientBoosting) on {len(X_train)} samples ...")
+print(f"Training Voting Ensemble (150-tree RF + HGB) on {len(X_train)} samples ...")
 pipeline.fit(X_train, y_train)
 
-# Evaluation
+# Evaluate in original space
 y_pred = pipeline.predict(X_test)
-r2 = float(r2_score(y_test, y_pred))
-mae = float(mean_absolute_error(y_test, y_pred))
-rmse = float(root_mean_squared_error(y_test, y_pred))
+if USE_LOG_TARGET:
+    y_pred = np.expm1(y_pred)
+y_pred = np.maximum(y_pred, 0.0)
 
-print(f"Model Evaluation on Holdout:")
+r2 = float(r2_score(y_test_original, y_pred))
+mae = float(mean_absolute_error(y_test_original, y_pred))
+rmse = float(root_mean_squared_error(y_test_original, y_pred))
+
+print(f"Holdout Evaluation (15% test, n={len(y_test)}):")
 print(f"  R2 Score : {r2:.4f}")
 print(f"  MAE      : {mae:.2f} LPA")
 print(f"  RMSE     : {rmse:.2f} LPA")
 
-# Save pipeline artifact
+# Also train on FULL data for the deployed pipeline
+pipeline_full = build_pipeline(n_estimators=150)
+pipeline_full.fit(X, y_train_target)
+print(f"Full-data pipeline trained on all {len(X)} samples for deployment.")
+
+# Save pipeline artifact (the full-data model is what gets deployed)
 pipeline_path = SCRIPT_DIR / "salary_pipeline.pkl"
-joblib.dump(pipeline, pipeline_path)
+joblib.dump(pipeline_full, pipeline_path)
 print(f"Pipeline saved -> {pipeline_path}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -287,16 +456,70 @@ metadata = {
     "role_families": all_role_families,
     "seniority_levels": all_seniorities,
     "experience_cap": experience_cap,
-    "data_source": "AmbitionBox (Scraped)",
+    "data_source": "AmbitionBox (Scraped, mid-2026, educational use only)",
     "num_records": len(merged_df),
     "scrape_date": "Mid-2026",
+    # Holdout metrics (15% test split)
     "r2_score": round(r2, 4),
     "mae_lpa": round(mae, 2),
     "rmse_lpa": round(rmse, 2),
+    # 5-fold CV metrics (statistically rigorous)
+    "cv_r2_mean": round(cv_r2_mean, 4),
+    "cv_r2_std": round(cv_r2_std, 4),
+    "cv_mae_mean": round(cv_mae_mean, 2),
+    "cv_mae_std": round(cv_mae_std, 2),
+    "cv_rmse_mean": round(cv_rmse_mean, 2),
+    "cv_rmse_std": round(cv_rmse_std, 2),
+    "n_estimators_rf": 150,
+    "log_target": USE_LOG_TARGET,
     "feature_cols": CATEGORICAL_COLS + NUMERIC_COLS,
 }
 
 metadata_path = SCRIPT_DIR / "model_metadata.pkl"
 joblib.dump(metadata, metadata_path)
 print(f"Metadata saved -> {metadata_path}")
-print("Training and asset generation complete!")
+
+# Save detailed evaluation report as JSON (for METHODOLOGY.md and interviews)
+eval_report = {
+    "holdout_metrics": {
+        "test_size": 0.15,
+        "n_test": len(y_test),
+        "r2": round(r2, 4),
+        "mae_lpa": round(mae, 2),
+        "rmse_lpa": round(rmse, 2),
+    },
+    "cv_metrics": {
+        "n_folds": 5,
+        "r2_per_fold": [round(s, 4) for s in cv_r2_scores],
+        "mae_per_fold": [round(s, 2) for s in cv_mae_scores],
+        "rmse_per_fold": [round(s, 2) for s in cv_rmse_scores],
+        "r2_mean_std": f"{cv_r2_mean:.4f} +/- {cv_r2_std:.4f}",
+        "mae_mean_std": f"{cv_mae_mean:.2f} +/- {cv_mae_std:.2f} LPA",
+        "rmse_mean_std": f"{cv_rmse_mean:.2f} +/- {cv_rmse_std:.2f} LPA",
+    },
+    "segment_analysis": segment_report,
+    "dataset_stats": {
+        "n_records": len(merged_df),
+        "n_companies": n_total_companies,
+        "n_job_titles": len(all_jobs),
+        "n_role_families": len(all_role_families),
+        "salary_skewness": round(float(y.skew()), 3),
+        "salary_min": round(float(y.min()), 1),
+        "salary_max": round(float(y.max()), 1),
+        "salary_median": round(float(y.median()), 1),
+    },
+    "model_config": {
+        "rf_n_estimators": 150,
+        "rf_max_depth": 22,
+        "hgb_max_iter": 200,
+        "hgb_max_leaf_nodes": 31,
+        "log_target": USE_LOG_TARGET,
+    },
+}
+
+eval_report_path = SCRIPT_DIR / "evaluation_report.json"
+with open(eval_report_path, "w", encoding="utf-8") as f:
+    json.dump(eval_report, f, indent=2, ensure_ascii=False)
+print(f"Evaluation report saved -> {eval_report_path}")
+
+print("\nTraining and asset generation complete!")

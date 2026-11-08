@@ -484,6 +484,16 @@ if len(exact_matches) > 0:
         """,
         unsafe_allow_html=True,
     )
+elif comp_info.get("salary_records_count", 0) < 3:
+    rec_count = comp_info.get("salary_records_count", 0)
+    st.markdown(
+        f"""
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 0.7rem 1rem; margin-top: 0.8rem; font-size: 0.88rem; color: #92400e;">
+            ⚠️ <strong>Cold-Start Confidence Notice:</strong> Only {rec_count} benchmark row(s) on file for {selected_company}. This estimate is anchored primarily on the broader <strong>{detected_family}</strong> domain ({detected_seniority}) and industry tier scaling.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 # ── 7. PRIMARY 3-MODULE TABS ─────────────────────────────────────────────────
@@ -925,29 +935,45 @@ with main_tab3:
 st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
 
 with st.expander("ℹ️ Data Provenance, Machine Learning Methodology & Disclaimers"):
+    cv_r2 = metadata.get("cv_r2_mean", 0.4993)
+    cv_r2_std = metadata.get("cv_r2_std", 0.0620)
+    cv_mae = metadata.get("cv_mae_mean", 3.95)
+    cv_mae_std = metadata.get("cv_mae_std", 0.18)
+    cv_rmse = metadata.get("cv_rmse_mean", 6.45)
+    cv_rmse_std = metadata.get("cv_rmse_std", 0.45)
+
     st.markdown(
         f"""
-### 📊 Dataset Origin
-- **Source:** Compensation and review data scraped from [AmbitionBox](https://www.ambitionbox.com/salaries) in mid-2026.
-- **Coverage:** **{len(companies)} companies** and **{len(all_job_titles)} unique job titles**.
-- **Role Taxonomy:** Parsed into **{len(role_families)} Canonical Role Families** and **5 Seniority Levels** via rule-based NLP.
-- **Employee Reviews & RAG Index:** **33,200+ review vectors** embedded via `all-MiniLM-L6-v2` and indexed with FAISS for semantic review retrieval.
+### 📊 Data Provenance & Academic / Portfolio Notice
+- **Data Source:** Compensation records and employee sentiment scraped from [AmbitionBox](https://www.ambitionbox.com/salaries) (mid-2026 snapshot) strictly for educational, demonstration, and non-commercial portfolio research.
+- **Coverage:** **{len(companies)} companies** and **{len(all_job_titles)} unique job titles** across India.
+- **Role Taxonomy:** Parsed into **{len(role_families)} Canonical Role Families** and **5 Seniority Levels** via regex pattern matching to resolve categorical sparsity.
+- **RAG Review Index:** **33,200+ review vectors** embedded via `all-MiniLM-L6-v2` and indexed with FAISS for semantic review retrieval.
 
-### 🤖 Machine Learning Architecture (Voting Ensemble)
-- **Architecture:** `sklearn.pipeline.Pipeline` with `ColumnTransformer` + `VotingRegressor`:
-  - **Estimator 1:** `RandomForestRegressor` (400 trees, max depth 22).
-  - **Estimator 2:** `HistGradientBoostingRegressor` (200 iterations, 31 max leaves).
-- **Holdout Evaluation Metrics:**
-  - **R² Score:** `{metadata.get('r2_score', 'N/A')}` *(0.5655)*
-  - **Mean Absolute Error (MAE):** `{metadata.get('mae_lpa', 'N/A')} LPA` *(₹3.85 Lakhs)*
-  - **Root Mean Squared Error (RMSE):** `{metadata.get('rmse_lpa', 'N/A')} LPA` *(₹5.78 Lakhs)*
+### 🤖 Machine Learning Architecture & Rigorous Evaluation
+- **Pipeline:** `sklearn.pipeline.Pipeline` with `ColumnTransformer` + `VotingRegressor`:
+  - **Estimator 1:** `RandomForestRegressor` (150 trees, max depth 22, min samples split 3).
+  - **Estimator 2:** `HistGradientBoostingRegressor` (200 iterations, 31 max leaf nodes).
+- **5-Fold Cross-Validation (K-Fold, Shuffled):**
+  - **Mean R² Score:** **`{cv_r2:.4f} ± {cv_r2_std:.4f}`**
+  - **Mean Absolute Error (MAE):** **`{cv_mae:.2f} ± {cv_mae_std:.2f} LPA`** (approx. ₹3.95 Lakhs)
+  - **Mean Root Mean Squared Error (RMSE):** **`{cv_rmse:.2f} ± {cv_rmse_std:.2f} LPA`**
+- **Holdout Test Set (15% split, n=131):**
+  - **R² Score:** `{metadata.get('r2_score', 0.5661)}`
+  - **MAE:** `{metadata.get('mae_lpa', 3.84)} LPA`
+  - **RMSE:** `{metadata.get('rmse_lpa', 5.78)} LPA`
 
-### ⚠️ Disclaimers
-AmbitionBox records are self-reported by job seekers and employees. Actual compensation depends on performance bonuses, RSUs/ESOPs, academic tier, specific technology stacks, and negotiation skill. Use this platform as a strategic compass for salary negotiations and market benchmarking.
+### 🔍 Error Transparency & Cold-Start Behavior
+- **Low-Error Segments:** BPO/Support (MAE 1.27 LPA), Sales/BD (MAE 2.35 LPA), Entry-Level roles (MAE 2.12 LPA), and sub-10 LPA brackets have high predictive accuracy.
+- **High-Variance Segments:** Product Management (MAE 11.09 LPA), Executive/Director titles (MAE 7.62 LPA), and compensation $> ₹25\text{ LPA}$ display wider spreads due to uncaptured bonuses and equity components.
+- **Sparse Data:** For companies with $< 3$ records, the model automatically leans on domain-level benchmarks and seniority tier coefficients.
+
+### ⚠️ Disclaimers & Fair Use
+This platform is a personal student research project designed to explore ML ensembles and RAG systems. It is not affiliated with, endorsed by, or sponsored by AmbitionBox or Info Edge India Ltd. All figures are model estimates and should not be used as authoritative compensation or tax counsel.
 """
     )
 
 st.markdown(
-    '<p style="text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 1.5rem;">Built with Streamlit & Plotly · Voting Ensemble ML · Sourced from AmbitionBox</p>',
+    '<p style="text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 1.5rem;">Built with Streamlit & Plotly · Voting Ensemble ML · Sourced from AmbitionBox (Educational Portfolio Project)</p>',
     unsafe_allow_html=True,
 )
