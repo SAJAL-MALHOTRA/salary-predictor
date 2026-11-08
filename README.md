@@ -1,8 +1,15 @@
-# 🇮🇳 India Salary & Career Intelligence Platform (with RAG AI & Voting Ensemble)
+# 🇮🇳 India Salary & Career Intelligence Platform
 
-A comprehensive Streamlit web platform for salary estimation, RAG-powered workplace culture analysis, company benchmarking, take-home pay calculations, and career progression modeling in India. Powered by real compensation and review data scraped from **[AmbitionBox](https://www.ambitionbox.com/salaries)** for educational portfolio research.
+[![CI Test Suite](https://github.com/SAJAL-MALHOTRA/salary-predictor/actions/workflows/ci.yml/badge.svg)](https://github.com/SAJAL-MALHOTRA/salary-predictor/actions/workflows/ci.yml)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io)
+![Python 3.11 | 3.12](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white)
+![Scikit-Learn](https://img.shields.io/badge/scikit--learn-Voting%20Ensemble-F7931E?logo=scikit-learn&logoColor=white)
+![FAISS Vector Index](https://img.shields.io/badge/FAISS-33k%20Vectors-0468FF?logo=meta&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-> 📖 **Deep Dive Technical Report:** Read the complete [Machine Learning Methodology, Cross-Validation & Ablation Report](METHODOLOGY.md) for 5-fold CV breakdowns, segment-level error analysis, and log-transform experiments.
+A production-grade compensation and career intelligence platform combining **Voting Ensemble Machine Learning (RF + HGB)**, **Retrieval-Augmented Generation (FAISS + Gemini/Extractive RAG)**, **NLP Role Taxonomy Normalization**, and **Multi-Source Cross-Validation (AmbitionBox + Kaggle Glassdoor India + US DOL OFLC H-1B Disclosures)**.
+
+> 📖 **Deep Dive Technical Report:** Read the complete [Machine Learning Methodology, Cross-Validation & Ablation Report](METHODOLOGY.md) for 5-fold CV breakdowns, segment-level error analysis, log-transform trade-offs, and cold-start shrinkage.
 
 ---
 
@@ -61,6 +68,14 @@ A comprehensive Streamlit web platform for salary estimation, RAG-powered workpl
 - Compares **Offshore India CTC** against **US Onsite H-1B Median Wages** with both Direct FX (USD to INR @ 86) and World Bank Purchasing Power Parity (PPP @ 23.5).
 - Displays federal prevailing wage tiers (Level I Entry to Level IV Leadership) pursuant to 20 CFR § 656.40.
 
+### 9. 📊 Multi-Source Kaggle Glassdoor India Cross-Validation
+- Ingested open research salary benchmarks from Kaggle's Glassdoor India repository (`ruchi798/software-industry-salary-dataset-2022`).
+- Matched **2,836 validated individual salary records across 73 target companies**, providing direct offshore triangulation against AmbitionBox figures.
+- Live comparison card in the platform displays:
+  - Total Glassdoor submission counts per company
+  - Empirical P10, P50 (median), and P90 benchmarks
+  - Real-time delta between ensemble predictions and Glassdoor medians.
+
 ---
 
 ## 🛠️ Quickstart & Setup
@@ -69,16 +84,20 @@ A comprehensive Streamlit web platform for salary estimation, RAG-powered workpl
 # 1. Clone repository and navigate inside
 cd salary-predictor
 
-# 2. Install pinned dependencies
+# 2. Install pinned dependencies (including CPU PyTorch & Pytest)
 pip install -r requirements.txt
 
-# 3. Train model pipeline & generate company intelligence assets
+# 3. Run automated verification test suite
+pytest tests/ -v
+
+# 4. (Optional) Re-train model pipeline & generate company intelligence assets
 python train_model.py
 
-# 4. (Optional) Ingest and update official US DOL H-1B LCA benchmarks
+# 5. (Optional) Refresh multi-source benchmarks (DOL H-1B & Glassdoor)
 python ingest_h1b_dol_data.py
+python ingest_glassdoor_data.py
 
-# 5. Launch the Streamlit web application
+# 6. Launch the Streamlit web application
 streamlit run app.py
 ```
 
@@ -86,15 +105,23 @@ streamlit run app.py
 
 ## 📁 Project Architecture
 
-| File | Description |
+| File / Directory | Description |
 |---|---|
-| `app.py` | Full multi-tab Streamlit dashboard with Plotly charts, RAG interface, tax calculators, and US H-1B benchmark module |
+| `app.py` | Multi-tab Streamlit intelligence platform with interactive Plotly visuals, RAG assistant, and tax calculators |
+| `taxonomy.py` | Single source of truth for NLP regex job categorization across 15 Role Families & 5 Seniority Levels |
 | `rag_assistant.py` | RAG module: lazy FAISS loading, review parsing, semantic search, and Gemini/extractive synthesis |
 | `faiss_index/` | Local vector index (`index.faiss` + `index.pkl`) storing 33,200+ review embeddings |
 | `train_model.py` | Ingests data, applies NLP role normalization, executes 5-fold CV, trains Voting Ensemble |
 | `ingest_h1b_dol_data.py` | Ingestion script pulling official US Department of Labor OFLC H-1B LCA public disclosure data |
 | `h1b_lca_benchmarks.json` | Pre-computed US DOL H-1B benchmarks for 50 employers (filings, median wage, wage levels) |
 | `h1b_summary.csv` | Summary table of top employers by certified H-1B filings and approval rates |
+| `ingest_glassdoor_data.py` | Ingestion & normalization script for Kaggle Glassdoor India compensation dataset |
+| `glassdoor_benchmarks.json` | Pre-computed Glassdoor benchmarks across 73 employers (sample counts, P10, P50, P90) |
+| `glassdoor_salaries_cleaned.csv` | Normalized Glassdoor records mapped to canonical company and role taxonomy |
+| `generate_evaluation_plots.py` | Publication-grade evaluation plotting script generating calibration & residual curves |
+| `assets/` | High-resolution evaluation charts (`model_evaluation_dashboard.png`, `calibration_plot.png`, etc.) |
+| `tests/test_platform.py` | Pytest verification suite covering inference, taxonomy, tax logic, and data schemas |
+| `.github/workflows/ci.yml` | GitHub Actions CI workflow executing pytest suite on push and pull requests |
 | `METHODOLOGY.md` | In-depth technical report: ablation study, 5-fold CV breakdown, segment error analysis, US DOL data integration |
 | `evaluation_report.json` | Programmatically exported cross-validation metrics, segment MAEs, and fold scores |
 | `salary_data.csv` | Cleaned, deduplicated salary dataset with company ratings, industry, role family, and seniority |

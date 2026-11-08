@@ -194,10 +194,17 @@ def load_assets():
     else:
         h1b_benchmarks = {}
 
-    return pipeline, metadata, df, company_insights, h1b_benchmarks
+    gd_file = _BASE / "glassdoor_benchmarks.json"
+    if gd_file.exists():
+        with open(gd_file, "r", encoding="utf-8") as f:
+            glassdoor_benchmarks = json.load(f)
+    else:
+        glassdoor_benchmarks = {}
+
+    return pipeline, metadata, df, company_insights, h1b_benchmarks, glassdoor_benchmarks
 
 
-pipeline, metadata, df, company_insights, h1b_benchmarks = load_assets()
+pipeline, metadata, df, company_insights, h1b_benchmarks, glassdoor_benchmarks = load_assets()
 
 companies = metadata["companies"]
 company_jobs = metadata["company_jobs"]
@@ -497,6 +504,19 @@ elif comp_info.get("salary_records_count", 0) < 3:
         f"""
         <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 0.7rem 1rem; margin-top: 0.8rem; font-size: 0.88rem; color: #92400e;">
             ⚠️ <strong>Cold-Start Confidence Notice:</strong> Only {rec_count} benchmark row(s) on file for {selected_company}. This estimate is anchored primarily on the broader <strong>{detected_family}</strong> domain ({detected_seniority}) and industry tier scaling.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+# Glassdoor India Multi-Source Cross-Validation
+gd_data = glassdoor_benchmarks.get(selected_company)
+if gd_data:
+    loc_str = ", ".join(gd_data["top_locations"]) if gd_data["top_locations"] else "India"
+    st.markdown(
+        f"""
+        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 0.6rem 1rem; margin-top: 0.45rem; font-size: 0.86rem; color: #334155;">
+            🌐 <strong>Glassdoor India Benchmark:</strong> <strong>{gd_data['sample_count']}</strong> verified salary reports on file. Median: <strong>₹ {gd_data['median_salary_lpa']} LPA</strong> (reported range: ₹ {gd_data['min_salary_lpa']} - {gd_data['max_salary_lpa']} LPA) across <em>{loc_str}</em>.
         </div>
         """,
         unsafe_allow_html=True,

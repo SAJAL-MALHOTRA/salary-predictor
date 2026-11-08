@@ -1,0 +1,1252 @@
+{
+  "AU Small Finance Bank": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 1,
+    "median_salary_lpa": 14.0,
+    "mean_salary_lpa": 14.0,
+    "min_salary_lpa": 14.0,
+    "max_salary_lpa": 14.0,
+    "top_locations": [
+      "Jaipur"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)"
+    ]
+  },
+  "Accenture": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 151,
+    "median_salary_lpa": 5.0,
+    "mean_salary_lpa": 6.2,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 32.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Senior Software Development Engineer",
+      "Software Development Engineer"
+    ]
+  },
+  "Amazon": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 202,
+    "median_salary_lpa": 9.7,
+    "mean_salary_lpa": 12.0,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 98.5,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer",
+      "Software Development Engineer I"
+    ]
+  },
+  "Amdocs": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 22,
+    "median_salary_lpa": 6.0,
+    "mean_salary_lpa": 6.7,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 17.0,
+    "top_locations": [
+      "Pune",
+      "New Delhi",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer In Test (SDET)"
+    ]
+  },
+  "Apollo Hospitals": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 1,
+    "median_salary_lpa": 6.0,
+    "mean_salary_lpa": 6.0,
+    "min_salary_lpa": 6.0,
+    "max_salary_lpa": 6.0,
+    "top_locations": [
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Test Engineer"
+    ]
+  },
+  "Ashok Leyland": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 4,
+    "median_salary_lpa": 4.5,
+    "mean_salary_lpa": 4.9,
+    "min_salary_lpa": 1.7,
+    "max_salary_lpa": 9.0,
+    "top_locations": [
+      "Bangalore",
+      "Chennai",
+      "Mumbai"
+    ],
+    "top_roles": [
+      "Software Development Engineer In Test (SDET)",
+      "Test Engineer",
+      "Test Engineer Contractor"
+    ]
+  },
+  "Atos": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 31,
+    "median_salary_lpa": 4.0,
+    "mean_salary_lpa": 5.4,
+    "min_salary_lpa": 1.2,
+    "max_salary_lpa": 16.5,
+    "top_locations": [
+      "Pune",
+      "Chennai",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Test Engineer",
+      "IOS Developer"
+    ]
+  },
+  "Axis Bank": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 2,
+    "median_salary_lpa": 4.4,
+    "mean_salary_lpa": 4.4,
+    "min_salary_lpa": 2.0,
+    "max_salary_lpa": 6.7,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Backend Process",
+      "Assistant Manager Backend"
+    ]
+  },
+  "BNY": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 25,
+    "median_salary_lpa": 8.0,
+    "mean_salary_lpa": 9.9,
+    "min_salary_lpa": 2.0,
+    "max_salary_lpa": 25.0,
+    "top_locations": [
+      "Chennai",
+      "Pune",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Senior Front End Developer",
+      "Software Development Engineer - Intern",
+      "Software Development Engineer"
+    ]
+  },
+  "Bajaj Finance": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 6,
+    "median_salary_lpa": 11.2,
+    "mean_salary_lpa": 10.2,
+    "min_salary_lpa": 5.0,
+    "max_salary_lpa": 14.0,
+    "top_locations": [
+      "Pune",
+      "Mumbai"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Android Developer",
+      "IOS Applications Developer - Intern"
+    ]
+  },
+  "Bajaj Finserv": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 9,
+    "median_salary_lpa": 9.0,
+    "mean_salary_lpa": 11.3,
+    "min_salary_lpa": 2.9,
+    "max_salary_lpa": 25.0,
+    "top_locations": [
+      "Pune"
+    ],
+    "top_roles": [
+      "Front End Developer",
+      "Software Development Engineer",
+      "Software Development Engineer - Intern"
+    ]
+  },
+  "Bharti Airtel": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 25,
+    "median_salary_lpa": 10.0,
+    "mean_salary_lpa": 10.5,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 24.0,
+    "top_locations": [
+      "New Delhi",
+      "Bangalore",
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer",
+      "Software Development Engineer - Intern"
+    ]
+  },
+  "Capgemini": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 119,
+    "median_salary_lpa": 4.0,
+    "mean_salary_lpa": 5.4,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 22.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Senior Software Development Engineer",
+      "Test Engineer"
+    ]
+  },
+  "Coforge": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 7,
+    "median_salary_lpa": 3.6,
+    "mean_salary_lpa": 6.4,
+    "min_salary_lpa": 2.8,
+    "max_salary_lpa": 13.0,
+    "top_locations": [
+      "New Delhi",
+      "Bangalore",
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Android Developer",
+      "Front End Developer"
+    ]
+  },
+  "Cognizant": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 144,
+    "median_salary_lpa": 5.0,
+    "mean_salary_lpa": 5.9,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 38.0,
+    "top_locations": [
+      "Hyderabad",
+      "Chennai",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer In Test (SDET)"
+    ]
+  },
+  "Cyient": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 7,
+    "median_salary_lpa": 3.7,
+    "mean_salary_lpa": 4.0,
+    "min_salary_lpa": 1.7,
+    "max_salary_lpa": 7.0,
+    "top_locations": [
+      "Hyderabad",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Senior Java Developer",
+      "Python Developer"
+    ]
+  },
+  "DMart": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 1,
+    "median_salary_lpa": 4.0,
+    "mean_salary_lpa": 4.0,
+    "min_salary_lpa": 4.0,
+    "max_salary_lpa": 4.0,
+    "top_locations": [
+      "Chennai"
+    ],
+    "top_roles": [
+      "Python Developer"
+    ]
+  },
+  "DXC Technology": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 40,
+    "median_salary_lpa": 5.1,
+    "mean_salary_lpa": 6.5,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 25.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Software Development Engineer In Test (SDET)",
+      "Java Developer"
+    ]
+  },
+  "Delhivery": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 10,
+    "median_salary_lpa": 8.0,
+    "mean_salary_lpa": 8.0,
+    "min_salary_lpa": 3.2,
+    "max_salary_lpa": 14.0,
+    "top_locations": [
+      "New Delhi",
+      "Hyderabad",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Android Developer",
+      "Backend Developer"
+    ]
+  },
+  "Deloitte": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 60,
+    "median_salary_lpa": 6.0,
+    "mean_salary_lpa": 7.2,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 20.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "New Delhi"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer In Test (SDET)"
+    ]
+  },
+  "EXL Service": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 3,
+    "median_salary_lpa": 2.8,
+    "mean_salary_lpa": 2.8,
+    "min_salary_lpa": 1.9,
+    "max_salary_lpa": 3.6,
+    "top_locations": [
+      "New Delhi",
+      "Pune"
+    ],
+    "top_roles": [
+      "Backend Process",
+      "Backend",
+      "Front End Developer"
+    ]
+  },
+  "Ericsson": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 15,
+    "median_salary_lpa": 6.0,
+    "mean_salary_lpa": 6.7,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 15.5,
+    "top_locations": [
+      "Bangalore",
+      "Chennai",
+      "New Delhi"
+    ],
+    "top_roles": [
+      "Senior Java Developer",
+      "Software Development Engineer - Intern",
+      "Senior Software Development Engineer"
+    ]
+  },
+  "FIS": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 66,
+    "median_salary_lpa": 8.0,
+    "mean_salary_lpa": 8.3,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 22.0,
+    "top_locations": [
+      "Bangalore",
+      "Pune",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Software Development Engineer (SDE)",
+      "Senior Software Development Engineer"
+    ]
+  },
+  "Firstsource Solutions": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 4,
+    "median_salary_lpa": 4.0,
+    "mean_salary_lpa": 3.8,
+    "min_salary_lpa": 2.0,
+    "max_salary_lpa": 5.0,
+    "top_locations": [
+      "Bangalore",
+      "Chennai"
+    ],
+    "top_roles": [
+      "SQL Server Database Administrator",
+      "Front End Developer",
+      "Test Engineer"
+    ]
+  },
+  "Flipkart": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 40,
+    "median_salary_lpa": 12.0,
+    "mean_salary_lpa": 13.4,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 46.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer",
+      "Software Development Engineer I"
+    ]
+  },
+  "Genpact": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 16,
+    "median_salary_lpa": 6.5,
+    "mean_salary_lpa": 6.7,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 14.0,
+    "top_locations": [
+      "Bangalore",
+      "New Delhi",
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Software Development Engineer (SDE)",
+      "Android Developer"
+    ]
+  },
+  "HCLTech": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 103,
+    "median_salary_lpa": 5.0,
+    "mean_salary_lpa": 6.9,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 68.0,
+    "top_locations": [
+      "Chennai",
+      "Hyderabad",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Test Engineer",
+      "Android Developer"
+    ]
+  },
+  "HDFC Bank": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 1,
+    "median_salary_lpa": 2.4,
+    "mean_salary_lpa": 2.4,
+    "min_salary_lpa": 2.4,
+    "max_salary_lpa": 2.4,
+    "top_locations": [
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Test Engineer"
+    ]
+  },
+  "Hetero": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 1,
+    "median_salary_lpa": 4.0,
+    "mean_salary_lpa": 4.0,
+    "min_salary_lpa": 4.0,
+    "max_salary_lpa": 4.0,
+    "top_locations": [
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Python Engineer"
+    ]
+  },
+  "Hexaware Technologies": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 19,
+    "median_salary_lpa": 5.0,
+    "mean_salary_lpa": 6.1,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 15.0,
+    "top_locations": [
+      "Chennai",
+      "Bangalore",
+      "Mumbai"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Senior Software Development Engineer",
+      "Software Development Engineer (SDE)"
+    ]
+  },
+  "IBM": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 141,
+    "median_salary_lpa": 5.0,
+    "mean_salary_lpa": 6.9,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 32.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Test Engineer",
+      "Software Development Engineer In Test (SDET)",
+      "Software Development Engineer"
+    ]
+  },
+  "ICICI Bank": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 7,
+    "median_salary_lpa": 2.3,
+    "mean_salary_lpa": 2.7,
+    "min_salary_lpa": 2.0,
+    "max_salary_lpa": 5.0,
+    "top_locations": [
+      "Chennai",
+      "Hyderabad",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Backend Developer",
+      "Front End Cashier",
+      "Backend Executive"
+    ]
+  },
+  "IDFC FIRST Bank": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 1,
+    "median_salary_lpa": 8.0,
+    "mean_salary_lpa": 8.0,
+    "min_salary_lpa": 8.0,
+    "max_salary_lpa": 8.0,
+    "top_locations": [
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Backend Developer"
+    ]
+  },
+  "IQVIA": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 15,
+    "median_salary_lpa": 7.0,
+    "mean_salary_lpa": 7.9,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 26.0,
+    "top_locations": [
+      "Bangalore",
+      "Kerala",
+      "New Delhi"
+    ],
+    "top_roles": [
+      "Database Administrator",
+      "Database Developer",
+      "Senior Database Administrator"
+    ]
+  },
+  "ITC": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 43,
+    "median_salary_lpa": 9.0,
+    "mean_salary_lpa": 8.9,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 22.0,
+    "top_locations": [
+      "Bangalore",
+      "New Delhi",
+      "Pune"
+    ],
+    "top_roles": [
+      "Android Developer",
+      "Front End Developer",
+      "Software Development Engineer (SDE)"
+    ]
+  },
+  "ITC Infotech": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 25,
+    "median_salary_lpa": 10.0,
+    "mean_salary_lpa": 10.2,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 22.0,
+    "top_locations": [
+      "Bangalore",
+      "New Delhi",
+      "Pune"
+    ],
+    "top_roles": [
+      "Android Developer",
+      "Front End Developer",
+      "Senior Android Developer"
+    ]
+  },
+  "Infosys": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 212,
+    "median_salary_lpa": 4.0,
+    "mean_salary_lpa": 4.9,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 23.0,
+    "top_locations": [
+      "Hyderabad",
+      "Bangalore",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer In Test (SDET)",
+      "Test Engineer",
+      "Android Developer"
+    ]
+  },
+  "Infosys BPM": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 9,
+    "median_salary_lpa": 3.2,
+    "mean_salary_lpa": 3.4,
+    "min_salary_lpa": 1.4,
+    "max_salary_lpa": 7.0,
+    "top_locations": [
+      "Hyderabad",
+      "Chennai",
+      "Pune"
+    ],
+    "top_roles": [
+      "Software Development Engineer In Test (SDET)",
+      "Test Engineer",
+      "Senior Software Engineer - Java Developer"
+    ]
+  },
+  "JLL": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 3,
+    "median_salary_lpa": 7.0,
+    "mean_salary_lpa": 6.5,
+    "min_salary_lpa": 1.4,
+    "max_salary_lpa": 11.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Database Administrator",
+      "Front End Developer",
+      "Java Developer"
+    ]
+  },
+  "JSW Steel": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 3,
+    "median_salary_lpa": 13.0,
+    "mean_salary_lpa": 11.3,
+    "min_salary_lpa": 4.0,
+    "max_salary_lpa": 17.0,
+    "top_locations": [
+      "Mumbai",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Software Development Engineer (SDE)",
+      "Web Developer"
+    ]
+  },
+  "JustDial": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 6,
+    "median_salary_lpa": 9.8,
+    "mean_salary_lpa": 9.1,
+    "min_salary_lpa": 2.0,
+    "max_salary_lpa": 16.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Mumbai"
+    ],
+    "top_roles": [
+      "Android Developer",
+      "Database Developer",
+      "Software Development Engineer"
+    ]
+  },
+  "LTIMindtree": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 60,
+    "median_salary_lpa": 4.2,
+    "mean_salary_lpa": 5.6,
+    "min_salary_lpa": 1.2,
+    "max_salary_lpa": 21.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer In Test (SDET)",
+      "Software Development Engineer",
+      "Senior Software Development Engineer"
+    ]
+  },
+  "Maruti Suzuki": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 1,
+    "median_salary_lpa": 3.0,
+    "mean_salary_lpa": 3.0,
+    "min_salary_lpa": 3.0,
+    "max_salary_lpa": 3.0,
+    "top_locations": [
+      "New Delhi"
+    ],
+    "top_roles": [
+      "Software Development Engineer"
+    ]
+  },
+  "Mphasis": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 39,
+    "median_salary_lpa": 5.0,
+    "mean_salary_lpa": 6.1,
+    "min_salary_lpa": 1.4,
+    "max_salary_lpa": 20.4,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Senior Java Developer",
+      "Java Software Developer"
+    ]
+  },
+  "NTT DATA": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 30,
+    "median_salary_lpa": 4.0,
+    "mean_salary_lpa": 6.0,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 18.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "New Delhi"
+    ],
+    "top_roles": [
+      "Senior Software Development Engineer",
+      "Software Development Engineer",
+      "Test Engineer"
+    ]
+  },
+  "Nagarro": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 11,
+    "median_salary_lpa": 5.0,
+    "mean_salary_lpa": 7.5,
+    "min_salary_lpa": 1.6,
+    "max_salary_lpa": 21.0,
+    "top_locations": [
+      "New Delhi",
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Backend Developer",
+      "IOS Developer",
+      "Senior IOS Developer"
+    ]
+  },
+  "Omega Healthcare": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 2,
+    "median_salary_lpa": 12.0,
+    "mean_salary_lpa": 12.0,
+    "min_salary_lpa": 10.0,
+    "max_salary_lpa": 14.0,
+    "top_locations": [
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Senior Database Administrator",
+      "Senior Database Administrator (Database Administrator)"
+    ]
+  },
+  "Optum Global Solutions": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 11,
+    "median_salary_lpa": 8.0,
+    "mean_salary_lpa": 7.0,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 12.0,
+    "top_locations": [
+      "Hyderabad",
+      "New Delhi"
+    ],
+    "top_roles": [
+      "Backend Developer",
+      "Backend Process",
+      "Software Engineer - Java Developer"
+    ]
+  },
+  "Oracle": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 68,
+    "median_salary_lpa": 9.8,
+    "mean_salary_lpa": 9.8,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 33.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Pune"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer",
+      "Software Development Engineer In Test (SDET)"
+    ]
+  },
+  "Paytm": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 53,
+    "median_salary_lpa": 8.0,
+    "mean_salary_lpa": 10.4,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 32.0,
+    "top_locations": [
+      "New Delhi",
+      "Bangalore",
+      "Pune"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer",
+      "Backend Developer"
+    ]
+  },
+  "Persistent Systems": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 24,
+    "median_salary_lpa": 6.0,
+    "mean_salary_lpa": 6.8,
+    "min_salary_lpa": 1.2,
+    "max_salary_lpa": 16.0,
+    "top_locations": [
+      "Pune",
+      "Hyderabad",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Software Development Engineer In Test (SDET)",
+      "Software Development Engineer",
+      "Software Development Engineer II"
+    ]
+  },
+  "PolicyBazaar": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 4,
+    "median_salary_lpa": 6.5,
+    "mean_salary_lpa": 8.8,
+    "min_salary_lpa": 2.3,
+    "max_salary_lpa": 20.0,
+    "top_locations": [
+      "New Delhi"
+    ],
+    "top_roles": [
+      "Android Developer - Contractor",
+      "Front End Developer",
+      "Software Development Engineer - Intern"
+    ]
+  },
+  "PwC": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 8,
+    "median_salary_lpa": 4.5,
+    "mean_salary_lpa": 4.5,
+    "min_salary_lpa": 1.4,
+    "max_salary_lpa": 8.0,
+    "top_locations": [
+      "Bangalore",
+      "Kerala"
+    ],
+    "top_roles": [
+      "Android Developer",
+      "Database Administrator (Database Administrator)",
+      "Front End Developer"
+    ]
+  },
+  "Quess": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 5,
+    "median_salary_lpa": 11.0,
+    "mean_salary_lpa": 11.5,
+    "min_salary_lpa": 2.4,
+    "max_salary_lpa": 25.0,
+    "top_locations": [
+      "Bangalore",
+      "Pune",
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Android Developer - Contractor",
+      "IOS Engineer - Contractor",
+      "Python Developer Contractor"
+    ]
+  },
+  "Randstad": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 6,
+    "median_salary_lpa": 3.5,
+    "mean_salary_lpa": 4.7,
+    "min_salary_lpa": 2.0,
+    "max_salary_lpa": 12.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Database Administrator (Database Administrator)",
+      "Front End Developer",
+      "Python Developer"
+    ]
+  },
+  "Reliance Industries": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 9,
+    "median_salary_lpa": 5.0,
+    "mean_salary_lpa": 8.1,
+    "min_salary_lpa": 2.0,
+    "max_salary_lpa": 27.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Android Developer",
+      "Backend Developer"
+    ]
+  },
+  "Samsung": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 64,
+    "median_salary_lpa": 10.0,
+    "mean_salary_lpa": 9.8,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 34.0,
+    "top_locations": [
+      "New Delhi",
+      "Bangalore",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer",
+      "Software Development Engineer In Test (SDET)"
+    ]
+  },
+  "Schneider Electric": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 6,
+    "median_salary_lpa": 5.5,
+    "mean_salary_lpa": 6.3,
+    "min_salary_lpa": 1.8,
+    "max_salary_lpa": 15.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Test Engineer - Contractor",
+      "Test Engineer",
+      "Mobile Applications Developer"
+    ]
+  },
+  "Standard Chartered": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 19,
+    "median_salary_lpa": 7.7,
+    "mean_salary_lpa": 8.7,
+    "min_salary_lpa": 2.0,
+    "max_salary_lpa": 18.0,
+    "top_locations": [
+      "Chennai",
+      "Bangalore",
+      "Pune"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Senior Java Developer",
+      "Software Development Engineer"
+    ]
+  },
+  "Swiggy": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 20,
+    "median_salary_lpa": 17.5,
+    "mean_salary_lpa": 16.5,
+    "min_salary_lpa": 2.0,
+    "max_salary_lpa": 36.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer I",
+      "Software Development Engineer (SDE1)"
+    ]
+  },
+  "TCS": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 301,
+    "median_salary_lpa": 4.0,
+    "mean_salary_lpa": 5.1,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 80.0,
+    "top_locations": [
+      "Hyderabad",
+      "Bangalore",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer In Test (SDET)",
+      "Software Development Engineer"
+    ]
+  },
+  "TP": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 45,
+    "median_salary_lpa": 4.0,
+    "mean_salary_lpa": 7.0,
+    "min_salary_lpa": 1.1,
+    "max_salary_lpa": 33.0,
+    "top_locations": [
+      "New Delhi",
+      "Bangalore",
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Android Developer",
+      "Software Development Engineer - Intern",
+      "Front End Developer"
+    ]
+  },
+  "TVS Motor": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 2,
+    "median_salary_lpa": 3.0,
+    "mean_salary_lpa": 3.0,
+    "min_salary_lpa": 3.0,
+    "max_salary_lpa": 3.0,
+    "top_locations": [
+      "Hyderabad",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE) - Intern",
+      "Test Engineer"
+    ]
+  },
+  "Tata Motors": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 1,
+    "median_salary_lpa": 1.9,
+    "mean_salary_lpa": 1.9,
+    "min_salary_lpa": 1.9,
+    "max_salary_lpa": 1.9,
+    "top_locations": [
+      "Pune"
+    ],
+    "top_roles": [
+      "Backend Process"
+    ]
+  },
+  "Tech Mahindra": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 77,
+    "median_salary_lpa": 5.0,
+    "mean_salary_lpa": 5.5,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 24.0,
+    "top_locations": [
+      "Hyderabad",
+      "Bangalore",
+      "New Delhi"
+    ],
+    "top_roles": [
+      "Software Development Engineer",
+      "Senior IOS Developer",
+      "Android Developer"
+    ]
+  },
+  "UST": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 139,
+    "median_salary_lpa": 6.0,
+    "mean_salary_lpa": 8.3,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 96.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Android Developer",
+      "Software Development Engineer",
+      "Software Development Engineer (SDE)"
+    ]
+  },
+  "Varun Beverages": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 1,
+    "median_salary_lpa": 6.0,
+    "mean_salary_lpa": 6.0,
+    "min_salary_lpa": 6.0,
+    "max_salary_lpa": 6.0,
+    "top_locations": [
+      "Madhya Pradesh"
+    ],
+    "top_roles": [
+      "Software Development Engineer"
+    ]
+  },
+  "WNS": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 12,
+    "median_salary_lpa": 5.6,
+    "mean_salary_lpa": 5.6,
+    "min_salary_lpa": 1.4,
+    "max_salary_lpa": 10.0,
+    "top_locations": [
+      "New Delhi",
+      "Pune",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Android Developer",
+      "Backend Developer",
+      "Junior Backend Developer"
+    ]
+  },
+  "Wells Fargo": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 19,
+    "median_salary_lpa": 11.0,
+    "mean_salary_lpa": 13.1,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 46.0,
+    "top_locations": [
+      "Hyderabad",
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Software Development Engineer (SDE)",
+      "Software Development Engineer In Test (SDET)",
+      "Software Development Engineer"
+    ]
+  },
+  "Wipro": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 184,
+    "median_salary_lpa": 4.0,
+    "mean_salary_lpa": 5.5,
+    "min_salary_lpa": 1.0,
+    "max_salary_lpa": 21.0,
+    "top_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Chennai"
+    ],
+    "top_roles": [
+      "Test Engineer",
+      "Software Development Engineer (SDE)",
+      "Senior Software Development Engineer"
+    ]
+  },
+  "Yes Bank": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 12,
+    "median_salary_lpa": 5.2,
+    "mean_salary_lpa": 4.8,
+    "min_salary_lpa": 1.2,
+    "max_salary_lpa": 9.0,
+    "top_locations": [
+      "Bangalore",
+      "Chennai",
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Python Developer",
+      "Software Development Engineer",
+      "Software Development Engineer (SDE)"
+    ]
+  },
+  "iEnergizer": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 2,
+    "median_salary_lpa": 3.8,
+    "mean_salary_lpa": 3.8,
+    "min_salary_lpa": 3.0,
+    "max_salary_lpa": 4.6,
+    "top_locations": [
+      "Chennai",
+      "Hyderabad"
+    ],
+    "top_roles": [
+      "Backend Process",
+      "Java Developer"
+    ]
+  },
+  "vivo": {
+    "source": "Glassdoor India (Kaggle Research Dataset)",
+    "sample_count": 1,
+    "median_salary_lpa": 3.2,
+    "mean_salary_lpa": 3.2,
+    "min_salary_lpa": 3.2,
+    "max_salary_lpa": 3.2,
+    "top_locations": [
+      "Bangalore"
+    ],
+    "top_roles": [
+      "Mobile Service Manager"
+    ]
+  }
+}
