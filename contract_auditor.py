@@ -91,6 +91,145 @@ def audit_offer_contract(
     paper_inflation_gap_rupees = ctc_rupees - guaranteed_year1_cash_rupees
     paper_inflation_gap_pct = round((paper_inflation_gap_rupees / ctc_rupees) * 100.0, 1)
 
+    # 6. Structured Risk Findings for FinTech Reporting
+    structured_risks = []
+
+    # Finding 1: Gratuity
+    if gratuity_included and expected_tenure_years < 5.0:
+        structured_risks.append({
+            "category": "Statutory Deduction",
+            "title": "Payment of Gratuity Act 1972 Forfeiture",
+            "severity": "High Risk",
+            "severity_level": "danger",
+            "why_it_matters": (
+                "Section 4(1) of the Act requires 5 years of continuous service to vest. "
+                "Employers provision 4.81% of your basic pay inside your quoted CTC, but exiting "
+                f"at {expected_tenure_years} years forfeits 100% of this accrued corpus."
+            ),
+            "financial_impact": f"₹ {int(annual_gratuity_rupees):,}/year uncollected (₹ 0 received at exit)",
+            "verification_step": "Review the Annexure: confirm if gratuity is deducted inside Cost to Company or treated as an extra-CTC statutory benefit.",
+        })
+    elif gratuity_included:
+        structured_risks.append({
+            "category": "Statutory Deduction",
+            "title": "Gratuity Eligible (5-Year Vesting Reached)",
+            "severity": "Vested / Low Risk",
+            "severity_level": "success",
+            "why_it_matters": f"At an expected tenure of {expected_tenure_years} years, you cross the 5-year statutory threshold to claim accumulated gratuity.",
+            "financial_impact": f"₹ {int(annual_gratuity_rupees * expected_tenure_years):,} estimated corpus receivable upon departure",
+            "verification_step": "Verify gratuity calculation formula in employment agreement matches Section 4(2) of the Act (15/26 days per completed year).",
+        })
+    else:
+        structured_risks.append({
+            "category": "Statutory Deduction",
+            "title": "Clean Gratuity Structure",
+            "severity": "Clean",
+            "severity_level": "success",
+            "why_it_matters": "Gratuity is not deducted from employee monthly CTC.",
+            "financial_impact": "₹ 0 deducted from offered cash",
+            "verification_step": "Confirm no phantom gratuity line item exists in the detailed salary annexure.",
+        })
+
+    # Finding 2: Variable Pay Timing
+    if variable_freq.lower() == "annual" and variable_pct > 0:
+        structured_risks.append({
+            "category": "Variable Compensation",
+            "title": "Annual Bonus Resignation Lock",
+            "severity": "High Risk",
+            "severity_level": "danger",
+            "why_it_matters": (
+                f"Your {variable_pct}% variable pay is disbursed on an annual cycle. In most Indian tech firms, "
+                "submitting a resignation letter prior to the formal bonus disbursement date results in 100% forfeiture of accrued bonus."
+            ),
+            "financial_impact": f"₹ {int(variable_rupees):,} at risk upon resignation timing",
+            "verification_step": "Check the Employee Handbook clause: does bonus entitlement require 'active employee not serving notice on payout date'?",
+        })
+    elif variable_pct > 0:
+        structured_risks.append({
+            "category": "Variable Compensation",
+            "title": "Quarterly Variable Distribution",
+            "severity": "Moderate Caution",
+            "severity_level": "warning",
+            "why_it_matters": "Quarterly payouts significantly reduce lock-in risk, limiting forfeiture exposure to at most 1 quarter upon exit.",
+            "financial_impact": f"₹ {int(variable_rupees / 4.0):,} maximum exposure per quarter",
+            "verification_step": "Verify performance gate: is payout tied strictly to company revenue targets, individual KPIs, or manager discretion?",
+        })
+    else:
+        structured_risks.append({
+            "category": "Variable Compensation",
+            "title": "100% Guaranteed Base Pay",
+            "severity": "Guaranteed",
+            "severity_level": "success",
+            "why_it_matters": "Zero variable pay deduction. 100% of CTC is fixed cash flow.",
+            "financial_impact": "₹ 0 at risk of appraisal forfeiture",
+            "verification_step": "Confirm no hidden company billability or client-allocation contingency clauses in the appointment letter.",
+        })
+
+    # Finding 3: Joining Bonus Clawback
+    if joining_bonus_lpa > 0 and clawback_months >= 12:
+        bonus_rupees = joining_bonus_lpa * 100000.0
+        est_tds_paid = bonus_rupees * 0.312
+        net_bonus_inhand = bonus_rupees - est_tds_paid
+        structured_risks.append({
+            "category": "Sign-on Terms",
+            "title": "Section 89(1) Tax Clawback Deficit",
+            "severity": "High Risk",
+            "severity_level": "danger",
+            "why_it_matters": (
+                f"You receive ₹ {int(bonus_rupees):,} gross (~₹ {int(net_bonus_inhand):,} in bank after TDS). "
+                f"Exiting within {clawback_months} months requires repaying the full GROSS amount out-of-pocket, "
+                "leaving you short until claiming relief under Section 89(1) Form 10E in the next financial year."
+            ),
+            "financial_impact": f"₹ {int(est_tds_paid):,} out-of-pocket tax cash flow deficit",
+            "verification_step": "Request a pro-rata clawback clause (e.g. 1/12th amortized per completed month) rather than an all-or-nothing cliff.",
+        })
+    elif joining_bonus_lpa > 0:
+        bonus_rupees = joining_bonus_lpa * 100000.0
+        structured_risks.append({
+            "category": "Sign-on Terms",
+            "title": "Short Sign-on Clawback Window",
+            "severity": "Moderate Caution",
+            "severity_level": "warning",
+            "why_it_matters": f"Clawback is limited to {clawback_months} months.",
+            "financial_impact": f"₹ {int(bonus_rupees):,} gross repayment if departing before {clawback_months} months",
+            "verification_step": "Verify repayment terms: check if net or gross recovery is mandated.",
+        })
+
+    # Finding 4: Notice Period
+    if notice_period_days >= 90:
+        structured_risks.append({
+            "category": "Exit Mobility",
+            "title": "90-Day Notice Lock & Buyout Discretion",
+            "severity": "High Risk",
+            "severity_level": "danger",
+            "why_it_matters": (
+                "Discretionary buyout power rests entirely with the employer. Indian IT Resource Management desks "
+                "frequently decline buyout requests, causing prospective employers to rescind offers demanding 30-45 day joiners."
+            ),
+            "financial_impact": "Limits lateral mobility and makes counter-offers harder to leverage",
+            "verification_step": "Confirm written buyout policy and ask if notice buyout is permitted during project release.",
+        })
+    elif notice_period_days >= 60:
+        structured_risks.append({
+            "category": "Exit Mobility",
+            "title": "60-Day Notice Period",
+            "severity": "Moderate Caution",
+            "severity_level": "warning",
+            "why_it_matters": "Standard mid-tier notice period. Buyouts are usually approved subject to team handover sign-off.",
+            "financial_impact": "Manageable market transition window",
+            "verification_step": "Confirm whether garden leave or buyout is standard upon voluntary exit.",
+        })
+    else:
+        structured_risks.append({
+            "category": "Exit Mobility",
+            "title": "Agile Notice Period (30 Days)",
+            "severity": "Agile Mobility",
+            "severity_level": "success",
+            "why_it_matters": "30-day notice allows rapid lateral hiring. High market mobility.",
+            "financial_impact": "Negligible exit friction",
+            "verification_step": "Confirm 30-day notice applies equally to employee and employer.",
+        })
+
     return {
         "quoted_ctc_lpa": float(ctc_lpa),
         "fixed_ctc_lpa": round(fixed_ctc_rupees / 100000.0, 2),
@@ -104,4 +243,5 @@ def audit_offer_contract(
         "variable_timing_flag": variable_timing_flag,
         "clawback_flag": clawback_flag,
         "notice_flag": notice_flag,
+        "structured_risks": structured_risks,
     }
