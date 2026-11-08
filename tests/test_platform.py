@@ -212,3 +212,55 @@ def test_reddit_nlp_extraction():
     assert flags["notice_period_days"] == 90
     assert flags["bench_risk"] in ["Moderate", "Severe"]
     assert flags["red_flag_score"] >= 35
+
+
+def test_community_notes_moderation_and_storage():
+    """Verify community offer notes moderation rules, storage, and retrieval."""
+    import community_notes as cn
+
+    # 1. Moderation rules
+    ok, err = cn.moderate_note("Too short")
+    assert not ok and "at least 10" in err
+
+    ok, err = cn.moderate_note("x" * 281)
+    assert not ok and "exceeds 280" in err
+
+    ok, err = cn.moderate_note("Check this out at http://scam.com/jobs")
+    assert not ok and "links" in err.lower()
+
+    ok, err = cn.moderate_note("Email me at candidate@gmail.com for details")
+    assert not ok and "email" in err.lower()
+
+    ok, err = cn.moderate_note("Call my phone at 9876543210 for referral")
+    assert not ok and "phone" in err.lower()
+
+    ok, err = cn.moderate_note("Toxic culture caused by manager named Sharma")
+    assert not ok and "naming individual" in err.lower()
+
+    valid_text = "Variable pay was paid at 75% last year. Notice period is strictly 90 days."
+    ok, err = cn.moderate_note(valid_text)
+    assert ok and err == ""
+
+    # 2. Insertion and Retrieval
+    test_comp = "TestCoAutomation"
+    ok, msg = cn.add_note(
+        company=test_comp,
+        role_family="Software & Systems Engineering",
+        note_text=valid_text,
+        yoe=3.0,
+        ctc_lpa=15.0,
+        author_tag="Test Offer",
+    )
+    assert ok, f"Expected note insertion to succeed: {msg}"
+
+    notes = cn.get_notes(test_comp)
+    assert len(notes) >= 1
+    assert notes[0]["note_text"] == valid_text
+    assert notes[0]["author_tag"] == "Test Offer"
+
+    # Clean up test row
+    conn = cn.get_connection()
+    with conn:
+        conn.execute("DELETE FROM offer_notes WHERE company = ?", (test_comp,))
+    conn.close()
+

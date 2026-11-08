@@ -5,6 +5,8 @@ Single-screen Offer Evaluator flow:
   2. Peer percentile with 80% conformal interval & P25-P75 market spread
   3. Three concrete counter-offer numbers
   4. One-line employer red-flag radar (notice period / bench / PIP)
+  5. Community offer intelligence notes & lightweight contribution flow
+  6. 1-Click negotiation counter-offer email generator & WhatsApp share card
 
 Hidden surfaces retained from v1 (Tabs 2-4, RAG copilot, culture x-ray)
 are gated behind os.getenv("DEV_MODE") == "1". See RETROSPECTIVE.md.
@@ -19,6 +21,8 @@ import joblib
 import numpy as np
 import pandas as pd
 import streamlit as st
+
+import community_notes as cn
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 _BASE = Path(__file__).resolve().parent
@@ -138,10 +142,30 @@ html, body, [class*="css"] {
     border-radius: 8px;
     padding: 0.85rem 1rem;
     margin-top: 0.5rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
     font-size: 0.88rem;
     color: #9a3412;
     line-height: 1.45;
+}
+
+/* Community Intel Card */
+.intel-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid #6366f1;
+}
+.intel-text {
+    font-size: 0.88rem;
+    color: #1e293b;
+    line-height: 1.4;
+}
+.intel-meta {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 0.35rem;
 }
 
 /* Badges */
@@ -221,6 +245,9 @@ def load_assets():
     rd_file = _BASE / "reddit_benchmarks.json"
     reddit_benchmarks = json.load(open(rd_file, "r", encoding="utf-8")) if rd_file.exists() else {}
 
+    # Initialize lightweight SQLite community notes
+    cn.init_db()
+
     return pipeline, metadata, df, company_insights, h1b_benchmarks, glassdoor_benchmarks, reddit_benchmarks
 
 
@@ -285,14 +312,6 @@ def categorize_job(title: str):
         role_family = "General Corporate & Services"
 
     return role_family, seniority
-
-
-def get_tree_predictions(pl, input_df):
-    """Extract individual tree predictions from the Random Forest component in VotingRegressor."""
-    preprocessed = pl.named_steps["preprocessor"].transform(input_df)
-    voting = pl.named_steps["regressor"]
-    rf = voting.named_estimators_["rf"]
-    return np.array([tree.predict(preprocessed)[0] for tree in rf.estimators_])
 
 
 def calculate_take_home(ctc_lpa):
@@ -399,7 +418,6 @@ industry = comp_info.get("industry", "IT Services & Consulting")
 rating = float(comp_info.get("rating", 3.8))
 
 # ── 6. MODEL INFERENCE & OUTPUTS ─────────────────────────────────────────────
-# 1. Feature DF for pipeline
 eval_input_df = pd.DataFrame(
     [
         {
@@ -566,7 +584,6 @@ with col_cnt3:
 # ═══════════════════════════════════════════════════════════════════════════════
 # OUTPUT 4: RED-FLAG LINE PER EMPLOYER FROM REDDIT LAYER (1 LINE MAX)
 # ═══════════════════════════════════════════════════════════════════════════════
-# Match company in reddit_benchmarks
 rd_match_key = None
 for k in reddit_benchmarks.keys():
     if k.lower() == input_company.strip().lower():
@@ -586,7 +603,104 @@ else:
 st.markdown(f'<div class="red-flag-box">{rf_line}</div>', unsafe_allow_html=True)
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# OUTPUT 5: COMMUNITY OFFER INTEL (LIGHTWEIGHT THREAD & SUBMISSION)
+# ═══════════════════════════════════════════════════════════════════════════════
+target_comp_name = comp_match_key if comp_match_key else input_company.strip()
+recent_notes = cn.get_notes(target_comp_name, detected_family, limit=3)
+
+st.markdown(f'<div class="card-caption">5. Community Offer Intel & Terms ({target_comp_name})</div>', unsafe_allow_html=True)
+
+if recent_notes:
+    for nt in recent_notes:
+        st.markdown(
+            f"""
+            <div class="intel-card">
+                <div class="intel-text">"{nt['note_text']}"</div>
+                <div class="intel-meta">🏷️ <strong>{nt['author_tag']}</strong> · {nt['role_family']} · Added {nt['created_at']}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+else:
+    st.caption("No specific community notes for this employer yet. Add the first one below!")
+
+with st.expander("➕ Add an Offer Note / Negotiation Intel (No Signup Required)"):
+    st.caption("Share verified terms that offer letters hide: variable payout reality, notice period enforcement, or joining bonus clawbacks.")
+    with st.form("add_offer_note_form", clear_on_submit=True):
+        note_text_in = st.text_area(
+            "Offer Details / Intel (10–280 chars):",
+            placeholder="e.g. Variable bonus paid out at 70% of target last year. Notice period is strictly 90 days with zero buyout approvals.",
+            max_chars=280,
+        )
+        tag_col1, tag_col2 = st.columns([1.5, 1])
+        with tag_col1:
+            note_tag_in = st.selectbox(
+                "Your Context:",
+                ["Verified Offer Letter", "Current Employee", "Ex-Employee", "Interview Loop"],
+            )
+        with tag_col2:
+            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+            submit_note_btn = st.form_submit_button("Post Intel 🚀", use_container_width=True)
+
+        if submit_note_btn:
+            ok, msg = cn.add_note(
+                company=target_comp_name,
+                role_family=detected_family,
+                note_text=note_text_in,
+                yoe=float(input_exp),
+                ctc_lpa=float(input_ctc),
+                author_tag=note_tag_in,
+            )
+            if ok:
+                st.success(msg)
+                st.rerun()
+            else:
+                st.error(msg)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# OUTPUT 6: YC-LEVEL TOOLKIT: NEGOTIATION EMAIL SCRIPT & WHATSAPP SHARE CARD
+# ═══════════════════════════════════════════════════════════════════════════════
+st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+
+tool_tab1, tool_tab2 = st.tabs(["📝 1-Click Counter Email", "📤 WhatsApp / Mentor Share Card"])
+
+with tool_tab1:
+    st.caption("Copy-paste professional negotiation email formatted with your evaluated figures:")
+    email_draft = f"""Subject: Regarding the offer for {input_role} - {input_company}
+
+Dear Hiring Team,
+
+Thank you very much for extending the offer for the {input_role} role at {target_comp_name}. I am genuinely excited about the team's roadmap and the opportunity to contribute my {input_exp} years of experience in {detected_family}.
+
+I reviewed the proposed package of ₹ {float(input_ctc):.1f} LPA CTC (with a {input_var_pct}% variable component). Based on my market research, current domain benchmarks for {detected_family} ({detected_seniority}), and comparable lateral compensation, I would like to explore if we can align the total compensation closer to ₹ {c_targ:.1f} LPA. 
+
+Alternatively, if the total CTC is constrained by internal banding, I would be very open to adjusting the fixed-to-variable ratio or exploring a signing bonus to bridge the gap and secure a guaranteed monthly take-home closer to market expectation.
+
+I am enthusiastic about joining {target_comp_name} and would welcome a brief discussion to finalize terms.
+
+Best regards,
+[Your Name]"""
+    st.code(email_draft, language="markdown")
+
+with tool_tab2:
+    st.caption("Formatted summary to send to a mentor, peer, or group chat for a second opinion:")
+    whatsapp_card = f"""📋 *Offer Review Request — {target_comp_name}*
+• *Role:* {input_role} ({input_exp} YoE)
+• *Offered CTC:* ₹{float(input_ctc):.1f} LPA (Variable: {input_var_pct}%)
+• *Net Monthly In-Hand:* ₹{int(low_mo/1000)}k – ₹{int(high_mo/1000)}k / mo (Budget 2024 New Tax Regime)
+• *Market Standing:* {percentile}th percentile for {detected_family}
+• *80% Conformal Range:* ₹{conf_low}L – ₹{conf_high}L
+• *Market Target Counter:* ₹{c_targ:.1f} LPA (+18%)
+• *Contract Terms:* {rf_line.replace('<strong>', '').replace('</strong>', '')}
+
+What do you think of these numbers?"""
+    st.code(whatsapp_card, language="markdown")
+
+
 # ── FOOTER & INDUSTRY CONTEXT ─────────────────────────────────────────────────
+st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
 st.caption(
     "💡 **Looking for aggregate company-wide medians across 1.5M records?** "
     "Consult [Weekday's Salary Directory](https://www.weekday.works/salaries). "

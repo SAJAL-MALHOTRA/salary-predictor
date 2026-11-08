@@ -6,7 +6,7 @@
 ![Scikit-Learn](https://img.shields.io/badge/scikit--learn-Voting%20Ensemble-F7931E?logo=scikit-learn&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-A portfolio project built to evaluate Indian tech job offers during candidate decision windows. Given an employer, job title, years of experience, offered CTC, and variable pay percentage, the tool computes monthly in-hand bank credit under India's New Tax Regime (Budget 2024), places the offer against a cross-validated peer distribution with finite-sample conformal prediction intervals, provides three concrete negotiation counter-figures, and surfaces employer contract risks (such as 90-day notice periods and bench policies) extracted from developer discussions on `r/developersIndia`.
+A portfolio project built to evaluate Indian tech job offers during candidate decision windows. Given an employer, job title, years of experience, offered CTC, and variable pay percentage, the tool computes monthly in-hand bank credit under India's New Tax Regime (Budget 2024), places the offer against a cross-validated peer distribution with finite-sample conformal prediction intervals, provides three concrete negotiation counter-figures, surfaces employer contract risks (such as 90-day notice periods and bench policies) from `r/developersIndia`, indexes crowdsourced offer-structure notes, and generates 1-click negotiation counter-emails and WhatsApp share cards.
 
 ---
 
@@ -132,7 +132,7 @@ cd salary-predictor
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Run automated verification suite (8 tests)
+# 3. Run automated verification suite (9 tests)
 pytest tests/ -v
 
 # 4. Launch single-screen Offer Evaluator
