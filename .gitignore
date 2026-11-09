@@ -14,3 +14,8 @@ synthetic_salaries.csv
 salary_rf_model.pkl
 model_columns.pkl
 ambitionbox_salaries_cleaned.csv
+
+# Frontend artifacts
+web/node_modules/
+web/dist/
+
